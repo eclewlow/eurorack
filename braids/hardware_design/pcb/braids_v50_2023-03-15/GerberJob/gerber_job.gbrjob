@@ -1,0 +1,24 @@
+{
+    "Header": {
+        "Comment": "All values are metric (mm)",
+        "CreationDate": "2023-03-15T21:32:09Z",
+        "GenerationSoftware": {
+            "Application": "EAGLE",
+            "Vendor": "Autodesk",
+            "Version": "9.6.2"
+        },
+        "Part": "Single"
+    },
+    "Overall": {
+        "BoardThickness": 1.57,
+        "LayerNumber": 2,
+        "Name": {
+            "ProjectId": "braids_v50"
+        },
+        "Owner": "EUGENE CLEWLOW <eugene.clewlow@gmail.com>",
+        "Size": {
+            "X": 78.72,
+            "Y": 106.68
+        }
+    }
+}

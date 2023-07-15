@@ -76,7 +76,7 @@ void TestDSP() {
   size_t duration = 19;
 
   FILE* fp_out = fopen("clouds.wav", "wb");
-  FILE* fp_in = fopen("audio_samples/kettel_32k.wav", "rb");
+  FILE* fp_in = fopen("plaits_fm_engine.wav", "rb");
 
   size_t remaining_samples = kSampleRate * duration;
   write_wav_header(fp_out, remaining_samples, 2);
@@ -98,7 +98,7 @@ void TestDSP() {
   
   size_t block_counter = 0;
   float phase_ = 0.0f;
-  bool synthetic = true;
+  bool synthetic = false;
   processor.Prepare();
   float pot_noise = 0.0f;
   while (remaining_samples) {
@@ -159,9 +159,9 @@ void TestGrainSize() {
       for (int32_t _pi = 0; _pi < 3; _pi++) {
   size_t duration = 19;
   char name[80];
-  sprintf(name, "clouds_%d%d%d.wav", _p, _s, _pi);
+  snprintf(name, 80, "clouds_%d%d%d.wav", _p, _s, _pi);
   FILE* fp_out = fopen(name, "wb");
-  FILE* fp_in = fopen("audio_samples/kettel_32k.wav", "rb");
+  FILE* fp_in = fopen("plaits_fm_engine.wav", "rb");
 
   size_t remaining_samples = kSampleRate * duration;
   write_wav_header(fp_out, remaining_samples, 2);

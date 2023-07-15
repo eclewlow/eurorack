@@ -299,8 +299,10 @@ void TestFMEngine() {
   for (size_t i = 0; i < kSampleRate * 80; i += kAudioBlockSize) {
     float out[kAudioBlockSize];
     float aux[kAudioBlockSize];
-    p.timbre = wav_writer.triangle(11);
-    p.harmonics = /*wav_writer.triangle(14)*/ 0.75f;
+    // p.timbre = wav_writer.triangle(11);
+    p.timbre = 0.5;
+    p.harmonics = wav_writer.triangle(11);
+    // p.harmonics = 0.75f;
     p.morph = /*1.0f - wav_writer.triangle(19)*/ 0.0f;
     bool already_enveloped;
     e.Render(p, out, aux, kAudioBlockSize, &already_enveloped);
@@ -449,7 +451,7 @@ void GenerateStringTuningData() {
     WavWriter wav_writer(1, kSampleRate, 4);
     
     char file_name[80];
-    sprintf(file_name, "string_%02d.wav", pass);
+    snprintf(file_name, 80, "string_%02d.wav", pass);
     wav_writer.Open(file_name);
     
     BufferAllocator allocator(ram_block, 16384);
@@ -502,7 +504,7 @@ void GenerateModalTuningData() {
     WavWriter wav_writer(1, kSampleRate, 4);
     
     char file_name[80];
-    sprintf(file_name, "modal_%02d.wav", pass);
+    snprintf(file_name, 80, "modal_%02d.wav", pass);
     wav_writer.Open(file_name);
     
     BufferAllocator allocator(ram_block, 16384);
@@ -1029,7 +1031,7 @@ int main(void) {
 
   // TestAdditiveEngine();
   // TestChordEngine();
-  TestFMEngine();
+  // TestFMEngine();
   // TestGrainEngine();
   // TestModalEngine();
   // TestStringEngine();
@@ -1037,7 +1039,7 @@ int main(void) {
   // TestParticleEngine();
   // TestSpeechEngine();
   // TestSwarmEngine();
-  // TestVirtualAnalogEngine();
+  TestVirtualAnalogEngine();
   // TestWaveshapingEngine();
   // TestWavetableEngine();
   // TestBassDrumEngine();
