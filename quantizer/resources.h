@@ -42,7 +42,7 @@ namespace quantizer {
 
 typedef uint8_t ResourceId;
 
-extern const float* lookup_table_table[];
+extern const float* const lookup_table_table[];
 
 extern const float lut_pow2[];
 #define LUT_POW2 0

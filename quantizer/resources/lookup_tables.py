@@ -41,8 +41,13 @@ Grain window.
 
 size = 4096
 t = numpy.arange(0, size)
-lookup_tables.append(('pow2', numpy.power(2, t * 2.0 / 4095.0)))
+lookup_tables.append(('pow2', numpy.power(2, t * 6.0 / 4095.0)))
 
+
+for i in range(0, 4095):
+  chaos = 4095 - i
+  factor = pow(2, 6*chaos / 4095.0)
+  print(2047 / (factor -0.8))
 """----------------------------------------------------------------------------
 Cosine table.
 ----------------------------------------------------------------------------"""

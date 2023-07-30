@@ -34,6 +34,7 @@
 namespace quantizer {
 
 const uint8_t kNumAdcChannels = 4;
+const uint8_t kHistoryLength = 8;
 
 class InternalAdc {
  public:
@@ -43,10 +44,22 @@ class InternalAdc {
 
   void Init();
   
-  inline uint16_t value(uint8_t channel) const { return values_[channel]; }
+  uint16_t value(uint8_t channel) {
+    history[channel][history_index[channel]] = values_[channel];
+    history_index[channel] = (history_index[channel] + 1) % kHistoryLength;
+    uint16_t sum = 0;
+    for (uint8_t i = 0; i < kHistoryLength; i++) {
+      sum += history[channel][i];
+    }
+    uint16_t average = sum / kHistoryLength;
+    return average;
+    // return values_[channel];
+  }
 
  private:
   uint16_t values_[kNumAdcChannels];
+  uint16_t history[kNumAdcChannels][kHistoryLength];
+  uint8_t history_index[kNumAdcChannels];
   
   DISALLOW_COPY_AND_ASSIGN(InternalAdc);
 };
