@@ -26,15 +26,15 @@
 //
 // Driver for quantization.
 
-#include "quantizer/drivers/quantizer.h"
-#include "quantizer/resources.h"
+#include "quantizer2/drivers/quantizer.h"
+#include "quantizer2/resources.h"
 #include <algorithm>
 #include <string.h>
 #include <math.h>
 
 using namespace std;
 
-namespace quantizer {
+namespace quantizer2 {
 
 static const uint16_t kCMajorChord = 0b000010010001;
 static const uint16_t kCSharpMajorChord = 0b000100100010;
@@ -192,4 +192,4 @@ uint16_t Quantizer::Quantize(uint16_t input, uint16_t transpose, uint16_t slew, 
   return static_cast<uint16_t>(last_output_);
 }
 
-}  // namespace quantizer
+}  // namespace quantizer2
