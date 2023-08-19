@@ -44,21 +44,15 @@ class Quantizer {
   
   void Init();
   
-  // bool PipelinedRead(uint8_t channel);
-
-  // uint16_t Read(uint8_t channel);
-  // uint16_t channel(uint8_t index) const { return channels_[index]; }
   uint16_t Quantize(uint16_t input, uint16_t param_1, uint16_t param_2, uint16_t param_3);
+  float getClosest(float, float, float);
+  float findClosest(const float arr[], int n, float target);
 
   inline void set_scale(uint16_t scale) {
     scale_ = scale;
   }
  
  private:
-  // uint16_t rx_word_;
-  // size_t active_channel_;
-  // size_t acquisition_stage_;
-  // uint16_t channels_[kNumChannels];
   uint16_t scale_;
   float target_;
   float increment_;

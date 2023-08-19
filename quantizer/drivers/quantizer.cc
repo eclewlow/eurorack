@@ -32,6 +32,8 @@
 #include <string.h>
 #include <math.h>
 
+using namespace std;
+
 namespace quantizer {
 
 static const uint16_t kCMajorChord = 0b000010010001;
@@ -73,106 +75,103 @@ void Quantizer::Init() {
   // scale_ = kCMajorChord;
 }
 
+ 
+// Returns element closest to target in arr[]
+float Quantizer::findClosest(const float arr[], int n, float target)
+{
+    // Corner cases
+  //left-side case
+    if (target <= arr[0])
+        return arr[0];
+  //right-side case
+    if (target >= arr[n - 1])
+        return arr[n - 1];
+ 
+    // Doing binary search
+    int i = 0, j = n, mid = 0;
+    while (i < j) {
+        mid = (i + j) / 2;
+ 
+        if (arr[mid] == target)
+            return arr[mid];
+ 
+        /* If target is less than array element,
+            then search in left */
+        if (target < arr[mid]) {
+ 
+            // If target is greater than previous
+            // to mid, return closest of two
+            if (mid > 0 && target > arr[mid - 1])
+                return getClosest(arr[mid - 1], arr[mid], target);  
+            j = mid;
+        }
+      /* Repeat for left half */
+ 
+        // If target is greater than mid
+        else {
+            if (mid < n - 1 && target < arr[mid + 1])
+                return getClosest(arr[mid], arr[mid + 1], target);
+            // update i
+            i = mid + 1;
+        }
+    }
+    // Only single element left after search
+    return arr[mid];
+}
+ 
+// Method to compare which one is the more close.
+// We find the closest by taking the difference
+// between the target and both values. It assumes
+// that val2 is greater than val1 and target lies
+// between these two.
+float Quantizer::getClosest(float val1, float val2,
+               float target)
+{
+    if (target - val1 >= val2 - target)
+        return val2;
+    else
+        return val1;
+}
+
 uint16_t Quantizer::Quantize(uint16_t input, uint16_t transpose, uint16_t slew, uint16_t chaos) {
 
   uint16_t output = 0;
 
-  int8_t midi_val_normalized = 0;
-
-  // chaos = 3000; // range
-  // slew = 0;
-  // transpose = 2047; // pitch shift
-
-  // param_1 widen / narrows input
-  // ccw 0 ... 1 cw 1...10 ?
-  // 0.5 to 10
-
-  chaos = 4095 - chaos;
-
+  // input = static_cast<uint16_t>(2047 + (input - 2047) / (factor - 0.8));
   float factor = lut_pow2[chaos];
-
-  input = static_cast<uint16_t>(2047 + (input - 2047) / (factor - 0.8));
+  input = factor * static_cast<float>(input);
   input = CLAMP<uint16_t>(input, 0, 4095);
 
+  float pitch_offset = 6.0 * (transpose-2047.5) / 120.0;
 
-  uint32_t d1 = input * 120; // input is 0...4095 +/- 5 volts
-  uint32_t d2 = 4095;
+  input -= pitch_offset;
 
-  int32_t midi_val = (d1 + (d2>>1)) / d2;
+  const float* arr = lookup_table_table[scale_ + 2];
 
-  // transpose, range from -6 to 6
-  int8_t pitch_offset = 13 * transpose / 4096 - 6;
-  bool out_of_bounds = false;
+  const uint8_t octave_range = 7;
 
-  midi_val -= pitch_offset;
+  float closest = findClosest(arr, 4 * octave_range, static_cast<float>(input));
 
-  if(midi_val > 120 || midi_val < 0) {
-    out_of_bounds = true;
-    midi_val += pitch_offset;
+  closest += pitch_offset;
+
+  while(closest < 0.0f) {
+    closest += 12.0f * 4095.0f / 120.0f;
+  }
+  while(closest > 4095.0f) {
+    closest -= 12.0f * 4095.0f / 120.0f;
   }
 
-  midi_val = CLAMP<int32_t>(midi_val, 0, 120);
+  // closest = 0.0;
 
-  uint8_t current_octave = midi_val / 12;
+  uint16_t q_val = static_cast<uint16_t>(closest);
 
-  midi_val_normalized = midi_val % 12;
-
-  uint8_t min_diff = 12;
-  uint8_t quantized_val = 0;
-  int8_t octave_shift = 0;
-
-  for (int8_t i=0; i < 12; i++) {
-    uint8_t is_set = (scale_ >> i) & 0x1;
-
-    if(!is_set)
-      continue;
-
-    uint8_t outer_octave_diff = 12 - abs(midi_val_normalized - i);
-    uint8_t inner_octave_diff = abs(midi_val_normalized - i);
-    uint8_t diff;
-
-    if (outer_octave_diff < inner_octave_diff) {
-      // if we receive c8 as the input, but we are quantizing to a b7, will this work?
-      if(midi_val_normalized > i && current_octave >= 9) { // upper octave diff but no upper octave
-        diff = inner_octave_diff;
-      } else if (midi_val_normalized < i && current_octave == 0) {
-        diff = inner_octave_diff;
-      } else {
-        diff = std::min(inner_octave_diff, outer_octave_diff);
-      }
-    } else {
-      diff = std::min(inner_octave_diff, outer_octave_diff);
-    }
-
-    if(diff < min_diff) {
-      min_diff = diff;
-      quantized_val = i;
-
-      // note: maybe we should choose an outer octave diff randomly, rather than default to the inner octave    
-      if (diff == outer_octave_diff && diff != inner_octave_diff) {
-        octave_shift = midi_val_normalized > i ? 12 : -12;
-      }
-    }
-  }
-
-  int32_t q_val = quantized_val + current_octave * 12 + octave_shift;
-
-  if(!out_of_bounds) {
-    q_val += pitch_offset;
-  }
-  // q_val = CLAMP<int32_t>(q_val, 0, 120);
-
-  d1 = q_val * 4095;
-  d2 = 120;
-
-  output = (d1 + (d2>>1)) / d2;
+  output = q_val;
 
   if(output != target_) {
 
     // slew.
     target_ = output;
     increment_ = (target_ - last_output_) / (1.0 + (1000.0 * slew) / 4095.0);
-    // increment_ = 0;
   }
 
   last_output_ += increment_;

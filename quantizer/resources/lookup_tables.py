@@ -41,13 +41,99 @@ Grain window.
 
 size = 4096
 t = numpy.arange(0, size)
-lookup_tables.append(('pow2', numpy.power(2, t * 6.0 / 4095.0)))
+# lookup_tables.append(('pow2', (t / 4095.0) ** 2 ))
+# lookup_tables.append(('pow2', numpy.power(2, t * 1.0 / 4095.0)))
+# lookup_tables.append(('pow2', 1 * numpy.log2(1.0 + t / 4095.0)))
+lookup_tables.append(('pow2',  (((2 * t / 4095.0 - 1) **3)+1)/1     ))
+# lookup_tables.append(('pow2', numpy.power(2, t * 2.0 / 4095.0)))
+# lookup_tables.append(('pow2', numpy.log2(2.0 + t * 62.0 / 4095.0)))
 
 
 for i in range(0, 4095):
   chaos = 4095 - i
   factor = pow(2, 6*chaos / 4095.0)
-  print(2047 / (factor -0.8))
+
+
+t = numpy.arange(0, 121);
+lookup_tables.append(('midi_to_12bit', t * 4095.0 / 120.0))
+
+
+octave_range = 7
+
+t = numpy.array([]);
+notes = numpy.array([0, 0, 4, 7])
+for x in range (octave_range):
+  t = numpy.append(t, x * 12 + notes)
+
+lookup_tables.append(('c_major_12bit', t * 4095.0 / 120.0))
+
+
+t = numpy.array([]);
+notes = numpy.array([1, 1, 5, 8])
+for x in range (octave_range):
+  t = numpy.append(t, x * 12 + notes)
+
+lookup_tables.append(('c_sharp_major_12bit', t * 4095.0 / 120.0))
+
+
+t = numpy.array([]);
+notes = numpy.array([1, 1, 5, 10])
+for x in range (octave_range):
+  t = numpy.append(t, x * 12 + notes)
+
+lookup_tables.append(('b_flat_minor_12bit', t * 4095.0 / 120.0))
+
+
+
+t = numpy.array([]);
+notes = numpy.array([2, 5, 8, 11])
+for x in range (octave_range):
+  t = numpy.append(t, x * 12 + notes)
+
+lookup_tables.append(('b_dim_12bit', t * 4095.0 / 120.0))
+
+
+
+t = numpy.array([]);
+notes = numpy.array([0, 0, 3, 7])
+for x in range (octave_range):
+  t = numpy.append(t, x * 12 + notes)
+
+lookup_tables.append(('c_minor_12bit', t * 4095.0 / 120.0))
+
+
+t = numpy.array([]);
+notes = numpy.array([0, 0, 2, 7])
+for x in range (octave_range):
+  t = numpy.append(t, x * 12 + notes)
+
+lookup_tables.append(('c_2_12bit', t * 4095.0 / 120.0))
+
+
+t = numpy.array([]);
+notes = numpy.array([2, 2, 5, 10])
+for x in range (octave_range):
+  t = numpy.append(t, x * 12 + notes)
+
+lookup_tables.append(('b_flat_major_12bit', t * 4095.0 / 120.0))
+
+
+t = numpy.array([]);
+notes = numpy.array([0, 5, 7, 9])
+for x in range (octave_range):
+  t = numpy.append(t, x * 12 + notes)
+
+lookup_tables.append(('f_2_12bit', t * 4095.0 / 120.0))
+
+
+t = numpy.array([]);
+notes = numpy.array([0, 1, 4, 7])
+for x in range (octave_range):
+  t = numpy.append(t, x * 12 + notes)
+
+lookup_tables.append(('c_me_12bit', t * 4095.0 / 120.0))
+
+
 """----------------------------------------------------------------------------
 Cosine table.
 ----------------------------------------------------------------------------"""

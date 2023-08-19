@@ -45,8 +45,38 @@ typedef uint8_t ResourceId;
 extern const float* const lookup_table_table[];
 
 extern const float lut_pow2[];
+extern const float lut_midi_to_12bit[];
+extern const float lut_c_major_12bit[];
+extern const float lut_c_sharp_major_12bit[];
+extern const float lut_b_flat_minor_12bit[];
+extern const float lut_b_dim_12bit[];
+extern const float lut_c_minor_12bit[];
+extern const float lut_c_2_12bit[];
+extern const float lut_b_flat_major_12bit[];
+extern const float lut_f_2_12bit[];
+extern const float lut_c_me_12bit[];
 #define LUT_POW2 0
 #define LUT_POW2_SIZE 4096
+#define LUT_MIDI_TO_12BIT 1
+#define LUT_MIDI_TO_12BIT_SIZE 121
+#define LUT_C_MAJOR_12BIT 2
+#define LUT_C_MAJOR_12BIT_SIZE 28
+#define LUT_C_SHARP_MAJOR_12BIT 3
+#define LUT_C_SHARP_MAJOR_12BIT_SIZE 28
+#define LUT_B_FLAT_MINOR_12BIT 4
+#define LUT_B_FLAT_MINOR_12BIT_SIZE 28
+#define LUT_B_DIM_12BIT 5
+#define LUT_B_DIM_12BIT_SIZE 28
+#define LUT_C_MINOR_12BIT 6
+#define LUT_C_MINOR_12BIT_SIZE 28
+#define LUT_C_2_12BIT 7
+#define LUT_C_2_12BIT_SIZE 28
+#define LUT_B_FLAT_MAJOR_12BIT 8
+#define LUT_B_FLAT_MAJOR_12BIT_SIZE 28
+#define LUT_F_2_12BIT 9
+#define LUT_F_2_12BIT_SIZE 28
+#define LUT_C_ME_12BIT 10
+#define LUT_C_ME_12BIT_SIZE 28
 
 }  // namespace quantizer
 

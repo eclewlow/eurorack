@@ -34,10 +34,9 @@
 
 #include <stm32f10x_conf.h>
 
-#include <cstring>
-#include <math.h>
 
 using namespace quantizer;
+using namespace std;
 using namespace stmlib;
 
 const uint32_t kStartAddress = 0x08008000;
@@ -50,6 +49,19 @@ Quantizer Q;
 
 #define SAMPLE_RATE (96000)
 
+uint16_t last_chord_type = 0;
+uint32_t chord_pot_width = 455;//4096 / kChordTableLength;
+uint32_t chord_pot_width_2 = 227;//chord_pot_width / 2;
+uint32_t pot_normalization = 247;
+uint16_t midi_test;
+uint32_t midi_test_timer;
+uint16_t chord_type;
+uint16_t transpose;
+int32_t chaos;
+uint16_t slew;
+uint16_t v_oct_input;
+int16_t chaos_cv_input;
+
 
 // Default interrupt handlers.
 extern "C" {
@@ -61,36 +73,36 @@ void BusFault_Handler() { while (1); }
 void UsageFault_Handler() { while (1); }
 void SVC_Handler() { }
 void DebugMon_Handler() { }
-void PendSV_Handler() { }
+void PendSV_Handler() { } 
+}
+
+extern "C" {
 
 void SysTick_Handler() {
   system_clock.Tick();
 }
 
-uint16_t last_chord_type = 0;
-uint32_t chord_pot_width = 455;//4096 / kChordTableLength;
-uint32_t chord_pot_width_2 = 227;//chord_pot_width / 2;
-uint32_t pot_normalization = 247;
 
 void TIM1_UP_IRQHandler() {
-  // if (!(TIM1->SR & TIM_IT_Update)) {
-  //   return;
-  // }
-  // TIM1->SR = (uint16_t)~TIM_IT_Update;
-
-  if (TIM_GetITStatus(TIM1, TIM_IT_Update) == RESET) {
+  if (!(TIM1->SR & TIM_IT_Update)) {
     return;
   }
+  TIM1->SR = (uint16_t)~TIM_IT_Update;
   
-  TIM_ClearITPendingBit(TIM1, TIM_IT_Update);
 
-  uint16_t chord_type = internal_adc.value(0);
-  uint16_t transpose = internal_adc.value(1);
-  int32_t chaos = internal_adc.value(2);
-  uint16_t slew = internal_adc.value(3);
+  chord_type = internal_adc.value(0);
+  transpose = internal_adc.value(1);
+  chaos = internal_adc.value(2);
+  slew = internal_adc.value(3);
 
-  uint16_t v_oct_input = adc.Read(0);
-  int16_t chaos_cv_input = adc.Read(1); // 0 - 4095
+
+  bool adc_scan_cycle_complete = adc.PipelinedScan();
+
+  if(adc_scan_cycle_complete) {
+    v_oct_input = adc.channel(0);
+    chaos_cv_input = adc.channel(1); // 0 - 4095
+  }
+
 
   switch(2) {
   case 1:
@@ -103,7 +115,6 @@ void TIM1_UP_IRQHandler() {
     break;
   }
 
-  chaos_cv_input += 1;
 
   bool apply_pot_hysterisis = true;
 
@@ -114,13 +125,10 @@ void TIM1_UP_IRQHandler() {
     if(last_chord_type == 0 && chord_type < chord_pot_width_2 + pot_normalization) {
       chord_type = last_chord_type;
     }
-    else if (last_chord_type == (kChordTableLength-1) && \
-      chord_type > (kChordTableLength-1) * chord_pot_width + chord_pot_width_2 - pot_normalization \
-      ) {
+    else if (last_chord_type == (kChordTableLength-1) && chord_type > (kChordTableLength-1) * chord_pot_width + chord_pot_width_2 - pot_normalization ) {
       chord_type = last_chord_type;
     } 
-    else if(chord_type < last_chord_center + pot_normalization && \
-      chord_type > last_chord_center - pot_normalization) {
+    else if(chord_type < last_chord_center + pot_normalization && chord_type > last_chord_center - pot_normalization) {
       chord_type = last_chord_type;
     }
     else {
@@ -131,26 +139,23 @@ void TIM1_UP_IRQHandler() {
     chord_type = kChordTableLength * chord_type / 4096;
   }
 
-  Q.set_scale(chord_table[chord_type]);
+  Q.set_scale(chord_type);
 
-
-  int32_t q;
+  int16_t q;
 
   q = Q.Quantize(v_oct_input, transpose, slew, chaos);
 
   uint16_t output = static_cast<uint16_t>(q);
 
-  if(output > 4095)
-    output = 4095;
-
   dac.Write(output, 0);
+  // dac.Write(midi_test, 0);
 
-  // uint32_t ms = system_clock.milliseconds() % 2000;
-  // if(ms > 1000) {
-  //   // dac.Write(static_cast<uint16_t>(sample));
-  // } else {
-  //   // dac.Write(0);
-  // }
+    midi_test_timer += 1;
+  if(midi_test_timer > 6000) {
+    midi_test += 69 ;
+    midi_test_timer -= 6000;
+  }
+
 }
 
 }
@@ -160,16 +165,7 @@ void Init() {
   System sys;
   
   system_clock.Init();
-  sys.Init((F_CPU) / SAMPLE_RATE - 1, true);
-
-  GPIO_InitTypeDef gpio_init;
-
-  // Initialize CS pin.
-  GPIOC->BRR = GPIO_Pin_13;
-  gpio_init.GPIO_Pin = GPIO_Pin_13;
-  gpio_init.GPIO_Speed = GPIO_Speed_50MHz;
-  gpio_init.GPIO_Mode = GPIO_Mode_Out_PP;
-  GPIO_Init(GPIOC, &gpio_init);
+  sys.Init(F_CPU / 96000 - 1, true);
 
   dac.Init();
   adc.Init();
@@ -178,23 +174,24 @@ void Init() {
   Q.Init();
 
   sys.StartTimers();
-
 }
 
 int main(void) {
   Init();
   while (1) { 
 
-    uint32_t ms = system_clock.milliseconds() % 2000;
-    if(ms > 1000) {
-      GPIOC->BRR = GPIO_Pin_13;
-      // dac.Write(static_cast<uint16_t>(4095.0 * (5.0+2.0)/10.0));
-      // dac.Write(2048,0);
-    } else {
-      GPIOC->BSRR = GPIO_Pin_13;
-      // dac.Write(static_cast<uint16_t>(4095.0 * (5.0+2.0)/10.0));
-      // dac.Write(0);
-    }
+    // uint32_t ms = system_clock.milliseconds() % 2000;
+    // if(ms > 1000) {
+    //   GPIOC->BRR = GPIO_Pin_13;
+    //   // dac.Write(static_cast<uint16_t>(4095.0 * (5.0+2.0)/10.0));
+    //   // dac.Write(2048,0);
+    //   midi_test = 0;
+    // } else {
+    //   GPIOC->BSRR = GPIO_Pin_13;
+    //   // dac.Write(static_cast<uint16_t>(4095.0 * (5.0+2.0)/10.0));
+    //   // dac.Write(0);
+    //   midi_test = 2047;
+    // }
 
   }
 }

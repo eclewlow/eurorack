@@ -48,7 +48,7 @@ class Adc {
     switch (acquisition_stage_) {
       case 0:
         rx_word_ |= SPI2->DR;
-        channels_[active_channel_] = rx_word_;
+        channels_[active_channel_] = 4095 - rx_word_; // flip -5...5 to 2.5...0 because of inverted opamp
         GPIOB->BSRR = GPIO_Pin_12;
         GPIOB->BRR = GPIO_Pin_12;
         SPI2->DR = 0x04 | 0x02;

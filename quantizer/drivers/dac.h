@@ -59,7 +59,7 @@ namespace quantizer {
       while (!((SPI1->SR)&(1<<1))) {};
 
       // SPI1->DR = (channel << 15) | value | (0x3000);
-      SPI1->DR = value | (0x3000);
+      SPI1->DR = value | (0x7000);
       // Wait<64>();
 
       // GPIO_SetBits(GPIOB, kPinSS);
