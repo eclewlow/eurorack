@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="30mm"
+   height="128.5mm"
+   viewBox="0 0 30 128.5"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.2.2 (b0a8486, 2022-12-01)"
+   sodipodi:docname="fet_overdrive.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="1.9057917"
+     inkscape:cx="67.950763"
+     inkscape:cy="311.15678"
+     inkscape:window-width="1442"
+     inkscape:window-height="878"
+     inkscape:window-x="0"
+     inkscape:window-y="25"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <circle
+       style="fill:#000000;stroke:#000000;stroke-width:0;stroke-dasharray:none"
+       id="path231"
+       cx="7.5000005"
+       cy="125.5"
+       r="1.6" />
+    <ellipse
+       style="fill:#000000;stroke:#000000;stroke-width:0;stroke-dasharray:none"
+       id="path231-9"
+       cx="7.3999996"
+       cy="110.3"
+       rx="3.049999"
+       ry="3.0499992" />
+    <ellipse
+       style="fill:#000000;stroke:#000000;stroke-width:0;stroke-dasharray:none"
+       id="path231-9-2"
+       cx="22.6"
+       cy="110.3"
+       rx="3.049999"
+       ry="3.0499992" />
+    <circle
+       style="fill:#000000;stroke:#000000;stroke-width:0;stroke-dasharray:none"
+       id="path231-9-2-7-9"
+       cx="21.299999"
+       cy="68.899994"
+       r="3.5499995" />
+    <ellipse
+       style="fill:#000000;stroke:#000000;stroke-width:0;stroke-dasharray:none"
+       id="path231-9-2-7-9-45"
+       cx="23.9"
+       cy="53.899998"
+       rx="1.5499998"
+       ry="1.5499997" />
+    <circle
+       style="fill:#000000;stroke:#000000;stroke-width:0;stroke-dasharray:none"
+       id="path231-9-2-7-9-45-5"
+       cx="15"
+       cy="33.099998"
+       r="2.2449994" />
+    <ellipse
+       style="fill:#000000;stroke:#000000;stroke-width:0;stroke-dasharray:none"
+       id="path231-9-2-7-9-67"
+       cx="4.3700004"
+       cy="73.57"
+       rx="1.145"
+       ry="1.1449997" />
+    <circle
+       style="fill:#000000;stroke:#000000;stroke-width:0;stroke-dasharray:none"
+       id="path231-9-2-7-9-6"
+       cx="8.6000004"
+       cy="87.399994"
+       r="3.5499995" />
+    <circle
+       style="fill:#000000;stroke:#000000;stroke-width:0;stroke-dasharray:none"
+       id="path231-9-2-7-9-4"
+       cx="8.6000004"
+       cy="50.299995"
+       r="3.5499995" />
+    <circle
+       style="fill:#000000;stroke:#000000;stroke-width:0;stroke-dasharray:none"
+       id="path231-1"
+       cx="7.5000005"
+       cy="2.9999967"
+       r="1.6" />
+    <text
+       xml:space="preserve"
+       style="font-size:3.175px;font-family:Herculanum;-inkscape-font-specification:Herculanum;fill:#000000;stroke:#000000;stroke-width:0"
+       x="4.2167673"
+       y="59.881691"
+       id="text10423"><tspan
+         sodipodi:role="line"
+         id="tspan10421"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Bring tha noize';-inkscape-font-specification:'Bring tha noize';fill:#000000;stroke-width:0"
+         x="4.2167673"
+         y="59.881691">ATTEN</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.175px;font-family:'Marker Felt';-inkscape-font-specification:'Marker Felt';fill:#000000;stroke:#000000;stroke-width:0"
+       x="18.017096"
+       y="78.189171"
+       id="text10545"><tspan
+         sodipodi:role="line"
+         id="tspan10543"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Bring tha noize';-inkscape-font-specification:'Bring tha noize';stroke-width:0"
+         x="18.017096"
+         y="78.189171">GAIN</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.175px;font-family:'Marker Felt';-inkscape-font-specification:'Marker Felt';fill:#000000;stroke:#000000;stroke-width:0"
+       x="3.4500818"
+       y="96.682571"
+       id="text10549"><tspan
+         sodipodi:role="line"
+         id="tspan10547"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Bring tha noize';-inkscape-font-specification:'Bring tha noize';stroke-width:0"
+         x="3.4500818"
+         y="96.682571">VOLUME</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.175px;font-family:'Marker Felt';-inkscape-font-specification:'Marker Felt';fill:#000000;stroke:#000000;stroke-width:0"
+       x="5.5469813"
+       y="118.05105"
+       id="text10553"><tspan
+         sodipodi:role="line"
+         id="tspan10551"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Bring tha noize';-inkscape-font-specification:'Bring tha noize';stroke-width:0"
+         x="5.5469813"
+         y="118.05105">IN</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.175px;font-family:'Marker Felt';-inkscape-font-specification:'Marker Felt';fill:#000000;stroke:#000000;stroke-width:0"
+       x="20.125481"
+       y="118.05679"
+       id="text10698"><tspan
+         sodipodi:role="line"
+         id="tspan10696"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Bring tha noize';-inkscape-font-specification:'Bring tha noize';stroke-width:0"
+         x="20.125481"
+         y="118.05679">OUT</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.175px;font-family:'Marker Felt';-inkscape-font-specification:'Marker Felt';fill:#000000;stroke:#000000;stroke-width:0"
+       x="4.1559277"
+       y="41.027912"
+       id="text10750"><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Bring tha noize';-inkscape-font-specification:'Bring tha noize';stroke-width:0"
+         x="4.1559277"
+         y="41.027912"
+         id="tspan11089">BYPASS</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.43019px;font-family:'Bring tha noize';-inkscape-font-specification:'Bring tha noize';fill:#000000;stroke:#000000;stroke-width:0"
+       x="15.091973"
+       y="24.557724"
+       id="text10985"
+       transform="scale(0.97803625,1.022457)"><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Bring tha noize';-inkscape-font-specification:'Bring tha noize';text-align:center;text-anchor:middle;stroke-width:0"
+         x="15.091973"
+         y="24.557724"
+         id="tspan10987">overdrive</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.7px;font-family:'Marker Felt';-inkscape-font-specification:'Marker Felt';text-align:center;text-anchor:middle;fill:#000000;stroke:#000000;stroke-width:0"
+       x="14.758685"
+       y="18.929296"
+       id="text10993"><tspan
+         sodipodi:role="line"
+         id="tspan10991"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.7px;font-family:'Some\'s Style';-inkscape-font-specification:'Some\'s Style Bold';stroke-width:0"
+         x="14.758685"
+         y="18.929296">FET</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.175px;font-family:'Marker Felt';-inkscape-font-specification:'Marker Felt';text-align:center;text-anchor:middle;fill:#000000;stroke:#000000;stroke-width:0"
+       x="21.46718"
+       y="39.75621"
+       id="text11095"><tspan
+         sodipodi:role="line"
+         id="tspan11093"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.175px;font-family:'Bring tha noize';-inkscape-font-specification:'Bring tha noize';stroke-width:0"
+         x="21.46718"
+         y="39.75621">ON</tspan></text>
+    <rect
+       style="fill:#000000;stroke:#000000;stroke-width:0"
+       id="rect11237"
+       width="0.24295498"
+       height="3.6139553"
+       x="21.562256"
+       y="33.079418" />
+    <rect
+       style="fill:#000000;stroke:#000000;stroke-width:0"
+       id="rect11237-8"
+       width="0.24295489"
+       height="4.3389006"
+       x="9.0128345"
+       y="33.138817" />
+    <rect
+       style="fill:#000000;stroke:#000000;stroke-width:0"
+       id="rect11239"
+       width="4.5857759"
+       height="0.21258567"
+       x="17.067589"
+       y="33.079418" />
+    <rect
+       style="fill:#000000;stroke:#000000;stroke-width:0"
+       id="rect11239-2"
+       width="3.7549353"
+       height="0.21258576"
+       x="9.0134144"
+       y="33.099632" />
+    <rect
+       style="fill:#000000;stroke:#000000;stroke-width:0"
+       id="rect11237-8-3"
+       width="0.24295375"
+       height="20.101358"
+       x="22.386549"
+       y="87.13327" />
+    <rect
+       style="fill:#000000;stroke:#000000;stroke-width:0"
+       id="rect11239-2-7"
+       width="10.363995"
+       height="0.21258511"
+       x="12.071852"
+       y="87.13324" />
+  </g>
+</svg>

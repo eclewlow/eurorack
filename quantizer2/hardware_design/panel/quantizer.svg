@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="30mm"
+   height="128.5mm"
+   viewBox="0 0 30 128.5"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.2.2 (b0a8486, 2022-12-01)"
+   sodipodi:docname="quantizer.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="1.4554077"
+     inkscape:cx="-62.181888"
+     inkscape:cy="208.18908"
+     inkscape:window-width="1442"
+     inkscape:window-height="878"
+     inkscape:window-x="0"
+     inkscape:window-y="25"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <circle
+       style="fill:#b3b3b3;stroke:#000000;stroke-width:0;stroke-dasharray:none"
+       id="path231"
+       cx="7.5000005"
+       cy="125.5"
+       r="1.6" />
+    <ellipse
+       style="fill:#b3b3b3;stroke:#000000;stroke-width:0;stroke-dasharray:none"
+       id="path231-9"
+       cx="6.9999995"
+       cy="110.89999"
+       rx="3.049999"
+       ry="3.0499992" />
+    <ellipse
+       style="fill:#b3b3b3;stroke:#000000;stroke-width:0;stroke-dasharray:none"
+       id="path231-9-2"
+       cx="23"
+       cy="110.89999"
+       rx="3.049999"
+       ry="3.0499992" />
+    <ellipse
+       style="fill:#b3b3b3;stroke:#000000;stroke-width:0;stroke-dasharray:none"
+       id="path231-9-2-7"
+       cx="14.999999"
+       cy="84.899994"
+       rx="3.049999"
+       ry="3.0499992" />
+    <circle
+       style="fill:#b3b3b3;stroke:#000000;stroke-width:0;stroke-dasharray:none"
+       id="path231-9-2-7-9"
+       cx="15"
+       cy="67.899994"
+       r="3.5499995" />
+    <circle
+       style="fill:#b3b3b3;stroke:#000000;stroke-width:0;stroke-dasharray:none"
+       id="path231-9-2-7-9-4"
+       cx="15"
+       cy="43.899998"
+       r="3.5499995" />
+    <circle
+       style="fill:#b3b3b3;stroke:#000000;stroke-width:0;stroke-dasharray:none"
+       id="path231-1"
+       cx="7.5000005"
+       cy="2.9999967"
+       r="1.6" />
+    <text
+       xml:space="preserve"
+       style="font-size:3.175px;fill:#b3b3b3;stroke:#000000;stroke-width:0;stroke-dasharray:none"
+       x="11.005968"
+       y="54.27206"
+       id="text9870"><tspan
+         sodipodi:role="line"
+         id="tspan9868"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Herculanum;-inkscape-font-specification:Herculanum;stroke-width:0"
+         x="11.005968"
+         y="54.27206">SCALE</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:3.175px;fill:#b3b3b3;stroke:#000000;stroke-width:0;stroke-dasharray:none"
+       x="9.9469099"
+       y="77.823761"
+       id="text9870-6"><tspan
+         sodipodi:role="line"
+         id="tspan9868-5"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Herculanum;-inkscape-font-specification:Herculanum;stroke-width:0"
+         x="9.9469099"
+         y="77.823761">CHAOS</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:3.175px;fill:#b3b3b3;stroke:#000000;stroke-width:0;stroke-dasharray:none"
+       x="10.82206"
+       y="92.199944"
+       id="text9870-6-5"><tspan
+         sodipodi:role="line"
+         id="tspan9868-5-3"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Herculanum;-inkscape-font-specification:Herculanum;stroke-width:0"
+         x="10.82206"
+         y="92.199944">BEND</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.175px;font-family:Herculanum;-inkscape-font-specification:Herculanum;fill:#b3b3b3;stroke:#000000;stroke-width:0;stroke-dasharray:none"
+       x="5.0902114"
+       y="103.41253"
+       id="text10008"><tspan
+         sodipodi:role="line"
+         id="tspan10006"
+         style="stroke-width:0"
+         x="5.0902114"
+         y="103.41253">in</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.175px;font-family:Herculanum;-inkscape-font-specification:Herculanum;fill:#b3b3b3;stroke:#000000;stroke-width:0;stroke-dasharray:none"
+       x="19.633673"
+       y="103.23072"
+       id="text10012"><tspan
+         sodipodi:role="line"
+         id="tspan10010"
+         style="stroke-width:0"
+         x="19.633673"
+         y="103.23072">out</tspan></text>
+  </g>
+</svg>
