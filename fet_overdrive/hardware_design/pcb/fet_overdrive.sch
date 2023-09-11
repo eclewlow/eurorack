@@ -1079,57 +1079,6 @@ Source: &lt;a href="http://www.onsemi.com/pub/Collateral/318-08.PDF"&gt; Datashe
 </deviceset>
 </devicesets>
 </library>
-<library name="Graphics v21">
-<packages>
-<package name="DAILYWELL">
-<pad name="P$1" x="1.524" y="2.54" drill="1.016"/>
-<pad name="P$2" x="4.064" y="2.54" drill="1.016"/>
-<pad name="P$3" x="6.604" y="2.54" drill="1.016"/>
-<rectangle x1="7.874" y1="0" x2="8.128" y2="5.08" layer="21"/>
-<rectangle x1="0" y1="4.826" x2="8.128" y2="5.08" layer="21"/>
-<rectangle x1="0" y1="0" x2="8.128" y2="0.254" layer="21"/>
-<rectangle x1="0" y1="0" x2="0.254" y2="5.08" layer="21"/>
-</package>
-</packages>
-<symbols>
-<symbol name="DAILYWELL">
-<wire x1="0" y1="-5.08" x2="5.08" y2="-5.08" width="0.254" layer="94"/>
-<wire x1="0" y1="5.08" x2="5.08" y2="5.08" width="0.254" layer="94"/>
-<circle x="0" y="2.54" radius="0.71783125" width="0.254" layer="94"/>
-<circle x="0" y="-2.54" radius="0.71783125" width="0.254" layer="94"/>
-<circle x="-5.08" y="0" radius="0.71783125" width="0.254" layer="94"/>
-<wire x1="-4.36216875" y1="0" x2="1.672409375" y2="-2.42860625" width="0.254" layer="94"/>
-<wire x1="0" y1="5.08" x2="0" y2="3.25783125" width="0.254" layer="94"/>
-<wire x1="0" y1="-5.08" x2="0" y2="-3.25783125" width="0.254" layer="94"/>
-<text x="-9.906" y="-2.032" size="1.016" layer="94" font="vector">2 Comm</text>
-<text x="-1.778" y="3.81" size="1.016" layer="94" font="vector">1</text>
-<text x="-1.778" y="-4.826" size="1.016" layer="94" font="vector">3</text>
-<wire x1="-5.7976125" y1="0.017709375" x2="-10.16" y2="0.017709375" width="0.254" layer="94"/>
-<pin name="P$1" x="5.08" y="5.08" visible="off" length="point"/>
-<pin name="P$2" x="-10.16" y="0" visible="off" length="point" rot="R180"/>
-<pin name="P$3" x="5.08" y="-5.08" visible="off" length="point"/>
-</symbol>
-</symbols>
-<devicesets>
-<deviceset name="DAILYWELL" uservalue="yes">
-<gates>
-<gate name="G$1" symbol="DAILYWELL" x="0" y="0"/>
-</gates>
-<devices>
-<device name="" package="DAILYWELL">
-<connects>
-<connect gate="G$1" pin="P$1" pad="P$1"/>
-<connect gate="G$1" pin="P$2" pad="P$2"/>
-<connect gate="G$1" pin="P$3" pad="P$3"/>
-</connects>
-<technologies>
-<technology name=""/>
-</technologies>
-</device>
-</devices>
-</deviceset>
-</devicesets>
-</library>
 <library name="TL072CD">
 <description>&lt;Dual Low-Noise JFET-Input General-Purpose Operational Amplifier&lt;/b&gt;&lt;p&gt;
 &lt;author&gt;Created by SamacSys&lt;/author&gt;</description>
@@ -3509,6 +3458,82 @@ Source: &lt;a href="https://www.onsemi.com/pub/Collateral/MMBT3904LT1-D.PDF"&gt;
 </deviceset>
 </devicesets>
 </library>
+<library name="Graphics v37">
+<packages>
+<package name="DAILYWELL-DPDT">
+<pad name="P$1" x="-2.546" y="-2.03" drill="1.016"/>
+<pad name="P$2" x="-0.006" y="-2.03" drill="1.016"/>
+<pad name="P$3" x="2.534" y="-2.03" drill="1.016"/>
+<rectangle x1="3.804" y1="-4.57" x2="4.058" y2="4.57" layer="21"/>
+<rectangle x1="-4.07" y1="4.316" x2="4.038" y2="4.57" layer="21"/>
+<rectangle x1="-4.07" y1="-4.57" x2="4.058" y2="-4.316" layer="21"/>
+<rectangle x1="-4.07" y1="-4.57" x2="-3.816" y2="4.57" layer="21"/>
+<pad name="P$4" x="-2.546" y="2.03" drill="1.016"/>
+<pad name="P$5" x="-0.006" y="2.03" drill="1.016"/>
+<pad name="P$6" x="2.534" y="2.03" drill="1.016"/>
+<circle x="0" y="0" radius="0.8464625" width="0.127" layer="21"/>
+</package>
+</packages>
+<symbols>
+<symbol name="DAILYWELL-DPDT-1">
+<wire x1="0" y1="-5.08" x2="5.08" y2="-5.08" width="0.254" layer="94"/>
+<wire x1="0" y1="5.08" x2="5.08" y2="5.08" width="0.254" layer="94"/>
+<circle x="0" y="2.54" radius="0.71783125" width="0.254" layer="94"/>
+<circle x="0" y="-2.54" radius="0.71783125" width="0.254" layer="94"/>
+<circle x="-5.08" y="0" radius="0.71783125" width="0.254" layer="94"/>
+<wire x1="-4.36216875" y1="0" x2="1.672409375" y2="-2.42860625" width="0.254" layer="94"/>
+<wire x1="0" y1="5.08" x2="0" y2="3.25783125" width="0.254" layer="94"/>
+<wire x1="0" y1="-5.08" x2="0" y2="-3.25783125" width="0.254" layer="94"/>
+<text x="-9.906" y="-2.032" size="1.016" layer="94" font="vector">2 Comm</text>
+<text x="-1.778" y="3.81" size="1.016" layer="94" font="vector">1</text>
+<text x="-1.778" y="-4.826" size="1.016" layer="94" font="vector">3</text>
+<wire x1="-5.7976125" y1="0.017709375" x2="-10.16" y2="0.017709375" width="0.254" layer="94"/>
+<pin name="P$1" x="5.08" y="5.08" visible="off" length="point"/>
+<pin name="P$2" x="-10.16" y="0" visible="off" length="point" rot="R180"/>
+<pin name="P$3" x="5.08" y="-5.08" visible="off" length="point"/>
+</symbol>
+<symbol name="DAILYWELL-DPDT-2">
+<wire x1="0" y1="-5.08" x2="5.08" y2="-5.08" width="0.254" layer="94"/>
+<wire x1="0" y1="5.08" x2="5.08" y2="5.08" width="0.254" layer="94"/>
+<circle x="0" y="2.54" radius="0.71783125" width="0.254" layer="94"/>
+<circle x="0" y="-2.54" radius="0.71783125" width="0.254" layer="94"/>
+<circle x="-5.08" y="0" radius="0.71783125" width="0.254" layer="94"/>
+<wire x1="-4.36216875" y1="0" x2="1.672409375" y2="-2.42860625" width="0.254" layer="94"/>
+<wire x1="0" y1="5.08" x2="0" y2="3.25783125" width="0.254" layer="94"/>
+<wire x1="0" y1="-5.08" x2="0" y2="-3.25783125" width="0.254" layer="94"/>
+<text x="-9.906" y="-2.032" size="1.016" layer="94" font="vector">5 Comm</text>
+<text x="-1.778" y="3.81" size="1.016" layer="94" font="vector">4</text>
+<text x="-1.778" y="-4.826" size="1.016" layer="94" font="vector">6</text>
+<wire x1="-5.7976125" y1="0.017709375" x2="-10.16" y2="0.017709375" width="0.254" layer="94"/>
+<pin name="P$1" x="5.08" y="5.08" visible="off" length="point"/>
+<pin name="P$2" x="-10.16" y="0" visible="off" length="point" rot="R180"/>
+<pin name="P$3" x="5.08" y="-5.08" visible="off" length="point"/>
+</symbol>
+</symbols>
+<devicesets>
+<deviceset name="DAILYWELL-DPDT" uservalue="yes">
+<gates>
+<gate name="G$1" symbol="DAILYWELL-DPDT-1" x="0" y="0"/>
+<gate name="G$2" symbol="DAILYWELL-DPDT-2" x="20.32" y="0"/>
+</gates>
+<devices>
+<device name="" package="DAILYWELL-DPDT">
+<connects>
+<connect gate="G$1" pin="P$1" pad="P$1"/>
+<connect gate="G$1" pin="P$2" pad="P$2"/>
+<connect gate="G$1" pin="P$3" pad="P$3"/>
+<connect gate="G$2" pin="P$1" pad="P$4"/>
+<connect gate="G$2" pin="P$2" pad="P$5"/>
+<connect gate="G$2" pin="P$3" pad="P$6"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+</devicesets>
+</library>
 </libraries>
 <attributes>
 </attributes>
@@ -3529,7 +3554,6 @@ Source: &lt;a href="https://www.onsemi.com/pub/Collateral/MMBT3904LT1-D.PDF"&gt;
 <part name="SUPPLY1" library="SparkFun-PowerSymbols" library_urn="urn:adsk.eagle:library:530" deviceset="5V" device=""/>
 <part name="SUPPLY3" library="SparkFun-PowerSymbols" library_urn="urn:adsk.eagle:library:530" deviceset="5V" device=""/>
 <part name="Q1" library="MMBFJ111" deviceset="MMBFJ111" device=""/>
-<part name="U$1" library="Graphics v21" deviceset="DAILYWELL" device=""/>
 <part name="IC1" library="TL072CD" deviceset="TL072CD" device=""/>
 <part name="C1" library="EEE-FP1E220AR" deviceset="EEE-FP1E220AR" device=""/>
 <part name="C2" library="EEE-FK1V470P" deviceset="EEE-FK1V470P" device=""/>
@@ -3589,6 +3613,7 @@ Source: &lt;a href="https://www.onsemi.com/pub/Collateral/MMBT3904LT1-D.PDF"&gt;
 <part name="C16" library="SparkFun-Capacitors" library_urn="urn:adsk.eagle:library:510" deviceset="1.0UF" device="-0603-16V-10%" package3d_urn="urn:adsk.eagle:package:37414/1" value="1.0uF"/>
 <part name="R14" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="10KOHM" device="-0603-1/10W-1%" package3d_urn="urn:adsk.eagle:package:39650/1" value="10k"/>
 <part name="GND16" library="SparkFun-PowerSymbols" library_urn="urn:adsk.eagle:library:530" deviceset="GND" device=""/>
+<part name="U$1" library="Graphics v37" deviceset="DAILYWELL-DPDT" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -3630,7 +3655,6 @@ Source: &lt;a href="https://www.onsemi.com/pub/Collateral/MMBT3904LT1-D.PDF"&gt;
 <attribute name="NAME" x="179.07" y="187.96" size="1.778" layer="95" rot="MR0" align="center-left"/>
 <attribute name="VALUE" x="179.07" y="185.42" size="1.778" layer="96" rot="MR0" align="center-left"/>
 </instance>
-<instance part="U$1" gate="G$1" x="53.34" y="218.44" smashed="yes"/>
 <instance part="IC1" gate="G$1" x="132.08" y="86.36" smashed="yes">
 <attribute name="NAME" x="156.21" y="93.98" size="1.778" layer="95" align="center-left"/>
 <attribute name="VALUE" x="156.21" y="91.44" size="1.778" layer="96" align="center-left"/>
@@ -3836,6 +3860,8 @@ Source: &lt;a href="https://www.onsemi.com/pub/Collateral/MMBT3904LT1-D.PDF"&gt;
 <instance part="GND16" gate="1" x="299.72" y="157.48" smashed="yes">
 <attribute name="VALUE" x="299.72" y="157.226" size="1.778" layer="96" align="top-center"/>
 </instance>
+<instance part="U$1" gate="G$1" x="53.34" y="218.44" smashed="yes" rot="MR180"/>
+<instance part="U$1" gate="G$2" x="330.2" y="205.74" smashed="yes" rot="R180"/>
 </instances>
 <busses>
 </busses>
@@ -4031,10 +4057,10 @@ Source: &lt;a href="https://www.onsemi.com/pub/Collateral/MMBT3904LT1-D.PDF"&gt;
 </net>
 <net name="N$6" class="0">
 <segment>
-<wire x1="58.42" y1="213.36" x2="63.5" y2="213.36" width="0.1524" layer="91"/>
-<pinref part="U$1" gate="G$1" pin="P$3"/>
 <wire x1="63.5" y1="213.36" x2="63.5" y2="187.96" width="0.1524" layer="91"/>
 <pinref part="R2" gate="G$1" pin="E"/>
+<wire x1="58.42" y1="213.36" x2="63.5" y2="213.36" width="0.1524" layer="91"/>
+<pinref part="U$1" gate="G$1" pin="P$1"/>
 </segment>
 </net>
 <net name="N$4" class="0">
@@ -4294,18 +4320,11 @@ Source: &lt;a href="https://www.onsemi.com/pub/Collateral/MMBT3904LT1-D.PDF"&gt;
 </net>
 <net name="N$15" class="0">
 <segment>
-<wire x1="58.42" y1="223.52" x2="340.36" y2="223.52" width="0.1524" layer="91"/>
-<wire x1="340.36" y1="223.52" x2="340.36" y2="205.74" width="0.1524" layer="91"/>
-<pinref part="J2" gate="G$1" pin="3"/>
-<wire x1="340.36" y1="205.74" x2="353.06" y2="205.74" width="0.1524" layer="91"/>
-<wire x1="340.36" y1="205.74" x2="340.36" y2="180.34" width="0.1524" layer="91"/>
-<junction x="340.36" y="205.74"/>
-<wire x1="340.36" y1="180.34" x2="299.72" y2="180.34" width="0.1524" layer="91"/>
-<pinref part="U$1" gate="G$1" pin="P$1"/>
-<wire x1="292.1" y1="180.34" x2="299.72" y2="180.34" width="0.1524" layer="91"/>
-<pinref part="C16" gate="G$1" pin="2"/>
-<wire x1="299.72" y1="180.34" x2="299.72" y2="175.26" width="0.1524" layer="91"/>
-<pinref part="R14" gate="G$1" pin="2"/>
+<wire x1="58.42" y1="223.52" x2="320.04" y2="223.52" width="0.1524" layer="91"/>
+<wire x1="320.04" y1="223.52" x2="320.04" y2="210.82" width="0.1524" layer="91"/>
+<wire x1="320.04" y1="210.82" x2="325.12" y2="210.82" width="0.1524" layer="91"/>
+<pinref part="U$1" gate="G$2" pin="P$3"/>
+<pinref part="U$1" gate="G$1" pin="P$3"/>
 </segment>
 </net>
 <net name="N$16" class="0">
@@ -4313,6 +4332,25 @@ Source: &lt;a href="https://www.onsemi.com/pub/Collateral/MMBT3904LT1-D.PDF"&gt;
 <pinref part="R13" gate="G$1" pin="2"/>
 <wire x1="281.94" y1="180.34" x2="284.48" y2="180.34" width="0.1524" layer="91"/>
 <pinref part="C16" gate="G$1" pin="1"/>
+</segment>
+</net>
+<net name="N$1" class="0">
+<segment>
+<pinref part="R14" gate="G$1" pin="2"/>
+<pinref part="C16" gate="G$1" pin="2"/>
+<wire x1="292.1" y1="180.34" x2="299.72" y2="180.34" width="0.1524" layer="91"/>
+<wire x1="299.72" y1="180.34" x2="299.72" y2="175.26" width="0.1524" layer="91"/>
+<wire x1="320.04" y1="180.34" x2="299.72" y2="180.34" width="0.1524" layer="91"/>
+<wire x1="325.12" y1="200.66" x2="320.04" y2="200.66" width="0.1524" layer="91"/>
+<wire x1="320.04" y1="200.66" x2="320.04" y2="180.34" width="0.1524" layer="91"/>
+<pinref part="U$1" gate="G$2" pin="P$1"/>
+</segment>
+</net>
+<net name="N$17" class="0">
+<segment>
+<pinref part="J2" gate="G$1" pin="3"/>
+<wire x1="340.36" y1="205.74" x2="353.06" y2="205.74" width="0.1524" layer="91"/>
+<pinref part="U$1" gate="G$2" pin="P$2"/>
 </segment>
 </net>
 </nets>

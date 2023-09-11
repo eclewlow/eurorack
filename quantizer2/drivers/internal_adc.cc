@@ -37,7 +37,7 @@ void InternalAdc::Init() {
   ADC_InitTypeDef adc_init;
   GPIO_InitTypeDef gpio_init;
     
-  gpio_init.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3;
+  gpio_init.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2;
   gpio_init.GPIO_Speed = GPIO_Speed_10MHz;
   gpio_init.GPIO_Mode = GPIO_Mode_AIN;
   GPIO_Init(GPIOA, &gpio_init);
@@ -70,7 +70,7 @@ void InternalAdc::Init() {
   ADC_RegularChannelConfig(ADC1, ADC_Channel_0, 1, ADC_SampleTime_239Cycles5); 
   ADC_RegularChannelConfig(ADC1, ADC_Channel_1, 2, ADC_SampleTime_239Cycles5); 
   ADC_RegularChannelConfig(ADC1, ADC_Channel_2, 3, ADC_SampleTime_239Cycles5); 
-  ADC_RegularChannelConfig(ADC1, ADC_Channel_3, 4, ADC_SampleTime_239Cycles5); 
+  // ADC_RegularChannelConfig(ADC1, ADC_Channel_3, 4, ADC_SampleTime_239Cycles5); 
   
   ADC_Cmd(ADC1, ENABLE);
   ADC_ResetCalibration(ADC1);

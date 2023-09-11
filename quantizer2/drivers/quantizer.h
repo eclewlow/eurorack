@@ -44,7 +44,7 @@ class Quantizer {
   
   void Init();
   
-  uint16_t Quantize(uint16_t input, uint16_t param_1, uint16_t param_2, uint16_t param_3);
+  uint16_t Quantize(uint16_t input, uint16_t param_1, uint16_t param_2);
   float getClosest(float, float, float);
   float findClosest(const float arr[], int n, float target);
 

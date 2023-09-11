@@ -33,7 +33,7 @@
 
 namespace quantizer2 {
 
-const uint8_t kNumAdcChannels = 4;
+const uint8_t kNumAdcChannels = 3;
 const uint8_t kHistoryLength = 8;
 
 class InternalAdc {

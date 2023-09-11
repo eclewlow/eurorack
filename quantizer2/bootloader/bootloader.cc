@@ -91,9 +91,9 @@ void TIM1_UP_IRQHandler() {
   
 
   chord_type = internal_adc.value(0);
-  transpose = internal_adc.value(1);
-  chaos = internal_adc.value(2);
-  slew = internal_adc.value(3);
+  // transpose = internal_adc.value(1);
+  chaos = internal_adc.value(1);
+  slew = internal_adc.value(2);
 
 
   bool adc_scan_cycle_complete = adc.PipelinedScan();
@@ -143,7 +143,7 @@ void TIM1_UP_IRQHandler() {
 
   int16_t q;
 
-  q = Q.Quantize(v_oct_input, transpose, slew, chaos);
+  q = Q.Quantize(v_oct_input, slew, chaos);
 
   uint16_t output = static_cast<uint16_t>(q);
 

@@ -45,6 +45,8 @@ static const uint16_t kC2Chord = 0b000010000101;
 static const uint16_t kBFlatMajorChord = 0b010000100100;
 static const uint16_t kFMajor2Chord = 0b001010100001;
 static const uint16_t kFMajorChord = 0b001000100001;
+static const uint16_t kGMinor4Chord = 0b010010000101;
+static const uint16_t kBFlatMajor2Chord = 0b010000100101;
 
 static const uint16_t kGMajorChord = 0b100010000100;
 static const uint16_t kCMiddleEastChord = 0b000010010011; //??
@@ -57,8 +59,10 @@ const uint16_t chord_table[] = {
   kBFlatMinorChord,
   kBDiminishedChord,
   kCMinorChord,
-  kC2Chord,
-  kBFlatMajorChord,
+  // kC2Chord,
+  // kBFlatMajorChord,
+  kGMinor4Chord,
+  kBFlatMajor2Chord,
   kFMajor2Chord,
   kCMiddleEastChord,
 };
@@ -133,7 +137,7 @@ float Quantizer::getClosest(float val1, float val2,
         return val1;
 }
 
-uint16_t Quantizer::Quantize(uint16_t input, uint16_t transpose, uint16_t slew, uint16_t chaos) {
+uint16_t Quantizer::Quantize(uint16_t input, uint16_t slew, uint16_t chaos) {
 
   uint16_t output = 0;
 
@@ -142,17 +146,11 @@ uint16_t Quantizer::Quantize(uint16_t input, uint16_t transpose, uint16_t slew, 
   input = factor * static_cast<float>(input);
   input = CLAMP<uint16_t>(input, 0, 4095);
 
-  float pitch_offset = 6.0 * (transpose-2047.5) / 120.0;
-
-  input -= pitch_offset;
-
   const float* arr = lookup_table_table[scale_ + 2];
 
   const uint8_t octave_range = 7;
 
   float closest = findClosest(arr, 4 * octave_range, static_cast<float>(input));
-
-  closest += pitch_offset;
 
   while(closest < 0.0f) {
     closest += 12.0f * 4095.0f / 120.0f;

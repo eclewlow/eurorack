@@ -1388,7 +1388,7 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <attribute name="NAME" x="22" y="18.238" size="0.6096" layer="26" font="vector" ratio="20" rot="MR180" align="bottom-center"/>
 <attribute name="PROD_ID" value=" " x="22" y="19" size="1.778" layer="28" rot="MR180" display="off"/>
 </element>
-<element name="C6" library="SparkFun-Capacitors" library_urn="urn:adsk.eagle:library:510" package="0603" package3d_urn="urn:adsk.eagle:package:37414/1" value="47pF" x="27" y="16" smashed="yes" rot="MR0">
+<element name="C6" library="SparkFun-Capacitors" library_urn="urn:adsk.eagle:library:510" package="0603" package3d_urn="urn:adsk.eagle:package:37414/1" value="100pF" x="27" y="16" smashed="yes" rot="MR0">
 <attribute name="NAME" x="27" y="16.762" size="0.6096" layer="26" font="vector" ratio="20" rot="MR0" align="bottom-center"/>
 <attribute name="PROD_ID" value="CAP-00810" x="27" y="16" size="1.778" layer="28" rot="MR0" display="off"/>
 <attribute name="VALUE" x="26.76" y="15.078" size="0.6096" layer="28" font="vector" ratio="20" rot="MR0" align="top-center"/>
