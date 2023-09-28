@@ -8,10 +8,10 @@
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -19,7 +19,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-// 
+//
 // See http://creativecommons.org/licenses/MIT/ for more information.
 //
 // -----------------------------------------------------------------------------
@@ -34,55 +34,55 @@
 
 namespace quantizer {
 
-  class Dac {
-  public:
-    Dac() { }
-    ~Dac() { }
+class Dac {
+public:
+  Dac() { }
+  ~Dac() { }
 
-    void Init();
+  void Init();
 
-    template<int N>
-    inline void Wait() {
-      Wait<N-1>();
-      __asm__("nop");
-    }
+  template<int N>
+  inline void Wait() {
+    Wait < N - 1 > ();
+    __asm__("nop");
+  }
 
-    void Write(uint16_t value, uint8_t channel) {
-      channel = channel & 0x01;
-      value = value & 0x0fff;
-      value = 4095 - value; // flip 0...2.5 to 2.5...0 because of inverted opamp
+  void Write(uint16_t value, uint8_t channel) {
+    channel = channel & 0x01;
+    value = value & 0x0fff;
+    value = 4095 - value; // flip 0...2.5 to 2.5...0 because of inverted opamp
 
-      GPIOB->BSRR = GPIO_Pin_1;
-      // GPIOB->BRR = GPIO_Pin_6;
-      GPIOA->BRR = GPIO_Pin_4;
+    GPIOB->BSRR = GPIO_Pin_1;
+    // GPIOB->BRR = GPIO_Pin_6;
+    GPIOA->BRR = GPIO_Pin_4;
 
-      while (!((SPI1->SR)&(1<<1))) {};
+    while (!((SPI1->SR) & (1 << 1))) {};
 
-      // SPI1->DR = (channel << 15) | value | (0x3000);
-      SPI1->DR = value | (0x3000);
-      // Wait<64>();
+    // SPI1->DR = (channel << 15) | value | (0x3000);
+    SPI1->DR = value | (0x3000);
+    // Wait<64>();
 
-      // GPIO_SetBits(GPIOB, kPinSS);
-      // GPIO_ResetBits(GPIOB, kPinSS);
-      // SPI_I2S_SendData(SPI1, 0x3000 | (value >> 8));
-      // SPI_I2S_SendData(SPI1, value << 8);
+    // GPIO_SetBits(GPIOB, kPinSS);
+    // GPIO_ResetBits(GPIOB, kPinSS);
+    // SPI_I2S_SendData(SPI1, 0x3000 | (value >> 8));
+    // SPI_I2S_SendData(SPI1, value << 8);
 
 
-      while (!((SPI1->SR)&(1<<1))) {};  // wait for TXE bit to set -> This will indicate that the buffer is empty
-      while (((SPI1->SR)&(1<<7))) {};  // wait for BSY bit to Reset -> This will indicate that SPI is not busy in communication 
-  
-      //  Clear the Overrun flag by reading DR and SR
-      uint8_t temp = SPI1->DR;
-      temp = SPI1->SR;
-      temp++;
+    while (!((SPI1->SR) & (1 << 1))) {}; // wait for TXE bit to set -> This will indicate that the buffer is empty
+    while (((SPI1->SR) & (1 << 7))) {}; // wait for BSY bit to Reset -> This will indicate that SPI is not busy in communication
 
-      // GPIOB->BSRR = GPIO_Pin_6;
-      GPIOA->BSRR = GPIO_Pin_4;
-      Wait<32>();
-      GPIOB->BRR = GPIO_Pin_1;
-   }
+    //  Clear the Overrun flag by reading DR and SR
+    uint8_t temp = SPI1->DR;
+    temp = SPI1->SR;
+    temp++;
 
- private:
+    // GPIOB->BSRR = GPIO_Pin_6;
+    GPIOA->BSRR = GPIO_Pin_4;
+    Wait<32>();
+    GPIOB->BRR = GPIO_Pin_1;
+  }
+
+private:
 
   DISALLOW_COPY_AND_ASSIGN(Dac);
 };

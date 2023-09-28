@@ -8,10 +8,10 @@
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -19,7 +19,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-// 
+//
 // See http://creativecommons.org/licenses/MIT/ for more information.
 //
 // -----------------------------------------------------------------------------
@@ -37,36 +37,36 @@ namespace quantizer {
 const size_t kNumChannels = 4;
 
 class Adc {
- public:
+public:
   Adc() { }
   ~Adc() { }
-  
+
   void Init();
-  
+
   // Inlined and optimized!
   inline bool PipelinedScan() {
     switch (acquisition_stage_) {
-      case 0:
-        rx_word_ |= SPI2->DR;
-        channels_[active_channel_] = 4095 - rx_word_; // flip -5...5 to 2.5...0 because of inverted opamp
-        GPIOB->BSRR = GPIO_Pin_12;
-        GPIOB->BRR = GPIO_Pin_12;
-        SPI2->DR = 0x04 | 0x02;
-        active_channel_ = (active_channel_ + 1) % kNumChannels;
-        acquisition_stage_ = 1;
-        break;
+    case 0:
+      rx_word_ |= SPI2->DR;
+      channels_[active_channel_] = 4095 - rx_word_; // flip -5...5 to 2.5...0 because of inverted opamp
+      GPIOB->BSRR = GPIO_Pin_12;
+      GPIOB->BRR = GPIO_Pin_12;
+      SPI2->DR = 0x04 | 0x02;
+      active_channel_ = (active_channel_ + 1) % kNumChannels;
+      acquisition_stage_ = 1;
+      break;
 
-      case 1:
-        SPI2->DR;
-        SPI2->DR = active_channel_ << 6;
-        acquisition_stage_ = 2;
-        break;
+    case 1:
+      SPI2->DR;
+      SPI2->DR = active_channel_ << 6;
+      acquisition_stage_ = 2;
+      break;
 
-      case 2:
-        rx_word_ = (SPI2->DR & 0xf) << 8;
-        SPI2->DR = 0x00;  // Dummy trailing data.
-        acquisition_stage_ = 0;
-        break;
+    case 2:
+      rx_word_ = (SPI2->DR & 0xf) << 8;
+      SPI2->DR = 0x00;  // Dummy trailing data.
+      acquisition_stage_ = 0;
+      break;
     }
     return (active_channel_ == 0 && acquisition_stage_ == 1);
   }
@@ -75,8 +75,8 @@ class Adc {
 
   uint16_t Read(uint8_t channel);
   uint16_t channel(uint8_t index) const { return channels_[index]; }
- 
- private:
+
+private:
   uint16_t rx_word_;
   size_t active_channel_;
   size_t acquisition_stage_;

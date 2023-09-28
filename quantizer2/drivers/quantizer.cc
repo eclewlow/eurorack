@@ -8,10 +8,10 @@
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -19,7 +19,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-// 
+//
 // See http://creativecommons.org/licenses/MIT/ for more information.
 //
 // -----------------------------------------------------------------------------
@@ -54,17 +54,17 @@ static const uint16_t kCMiddleEastChord = 0b000010010011; //??
 const uint8_t kChordTableLength = 9;
 
 const uint16_t chord_table[] = {
-  kCMajorChord,
-  kCSharpMajorChord,
-  kBFlatMinorChord,
-  kBDiminishedChord,
-  kCMinorChord,
-  // kC2Chord,
-  // kBFlatMajorChord,
-  kGMinor4Chord,
-  kBFlatMajor2Chord,
-  kFMajor2Chord,
-  kCMiddleEastChord,
+    kCMajorChord,
+    kCSharpMajorChord,
+    kBFlatMinorChord,
+    kBDiminishedChord,
+    kCMinorChord,
+    // kC2Chord,
+    // kBFlatMajorChord,
+    kGMinor4Chord,
+    kBFlatMajor2Chord,
+    kFMajor2Chord,
+    kCMiddleEastChord,
 };
 
 // The scale structure of the Middle Eastern Chord is always 1-b2-3-4-5-b6-7-1
@@ -75,42 +75,42 @@ template <typename T> T CLAMP(T value, T low, T high)
 
 
 void Quantizer::Init() {
-  scale_ = kCMiddleEastChord;
-  // scale_ = kCMajorChord;
+    scale_ = kCMiddleEastChord;
+    // scale_ = kCMajorChord;
 }
 
- 
+
 // Returns element closest to target in arr[]
 float Quantizer::findClosest(const float arr[], int n, float target)
 {
     // Corner cases
-  //left-side case
+    //left-side case
     if (target <= arr[0])
         return arr[0];
-  //right-side case
+    //right-side case
     if (target >= arr[n - 1])
         return arr[n - 1];
- 
+
     // Doing binary search
     int i = 0, j = n, mid = 0;
     while (i < j) {
         mid = (i + j) / 2;
- 
+
         if (arr[mid] == target)
             return arr[mid];
- 
+
         /* If target is less than array element,
             then search in left */
         if (target < arr[mid]) {
- 
+
             // If target is greater than previous
             // to mid, return closest of two
             if (mid > 0 && target > arr[mid - 1])
-                return getClosest(arr[mid - 1], arr[mid], target);  
+                return getClosest(arr[mid - 1], arr[mid], target);
             j = mid;
         }
-      /* Repeat for left half */
- 
+        /* Repeat for left half */
+
         // If target is greater than mid
         else {
             if (mid < n - 1 && target < arr[mid + 1])
@@ -122,14 +122,14 @@ float Quantizer::findClosest(const float arr[], int n, float target)
     // Only single element left after search
     return arr[mid];
 }
- 
+
 // Method to compare which one is the more close.
 // We find the closest by taking the difference
 // between the target and both values. It assumes
 // that val2 is greater than val1 and target lies
 // between these two.
 float Quantizer::getClosest(float val1, float val2,
-               float target)
+                            float target)
 {
     if (target - val1 >= val2 - target)
         return val2;
@@ -139,55 +139,62 @@ float Quantizer::getClosest(float val1, float val2,
 
 uint16_t Quantizer::Quantize(uint16_t input, uint16_t slew, uint16_t chaos) {
 
-  uint16_t output = 0;
+    uint16_t output = 0;
 
-  // input = static_cast<uint16_t>(2047 + (input - 2047) / (factor - 0.8));
-  float factor = lut_pow2[chaos];
-  input = factor * static_cast<float>(input);
-  input = CLAMP<uint16_t>(input, 0, 4095);
+    // input = static_cast<uint16_t>(2047 + (input - 2047) / (factor - 0.8));
+    float factor = lut_pow2[chaos];
+    input = factor * static_cast<float>(input);
+    input = CLAMP<uint16_t>(input, 0, 4095);
 
-  const float* arr = lookup_table_table[scale_ + 2];
+    if (abs(static_cast<int>(input) - static_cast<int>(last_input_)) < 70) {
+        input = last_input_;
+    }
 
-  const uint8_t octave_range = 7;
+    last_input_ = input;
 
-  float closest = findClosest(arr, 4 * octave_range, static_cast<float>(input));
 
-  while(closest < 0.0f) {
-    closest += 12.0f * 4095.0f / 120.0f;
-  }
-  while(closest > 4095.0f) {
-    closest -= 12.0f * 4095.0f / 120.0f;
-  }
+    const float* arr = lookup_table_table[scale_ + 2];
 
-  // closest = 0.0;
+    const uint8_t octave_range = 7;
 
-  uint16_t q_val = static_cast<uint16_t>(closest);
+    float closest = findClosest(arr, 4 * octave_range, static_cast<float>(input));
 
-  output = q_val;
+    while (closest < 0.0f) {
+        closest += 12.0f * 4095.0f / 120.0f;
+    }
+    while (closest > 4095.0f) {
+        closest -= 12.0f * 4095.0f / 120.0f;
+    }
 
-  if(output != target_) {
+    // closest = 0.0;
 
-    // slew.
-    target_ = output;
-    increment_ = (target_ - last_output_) / (1.0 + (1000.0 * slew) / 4095.0);
-  }
+    uint16_t q_val = static_cast<uint16_t>(closest);
 
-  last_output_ += increment_;
+    output = q_val;
 
-  if (increment_ > 0 && last_output_ > target_) {
-    increment_ = 0;
-    last_output_ = target_;
-  }
-  else if (increment_ < 0 && last_output_ < target_) {
-    increment_ = 0;
-    last_output_ = target_;    
-  }
+    if (output != target_) {
 
-  if(last_output_ == target_) {
-    increment_ = 0;
-  }
+        // slew.
+        target_ = output;
+        increment_ = (target_ - last_output_) / (1.0 + (1000.0 * slew) / 4095.0);
+    }
 
-  return static_cast<uint16_t>(last_output_);
+    last_output_ += increment_;
+
+    if (increment_ > 0 && last_output_ > target_) {
+        increment_ = 0;
+        last_output_ = target_;
+    }
+    else if (increment_ < 0 && last_output_ < target_) {
+        increment_ = 0;
+        last_output_ = target_;
+    }
+
+    if (last_output_ == target_) {
+        increment_ = 0;
+    }
+
+    return static_cast<uint16_t>(last_output_);
 }
 
 }  // namespace quantizer2
