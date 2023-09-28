@@ -35,6 +35,7 @@
 namespace quantizer2 {
 
 const size_t kNumChannels = 1;
+const uint8_t kADCHistoryLength = 8;
 
 class Adc {
 public:
@@ -74,13 +75,27 @@ public:
   bool PipelinedRead(uint8_t channel);
 
   uint16_t Read(uint8_t channel);
-  uint16_t channel(uint8_t index) const { return channels_[index]; }
+
+  uint16_t channel(uint8_t index) { 
+    history[history_index] = channels_[index];
+    history_index = (history_index + 1) % kADCHistoryLength;
+    uint16_t sum = 0;
+    for (uint8_t i = 0; i < kADCHistoryLength; i++) {
+      sum += history[i];
+    }
+    uint16_t average = sum / kADCHistoryLength;
+    return average;
+
+    // return channels_[index];
+  }
 
 private:
   uint16_t rx_word_;
   size_t active_channel_;
   size_t acquisition_stage_;
   uint16_t channels_[kNumChannels];
+  uint16_t history[kADCHistoryLength];
+  uint8_t history_index;
 
   DISALLOW_COPY_AND_ASSIGN(Adc);
 };
