@@ -35,7 +35,7 @@
 namespace quantizer2 {
 
 const size_t kNumChannels = 1;
-const uint8_t kADCHistoryLength = 1;
+const uint8_t kADCHistoryLength = 32;
 
 class Adc {
 public:

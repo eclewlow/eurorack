@@ -30,11 +30,12 @@
 #define QUANTIZER2_DRIVERS_INTERNAL_ADC_H_
 
 #include "stmlib/stmlib.h"
+#include <algorithm>
 
 namespace quantizer2 {
 
 const uint8_t kNumAdcChannels = 3;
-const uint8_t kHistoryLength = 8;
+const uint8_t kHistoryLength = 32;
 
 class InternalAdc {
 public:
@@ -45,21 +46,32 @@ public:
   void Init();
 
   uint16_t value(uint8_t channel) {
-    history[channel][history_index[channel]] = values_[channel];
+
+    // apply hysteresis
+    if (abs(static_cast<int>(values_[channel]) - static_cast<int>(last_values[channel])) < 120) {
+      history[channel][history_index[channel]] = last_values[channel];
+    } else {
+      history[channel][history_index[channel]] = values_[channel];
+      last_values[channel] = values_[channel];
+    }
+
+    // history[channel][history_index[channel]] = values_[channel];
+
     history_index[channel] = (history_index[channel] + 1) % kHistoryLength;
-    uint16_t sum = 0;
+    uint32_t sum = 0;
     for (uint8_t i = 0; i < kHistoryLength; i++) {
       sum += history[channel][i];
     }
     uint16_t average = sum / kHistoryLength;
+
     return average;
-    // return values_[channel];
   }
 
 private:
   uint16_t values_[kNumAdcChannels];
   uint16_t history[kNumAdcChannels][kHistoryLength];
   uint8_t history_index[kNumAdcChannels];
+  uint16_t last_values[kNumAdcChannels];
 
   DISALLOW_COPY_AND_ASSIGN(InternalAdc);
 };

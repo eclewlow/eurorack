@@ -148,11 +148,11 @@ uint16_t Quantizer::Quantize(uint16_t input, uint16_t slew, uint16_t chaos) {
     input = CLAMP<uint16_t>(input, 0, 4095);
 
     // if current input is close enough to the last input, then we use the last input
-    if (abs(static_cast<int>(input) - static_cast<int>(last_input_)) < 70) {
-        input = last_input_;
-    }
+    // if (abs(static_cast<int>(input) - static_cast<int>(last_input_)) < 24) {
+    //     input = last_input_;
+    // }
 
-    last_input_ = input;
+    // last_input_ = input;
 
 
     const float* arr = lookup_table_table[scale_ + 2];
@@ -175,11 +175,12 @@ uint16_t Quantizer::Quantize(uint16_t input, uint16_t slew, uint16_t chaos) {
     output = q_val;
 
     // if current input is within the last Q vals hysteresis range, then we use the last Q val
-    if (abs(static_cast<int>(input) - static_cast<int>(last_q_val_)) <= 70) {
-        output = last_q_val_;
-    }
+    // if (abs(static_cast<int>(input) - static_cast<int>(last_q_val_)) <= 1) {
+    //     output = last_q_val_;
+    // }
 
-    last_q_val_ = output;
+    // last_q_val_ = output;
+
 
     if (output != target_) {
 

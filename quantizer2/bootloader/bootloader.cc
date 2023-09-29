@@ -49,12 +49,6 @@ Quantizer Q;
 
 #define SAMPLE_RATE (96000)
 
-uint16_t last_chord_type = 0;
-uint32_t chord_pot_width = 455;//4096 / kChordTableLength;
-uint32_t chord_pot_width_2 = 227;//chord_pot_width / 2;
-uint32_t pot_normalization = 247;
-uint16_t midi_test;
-uint32_t midi_test_timer;
 uint16_t chord_type;
 uint16_t transpose;
 int32_t chaos;
@@ -103,41 +97,11 @@ extern "C" {
       // chaos_cv_input = adc.channel(1); // 0 - 4095
     }
 
+    // slew = 0;
+    // chaos = 2045;
+    // chord_type = 4095;
 
-    switch (2) {
-    case 1:
-    // case 1: +/- 5 v cv -5v => 0 chaos
-    // chaos = (chaos - 2047) * chaos_cv_input / 4095 + 2047;
-    case 2:
-    // case 2: -5 v is -chaos , +5 is +chaos
-    // chaos = (chaos - 2047) * (chaos_cv_input - 2047) / 2048 + 2047;
-    default:
-      break;
-    }
-
-
-    bool apply_pot_hysterisis = false;
-
-    if (apply_pot_hysterisis) {
-
-      uint32_t last_chord_center = last_chord_type * chord_pot_width + chord_pot_width_2;
-
-      if (last_chord_type == 0 && chord_type < chord_pot_width_2 + pot_normalization) {
-        chord_type = last_chord_type;
-      }
-      else if (last_chord_type == (kChordTableLength - 1) && chord_type > (kChordTableLength - 1) * chord_pot_width + chord_pot_width_2 - pot_normalization ) {
-        chord_type = last_chord_type;
-      }
-      else if (chord_type < last_chord_center + pot_normalization && chord_type > last_chord_center - pot_normalization) {
-        chord_type = last_chord_type;
-      }
-      else {
-        chord_type = kChordTableLength * chord_type / 4096;
-        last_chord_type = chord_type;
-      }
-    } else {
-      chord_type = kChordTableLength * chord_type / 4096;
-    }
+    chord_type = kChordTableLength * chord_type / 4096;
 
     Q.set_scale(chord_type);
 
@@ -148,14 +112,6 @@ extern "C" {
     uint16_t output = static_cast<uint16_t>(q);
 
     dac.Write(output, 0);
-    // dac.Write(midi_test, 0);
-
-    midi_test_timer += 1;
-    if (midi_test_timer > 6000) {
-      midi_test += 69 ;
-      midi_test_timer -= 6000;
-    }
-
   }
 
 }
