@@ -1,6 +1,6 @@
-// Copyright 2013 Emilie Gillet.
+// Copyright 2023 Eugene Clewlow.
 //
-// Author: Emilie Gillet (emilie.o.gillet@gmail.com)
+// Author: Eugene Clewlow (eugene.clewlowgmail.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal

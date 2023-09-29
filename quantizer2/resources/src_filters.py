@@ -1,8 +1,8 @@
 #!/usr/bin/python2.5
 #
-# Copyright 2014 Emilie Gillet.
-#
-# Author: Emilie Gillet (emilie.o.gillet@gmail.com)
+# Copyright 2023 Eugene Clewlow.
+# 
+# Author: Eugene Clewlow (eugene.clewlow@gmail.com)
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
