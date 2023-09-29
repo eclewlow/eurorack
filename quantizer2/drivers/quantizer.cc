@@ -147,7 +147,7 @@ uint16_t Quantizer::Quantize(uint16_t input, uint16_t slew, uint16_t chaos) {
     input = factor * static_cast<float>(input);
     input = CLAMP<uint16_t>(input, 0, 4095);
 
-    // if current input is within the last Q vals hysteresis range, then we use the last Q val
+    // if current input is close enough to the last input, then we use the last input
     if (abs(static_cast<int>(input) - static_cast<int>(last_input_)) < 70) {
         input = last_input_;
     }
