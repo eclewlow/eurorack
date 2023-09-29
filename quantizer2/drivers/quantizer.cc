@@ -36,6 +36,8 @@ using namespace std;
 
 namespace quantizer2 {
 
+#define ONE_OCTAVE_12BIT (12.0f * 4095.0f / 120.0f)
+
 static const uint16_t kCMajorChord = 0b000010010001;
 static const uint16_t kCSharpMajorChord = 0b000100100010;
 static const uint16_t kBFlatMinorChord = 0b010000100010;
@@ -141,11 +143,11 @@ uint16_t Quantizer::Quantize(uint16_t input, uint16_t slew, uint16_t chaos) {
 
     uint16_t output = 0;
 
-    // input = static_cast<uint16_t>(2047 + (input - 2047) / (factor - 0.8));
     float factor = lut_pow2[chaos];
     input = factor * static_cast<float>(input);
     input = CLAMP<uint16_t>(input, 0, 4095);
 
+    // if current input is within the last Q vals hysteresis range, then we use the last Q val
     if (abs(static_cast<int>(input) - static_cast<int>(last_input_)) < 70) {
         input = last_input_;
     }
@@ -160,10 +162,10 @@ uint16_t Quantizer::Quantize(uint16_t input, uint16_t slew, uint16_t chaos) {
     float closest = findClosest(arr, 4 * octave_range, static_cast<float>(input));
 
     while (closest < 0.0f) {
-        closest += 12.0f * 4095.0f / 120.0f;
+        closest += ONE_OCTAVE_12BIT;
     }
     while (closest > 4095.0f) {
-        closest -= 12.0f * 4095.0f / 120.0f;
+        closest -= ONE_OCTAVE_12BIT;
     }
 
     // closest = 0.0;
@@ -171,6 +173,13 @@ uint16_t Quantizer::Quantize(uint16_t input, uint16_t slew, uint16_t chaos) {
     uint16_t q_val = static_cast<uint16_t>(closest);
 
     output = q_val;
+
+    // if current input is within the last Q vals hysteresis range, then we use the last Q val
+    if (abs(static_cast<int>(input) - static_cast<int>(last_q_val_)) <= 70) {
+        output = last_q_val_;
+    }
+
+    last_q_val_ = output;
 
     if (output != target_) {
 

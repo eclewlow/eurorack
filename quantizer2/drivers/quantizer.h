@@ -56,6 +56,7 @@ private:
   uint16_t scale_;
   uint16_t target_;
   uint16_t last_input_;
+  uint16_t last_q_val_;
   float increment_;
   float last_output_;
 

@@ -35,7 +35,7 @@
 namespace quantizer2 {
 
 const size_t kNumChannels = 1;
-const uint8_t kADCHistoryLength = 8;
+const uint8_t kADCHistoryLength = 1;
 
 class Adc {
 public:
@@ -79,7 +79,7 @@ public:
   uint16_t channel(uint8_t index) { 
     history[history_index] = channels_[index];
     history_index = (history_index + 1) % kADCHistoryLength;
-    uint16_t sum = 0;
+    uint32_t sum = 0;
     for (uint8_t i = 0; i < kADCHistoryLength; i++) {
       sum += history[i];
     }
