@@ -48,11 +48,11 @@ public:
   uint16_t value(uint8_t channel) {
 
     // apply hysteresis
-    if (abs(static_cast<int>(values_[channel]) - static_cast<int>(last_values[channel])) < 120) {
-      history[channel][history_index[channel]] = last_values[channel];
+    if (abs(static_cast<int>(values_[channel]) - static_cast<int>(pre_hysteresis[channel])) < 120) {
+      history[channel][history_index[channel]] = pre_hysteresis[channel];
     } else {
       history[channel][history_index[channel]] = values_[channel];
-      last_values[channel] = values_[channel];
+      pre_hysteresis[channel] = values_[channel];
     }
 
     // history[channel][history_index[channel]] = values_[channel];
@@ -64,6 +64,13 @@ public:
     }
     uint16_t average = sum / kHistoryLength;
 
+    // apply hysteresis
+    if (abs(static_cast<int>(average) - static_cast<int>(post_hysteresis[channel])) < 120) {
+      average = post_hysteresis[channel];
+    } else {
+      post_hysteresis[channel] = average;
+    }
+
     return average;
   }
 
@@ -72,6 +79,8 @@ private:
   uint16_t history[kNumAdcChannels][kHistoryLength];
   uint8_t history_index[kNumAdcChannels];
   uint16_t last_values[kNumAdcChannels];
+  uint16_t pre_hysteresis[kNumAdcChannels];
+  uint16_t post_hysteresis[kNumAdcChannels];
 
   DISALLOW_COPY_AND_ASSIGN(InternalAdc);
 };
