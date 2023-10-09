@@ -1036,7 +1036,7 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <attribute name="PROD_ID" value="CAP-07883" x="24.384" y="19.812" size="1.778" layer="28" rot="MR0" display="off"/>
 <attribute name="VALUE" x="24.384" y="19.05" size="0.6096" layer="28" font="vector" ratio="20" rot="MR0" align="top-center"/>
 </element>
-<element name="C13" library="SparkFun-Capacitors" library_urn="urn:adsk.eagle:library:510" package="0603" package3d_urn="urn:adsk.eagle:package:37414/1" value="1.0uF" x="12.7" y="55.88" smashed="yes" rot="MR0">
+<element name="C13" library="SparkFun-Capacitors" library_urn="urn:adsk.eagle:library:510" package="0603" package3d_urn="urn:adsk.eagle:package:37414/1" value="10.0uF" x="12.7" y="55.88" smashed="yes" rot="MR0">
 <attribute name="NAME" x="12.7" y="56.642" size="0.6096" layer="26" font="vector" ratio="20" rot="MR0" align="bottom-center"/>
 <attribute name="PROD_ID" value="CAP-00868" x="12.7" y="55.88" size="1.778" layer="28" rot="MR0" display="off"/>
 <attribute name="VALUE" x="12.5" y="54.818" size="0.6096" layer="28" font="vector" ratio="20" rot="MR0" align="top-center"/>
@@ -1046,7 +1046,7 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <attribute name="PROD_ID" value="RES-07869" x="12.7" y="52.324" size="1.778" layer="28" rot="MR0" display="off"/>
 <attribute name="VALUE" x="12.7" y="51.562" size="0.6096" layer="28" font="vector" ratio="20" rot="MR0" align="top-center"/>
 </element>
-<element name="C14" library="SparkFun-Capacitors" library_urn="urn:adsk.eagle:library:510" package="0603" package3d_urn="urn:adsk.eagle:package:37414/1" value="1.0uF" x="24.384" y="16.764" smashed="yes" rot="MR0">
+<element name="C14" library="SparkFun-Capacitors" library_urn="urn:adsk.eagle:library:510" package="0603" package3d_urn="urn:adsk.eagle:package:37414/1" value="10.0uF" x="24.384" y="16.764" smashed="yes" rot="MR0">
 <attribute name="NAME" x="24.384" y="17.526" size="0.6096" layer="26" font="vector" ratio="20" rot="MR0" align="bottom-center"/>
 <attribute name="PROD_ID" value="CAP-00868" x="24.384" y="16.764" size="1.778" layer="28" rot="MR0" display="off"/>
 <attribute name="VALUE" x="24.384" y="16.002" size="0.6096" layer="28" font="vector" ratio="20" rot="MR0" align="top-center"/>
@@ -1071,7 +1071,7 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <attribute name="PROD_ID" value="RES-07856" x="15.086" y="13.076" size="1.778" layer="28" rot="MR0" display="off"/>
 <attribute name="VALUE" x="15.086" y="12.314" size="0.6096" layer="28" font="vector" ratio="20" rot="MR0" align="top-center"/>
 </element>
-<element name="C16" library="SparkFun-Capacitors" library_urn="urn:adsk.eagle:library:510" package="0603" package3d_urn="urn:adsk.eagle:package:37414/1" value="1.0uF" x="14.986" y="9.906" smashed="yes" rot="MR0">
+<element name="C16" library="SparkFun-Capacitors" library_urn="urn:adsk.eagle:library:510" package="0603" package3d_urn="urn:adsk.eagle:package:37414/1" value="10.0uF" x="14.986" y="9.906" smashed="yes" rot="MR0">
 <attribute name="NAME" x="14.986" y="10.668" size="0.6096" layer="26" font="vector" ratio="20" rot="MR0" align="bottom-center"/>
 <attribute name="PROD_ID" value="CAP-00868" x="14.986" y="9.906" size="1.778" layer="28" rot="MR0" display="off"/>
 <attribute name="VALUE" x="14.986" y="9.144" size="0.6096" layer="28" font="vector" ratio="20" rot="MR0" align="top-center"/>
