@@ -237,7 +237,7 @@ const float lut_logit[] = {
 };
 
 
-const float* lookup_table_table[] = {
+const float* const lookup_table_table[] = {
   lut_raised_cosine,
   lut_sine,
   lut_logit,
@@ -4700,7 +4700,7 @@ const float dist_icdf_4_8[] = {
 };
 
 
-const float* distributions_table[] = {
+const float* const distributions_table[] = {
   dist_icdf_0_0,
   dist_icdf_0_1,
   dist_icdf_0_2,

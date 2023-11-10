@@ -80,10 +80,10 @@ void Display::Refresh() {
 }
 
 void Display::Print(const char* s) {
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wstringop-truncation"
+  // #pragma GCC diagnostic push
+  // #pragma GCC diagnostic ignored "-Wstringop-truncation"
   strncpy(buffer_, s, kDisplayWidth);
-  #pragma GCC diagnostic pop
+  // #pragma GCC diagnostic pop
 }
 
 void Display::Shift14SegmentsWord(uint16_t data) {
