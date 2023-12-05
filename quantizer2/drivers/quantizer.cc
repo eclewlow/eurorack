@@ -38,36 +38,7 @@ namespace quantizer2 {
 
 #define ONE_OCTAVE_12BIT (12.0f * 4095.0f / 120.0f)
 
-static const uint16_t kCMajorChord = 0b000010010001;
-static const uint16_t kCSharpMajorChord = 0b000100100010;
-static const uint16_t kBFlatMinorChord = 0b010000100010;
-static const uint16_t kBDiminishedChord = 0b100100100100;
-static const uint16_t kCMinorChord = 0b000010001001;
-static const uint16_t kC2Chord = 0b000010000101;
-static const uint16_t kBFlatMajorChord = 0b010000100100;
-static const uint16_t kFMajor2Chord = 0b001010100001;
-static const uint16_t kFMajorChord = 0b001000100001;
-static const uint16_t kGMinor4Chord = 0b010010000101;
-static const uint16_t kBFlatMajor2Chord = 0b010000100101;
-
-static const uint16_t kGMajorChord = 0b100010000100;
-static const uint16_t kCMiddleEastChord = 0b000010010011; //??
-
 const uint8_t kChordTableLength = 9;
-
-const uint16_t chord_table[] = {
-    kCMajorChord,
-    kCSharpMajorChord,
-    kBFlatMinorChord,
-    kBDiminishedChord,
-    kCMinorChord,
-    // kC2Chord,
-    // kBFlatMajorChord,
-    kGMinor4Chord,
-    kBFlatMajor2Chord,
-    kFMajor2Chord,
-    kCMiddleEastChord,
-};
 
 // The scale structure of the Middle Eastern Chord is always 1-b2-3-4-5-b6-7-1
 template <typename T> T CLAMP(T value, T low, T high)
@@ -77,8 +48,7 @@ template <typename T> T CLAMP(T value, T low, T high)
 
 
 void Quantizer::Init() {
-    scale_ = kCMiddleEastChord;
-    // scale_ = kCMajorChord;
+    scale_ = 0;
 }
 
 
