@@ -55,6 +55,7 @@ extern const float lut_c_2_12bit[];
 extern const float lut_b_flat_major_12bit[];
 extern const float lut_f_2_12bit[];
 extern const float lut_c_me_12bit[];
+extern const float lut_test[];
 #define LUT_POW2 0
 #define LUT_POW2_SIZE 4096
 #define LUT_MIDI_TO_12BIT 1
@@ -77,6 +78,8 @@ extern const float lut_c_me_12bit[];
 #define LUT_F_2_12BIT_SIZE 28
 #define LUT_C_ME_12BIT 10
 #define LUT_C_ME_12BIT_SIZE 28
+#define LUT_TEST 11
+#define LUT_TEST_SIZE 12
 
 }  // namespace quantizer2
 

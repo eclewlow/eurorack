@@ -2579,23 +2579,6 @@ It has a reduced top mask to make it harder to install upside-down.</description
 <circle x="-3.81" y="0" radius="1.02390625" width="0" layer="30"/>
 <circle x="3.81" y="0" radius="1.04726875" width="0" layer="30"/>
 </package>
-<package name="0402" urn="urn:adsk.eagle:footprint:39625/1" library_version="1">
-<description>&lt;p&gt;&lt;b&gt;Generic 1005 (0402) package&lt;/b&gt;&lt;/p&gt;
-&lt;p&gt;0.2mm courtyard excess rounded to nearest 0.05mm.&lt;/p&gt;</description>
-<wire x1="-0.2704" y1="0.2286" x2="0.2704" y2="0.2286" width="0.1524" layer="51"/>
-<wire x1="0.2704" y1="-0.2286" x2="-0.2704" y2="-0.2286" width="0.1524" layer="51"/>
-<wire x1="-1.2" y1="0.65" x2="1.2" y2="0.65" width="0.0508" layer="39"/>
-<wire x1="1.2" y1="0.65" x2="1.2" y2="-0.65" width="0.0508" layer="39"/>
-<wire x1="1.2" y1="-0.65" x2="-1.2" y2="-0.65" width="0.0508" layer="39"/>
-<wire x1="-1.2" y1="-0.65" x2="-1.2" y2="0.65" width="0.0508" layer="39"/>
-<smd name="1" x="-0.58" y="0" dx="0.85" dy="0.9" layer="1"/>
-<smd name="2" x="0.58" y="0" dx="0.85" dy="0.9" layer="1"/>
-<text x="0" y="0.762" size="0.6096" layer="25" font="vector" ratio="20" align="bottom-center">&gt;NAME</text>
-<text x="0" y="-0.762" size="0.6096" layer="27" font="vector" ratio="20" align="top-center">&gt;VALUE</text>
-<rectangle x1="-0.554" y1="-0.3048" x2="-0.254" y2="0.3048" layer="51"/>
-<rectangle x1="0.2588" y1="-0.3048" x2="0.5588" y2="0.3048" layer="51"/>
-<rectangle x1="-0.1999" y1="-0.3" x2="0.1999" y2="0.3" layer="35"/>
-</package>
 </packages>
 <packages3d>
 <package3d name="AXIAL-0.3" urn="urn:adsk.eagle:package:39658/1" type="box" library_version="1">
@@ -2640,13 +2623,6 @@ Warning: This is the KIT version of the AXIAL-0.3 package. This package has a sm
 It has a reduced top mask to make it harder to install upside-down.</description>
 <packageinstances>
 <packageinstance name="AXIAL-0.3EZ"/>
-</packageinstances>
-</package3d>
-<package3d name="0402" urn="urn:adsk.eagle:package:39657/1" type="box" library_version="1">
-<description>Generic 1005 (0402) package
-0.2mm courtyard excess rounded to nearest 0.05mm.</description>
-<packageinstances>
-<packageinstance name="0402"/>
 </packageinstances>
 </package3d>
 </packages3d>
@@ -3202,165 +3178,6 @@ It has a reduced top mask to make it harder to install upside-down.</description
 </device>
 </devices>
 </deviceset>
-<deviceset name="100KOHM" urn="urn:adsk.eagle:component:39765/1" prefix="R" library_version="1">
-<description>&lt;h3&gt;100kΩ resistor&lt;/h3&gt;
-&lt;p&gt;A resistor is a passive two-terminal electrical component that implements electrical resistance as a circuit element. Resistors act to reduce current flow, and, at the same time, act to lower voltage levels within circuits. - Wikipedia&lt;/p&gt;</description>
-<gates>
-<gate name="G$1" symbol="RESISTOR" x="0" y="0"/>
-</gates>
-<devices>
-<device name="-HORIZ-1/4W-1%" package="AXIAL-0.3">
-<connects>
-<connect gate="G$1" pin="1" pad="P$1"/>
-<connect gate="G$1" pin="2" pad="P$2"/>
-</connects>
-<package3dinstances>
-<package3dinstance package3d_urn="urn:adsk.eagle:package:39658/1"/>
-</package3dinstances>
-<technologies>
-<technology name="">
-<attribute name="PROD_ID" value="RES-12184"/>
-<attribute name="VALUE" value="100k" constant="no"/>
-</technology>
-</technologies>
-</device>
-<device name="-VERT-1/4W-1%" package="AXIAL-0.1">
-<connects>
-<connect gate="G$1" pin="1" pad="P$1"/>
-<connect gate="G$1" pin="2" pad="P$2"/>
-</connects>
-<package3dinstances>
-<package3dinstance package3d_urn="urn:adsk.eagle:package:39656/1"/>
-</package3dinstances>
-<technologies>
-<technology name="">
-<attribute name="PROD_ID" value="RES-12184"/>
-<attribute name="VALUE" value="100k"/>
-</technology>
-</technologies>
-</device>
-<device name="-VERT_KIT-1/4W-1%" package="AXIAL-0.1-KIT">
-<connects>
-<connect gate="G$1" pin="1" pad="P$1"/>
-<connect gate="G$1" pin="2" pad="P$2"/>
-</connects>
-<package3dinstances>
-<package3dinstance package3d_urn="urn:adsk.eagle:package:39653/1"/>
-</package3dinstances>
-<technologies>
-<technology name="">
-<attribute name="PROD_ID" value="RES-12184"/>
-<attribute name="VALUE" value="100k" constant="no"/>
-</technology>
-</technologies>
-</device>
-<device name="-HORIZ_KIT-1/4W-1%" package="AXIAL-0.3-KIT">
-<connects>
-<connect gate="G$1" pin="1" pad="P$1"/>
-<connect gate="G$1" pin="2" pad="P$2"/>
-</connects>
-<package3dinstances>
-<package3dinstance package3d_urn="urn:adsk.eagle:package:39661/1"/>
-</package3dinstances>
-<technologies>
-<technology name="">
-<attribute name="PROD_ID" value="RES-12184"/>
-<attribute name="VALUE" value="100k"/>
-</technology>
-</technologies>
-</device>
-<device name="-VERT-1/4W-5%" package="AXIAL-0.1">
-<connects>
-<connect gate="G$1" pin="1" pad="P$1"/>
-<connect gate="G$1" pin="2" pad="P$2"/>
-</connects>
-<package3dinstances>
-<package3dinstance package3d_urn="urn:adsk.eagle:package:39656/1"/>
-</package3dinstances>
-<technologies>
-<technology name="">
-<attribute name="PROD_ID" value="RES-10686"/>
-<attribute name="VALUE" value="100k"/>
-</technology>
-</technologies>
-</device>
-<device name="-VERT_KIT-1/4W-5%" package="AXIAL-0.1-KIT">
-<connects>
-<connect gate="G$1" pin="1" pad="P$1"/>
-<connect gate="G$1" pin="2" pad="P$2"/>
-</connects>
-<package3dinstances>
-<package3dinstance package3d_urn="urn:adsk.eagle:package:39653/1"/>
-</package3dinstances>
-<technologies>
-<technology name="">
-<attribute name="PROD_ID" value="RES-10686"/>
-<attribute name="VALUE" value="100k"/>
-</technology>
-</technologies>
-</device>
-<device name="-HORIZ-1/4W-5%" package="AXIAL-0.3">
-<connects>
-<connect gate="G$1" pin="1" pad="P$1"/>
-<connect gate="G$1" pin="2" pad="P$2"/>
-</connects>
-<package3dinstances>
-<package3dinstance package3d_urn="urn:adsk.eagle:package:39658/1"/>
-</package3dinstances>
-<technologies>
-<technology name="">
-<attribute name="PROD_ID" value="RES-10686"/>
-<attribute name="VALUE" value="100k"/>
-</technology>
-</technologies>
-</device>
-<device name="-HORIZ_KIT-1/4W-5%" package="AXIAL-0.3-KIT">
-<connects>
-<connect gate="G$1" pin="1" pad="P$1"/>
-<connect gate="G$1" pin="2" pad="P$2"/>
-</connects>
-<package3dinstances>
-<package3dinstance package3d_urn="urn:adsk.eagle:package:39661/1"/>
-</package3dinstances>
-<technologies>
-<technology name="">
-<attribute name="PROD_ID" value="RES-10686"/>
-<attribute name="VALUE" value="100k"/>
-</technology>
-</technologies>
-</device>
-<device name="-0603-1/10W-1%" package="0603">
-<connects>
-<connect gate="G$1" pin="1" pad="1"/>
-<connect gate="G$1" pin="2" pad="2"/>
-</connects>
-<package3dinstances>
-<package3dinstance package3d_urn="urn:adsk.eagle:package:39650/1"/>
-</package3dinstances>
-<technologies>
-<technology name="">
-<attribute name="PROD_ID" value="RES-07828"/>
-<attribute name="VALUE" value="100k"/>
-</technology>
-</technologies>
-</device>
-<device name="-0402-1/16W-1%" package="0402">
-<connects>
-<connect gate="G$1" pin="1" pad="1"/>
-<connect gate="G$1" pin="2" pad="2"/>
-</connects>
-<package3dinstances>
-<package3dinstance package3d_urn="urn:adsk.eagle:package:39657/1"/>
-</package3dinstances>
-<technologies>
-<technology name="">
-<attribute name="PROD_ID" value="RES-13495"/>
-<attribute name="VALUE" value="100K"/>
-</technology>
-</technologies>
-</device>
-</devices>
-</deviceset>
 <deviceset name="200KOHM" urn="urn:adsk.eagle:component:39703/1" prefix="R" library_version="1">
 <description>&lt;h3&gt;200kΩ resistor&lt;/h3&gt;
 &lt;p&gt;A resistor is a passive two-terminal electrical component that implements electrical resistance as a circuit element. Resistors act to reduce current flow, and, at the same time, act to lower voltage levels within circuits. - Wikipedia&lt;/p&gt;</description>
@@ -3380,6 +3197,30 @@ It has a reduced top mask to make it harder to install upside-down.</description
 <technology name="">
 <attribute name="PROD_ID" value="RES-09385"/>
 <attribute name="VALUE" value="200k"/>
+</technology>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="82OHM" urn="urn:adsk.eagle:component:39748/1" prefix="R" library_version="1">
+<description>&lt;h3&gt;82Ω resistor&lt;/h3&gt;
+&lt;p&gt;A resistor is a passive two-terminal electrical component that implements electrical resistance as a circuit element. Resistors act to reduce current flow, and, at the same time, act to lower voltage levels within circuits. - Wikipedia&lt;/p&gt;</description>
+<gates>
+<gate name="G$1" symbol="RESISTOR" x="0" y="0"/>
+</gates>
+<devices>
+<device name="-0603-1/10W-1%" package="0603">
+<connects>
+<connect gate="G$1" pin="1" pad="1"/>
+<connect gate="G$1" pin="2" pad="2"/>
+</connects>
+<package3dinstances>
+<package3dinstance package3d_urn="urn:adsk.eagle:package:39650/1"/>
+</package3dinstances>
+<technologies>
+<technology name="">
+<attribute name="PROD_ID" value="RES-12311"/>
+<attribute name="VALUE" value="82"/>
 </technology>
 </technologies>
 </device>
@@ -10243,6 +10084,70 @@ Source: AVX .. aphvc.pdf</description>
 </deviceset>
 </devicesets>
 </library>
+<library name="D6R Push Button">
+<description>&lt;D6R90F1LFS (Key Switches)&lt;/b&gt;&lt;p&gt;
+&lt;author&gt;Created by SamacSys&lt;/author&gt;</description>
+<packages>
+<package name="D6C10F1LFS">
+<description>&lt;b&gt;d6&lt;/b&gt;&lt;br&gt;
+</description>
+<pad name="1" x="-2.5" y="2.5" drill="1.14" diameter="1.7"/>
+<pad name="2" x="-2.5" y="-2.5" drill="1.14" diameter="1.7"/>
+<pad name="3" x="2.5" y="-2.5" drill="1.14" diameter="1.7"/>
+<pad name="4" x="2.5" y="2.5" drill="1.14" diameter="1.7"/>
+<text x="-0.41" y="0.017" size="1.27" layer="25" align="center">&gt;NAME</text>
+<text x="-0.41" y="0.017" size="1.27" layer="27" align="center">&gt;VALUE</text>
+<wire x1="-5.4" y1="2.5" x2="-5.4" y2="-2.5" width="0.2" layer="51" curve="-310.5"/>
+<wire x1="-5.4" y1="2.5" x2="-5.4" y2="-2.5" width="0.2" layer="51"/>
+<wire x1="-5.4" y1="2.5" x2="-5.4" y2="-2.5" width="0.2" layer="21" curve="-310.5"/>
+<wire x1="-5.4" y1="2.5" x2="-5.4" y2="-2.5" width="0.2" layer="21"/>
+<circle x="-6.391" y="2.656" radius="0.066" width="0.2" layer="25"/>
+</package>
+</packages>
+<symbols>
+<symbol name="D6R90F1LFS">
+<wire x1="5.08" y1="2.54" x2="15.24" y2="2.54" width="0.254" layer="94"/>
+<wire x1="15.24" y1="-5.08" x2="15.24" y2="2.54" width="0.254" layer="94"/>
+<wire x1="15.24" y1="-5.08" x2="5.08" y2="-5.08" width="0.254" layer="94"/>
+<wire x1="5.08" y1="2.54" x2="5.08" y2="-5.08" width="0.254" layer="94"/>
+<text x="16.51" y="7.62" size="1.778" layer="95" align="center-left">&gt;NAME</text>
+<text x="16.51" y="5.08" size="1.778" layer="96" align="center-left">&gt;VALUE</text>
+<pin name="1" x="0" y="0" length="middle"/>
+<pin name="2" x="0" y="-2.54" length="middle"/>
+<pin name="3" x="20.32" y="-2.54" length="middle" rot="R180"/>
+<pin name="4" x="20.32" y="0" length="middle" rot="R180"/>
+</symbol>
+</symbols>
+<devicesets>
+<deviceset name="D6R90F1LFS" prefix="S">
+<description>&lt;b&gt;D6R90F1LFS (Key Switches)&lt;/b&gt;&lt;p&gt;
+Source: &lt;a href="https://www.ckswitches.com/media/1341/d6.pdf"&gt; Datasheet &lt;/a&gt;</description>
+<gates>
+<gate name="G$1" symbol="D6R90F1LFS" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="D6C10F1LFS">
+<connects>
+<connect gate="G$1" pin="1" pad="1"/>
+<connect gate="G$1" pin="2" pad="2"/>
+<connect gate="G$1" pin="3" pad="3"/>
+<connect gate="G$1" pin="4" pad="4"/>
+</connects>
+<technologies>
+<technology name="">
+<attribute name="DESCRIPTION" value="D6R90F1LFS (Key Switches)" constant="no"/>
+<attribute name="HEIGHT" value="mm" constant="no"/>
+<attribute name="MANUFACTURER_NAME" value="C &amp; K COMPONENTS" constant="no"/>
+<attribute name="MANUFACTURER_PART_NUMBER" value="D6R90F1LFS" constant="no"/>
+<attribute name="MOUSER_PART_NUMBER" value="611-D6R90LFS" constant="no"/>
+<attribute name="MOUSER_PRICE-STOCK" value="https://www.mouser.co.uk/ProductDetail/CK/D6R90F1LFS?qs=WS%2FiepCTwPDejJXcQ7Ir1g%3D%3D" constant="no"/>
+</technology>
+</technologies>
+</device>
+</devices>
+</deviceset>
+</devicesets>
+</library>
 </libraries>
 <attributes>
 </attributes>
@@ -10423,28 +10328,23 @@ Source: AVX .. aphvc.pdf</description>
 <part name="C43" library="SparkFun-Capacitors" library_urn="urn:adsk.eagle:library:510" deviceset="0.1UF" device="-0603-25V-(+80/-20%)" package3d_urn="urn:adsk.eagle:package:37414/1" value="0.1uF"/>
 <part name="GND58" library="SparkFun-PowerSymbols" library_urn="urn:adsk.eagle:library:530" deviceset="GND" device=""/>
 <part name="C44" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="C-US" device="C0603" package3d_urn="urn:adsk.eagle:package:23616/2" value="ESD"/>
-<part name="R21" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="100KOHM" device="-0603-1/10W-1%" package3d_urn="urn:adsk.eagle:package:39650/1" value="100k"/>
 <part name="GND59" library="SparkFun-PowerSymbols" library_urn="urn:adsk.eagle:library:530" deviceset="GND" device=""/>
 <part name="GND61" library="SparkFun-PowerSymbols" library_urn="urn:adsk.eagle:library:530" deviceset="GND" device=""/>
 <part name="GND60" library="SparkFun-PowerSymbols" library_urn="urn:adsk.eagle:library:530" deviceset="GND" device=""/>
 <part name="GND62" library="SparkFun-PowerSymbols" library_urn="urn:adsk.eagle:library:530" deviceset="GND" device=""/>
-<part name="R22" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="200KOHM" device="-0603-1/10W-1%" package3d_urn="urn:adsk.eagle:package:39650/1" value="200k"/>
 <part name="R23" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="33KOHM" device="-0603-1/10W-1%" package3d_urn="urn:adsk.eagle:package:39650/1" value="33k"/>
 <part name="C45" library="SparkFun-Capacitors" library_urn="urn:adsk.eagle:library:510" deviceset="1.0NF/1000PF" device="-0603-50V-10%" package3d_urn="urn:adsk.eagle:package:37414/1" value="1nF"/>
 <part name="C46" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="C-US" device="C0603" package3d_urn="urn:adsk.eagle:package:23616/2" value="ESD"/>
-<part name="R24" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="100KOHM" device="-0603-1/10W-1%" package3d_urn="urn:adsk.eagle:package:39650/1" value="100k"/>
 <part name="GND63" library="SparkFun-PowerSymbols" library_urn="urn:adsk.eagle:library:530" deviceset="GND" device=""/>
 <part name="R25" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="200KOHM" device="-0603-1/10W-1%" package3d_urn="urn:adsk.eagle:package:39650/1" value="200k"/>
 <part name="R26" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="33KOHM" device="-0603-1/10W-1%" package3d_urn="urn:adsk.eagle:package:39650/1" value="33k"/>
 <part name="C47" library="SparkFun-Capacitors" library_urn="urn:adsk.eagle:library:510" deviceset="1.0NF/1000PF" device="-0603-50V-10%" package3d_urn="urn:adsk.eagle:package:37414/1" value="1nF"/>
 <part name="C48" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="C-US" device="C0603" package3d_urn="urn:adsk.eagle:package:23616/2" value="ESD"/>
-<part name="R27" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="100KOHM" device="-0603-1/10W-1%" package3d_urn="urn:adsk.eagle:package:39650/1" value="100k"/>
 <part name="GND64" library="SparkFun-PowerSymbols" library_urn="urn:adsk.eagle:library:530" deviceset="GND" device=""/>
 <part name="R28" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="200KOHM" device="-0603-1/10W-1%" package3d_urn="urn:adsk.eagle:package:39650/1" value="200k"/>
 <part name="R29" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="33KOHM" device="-0603-1/10W-1%" package3d_urn="urn:adsk.eagle:package:39650/1" value="33k"/>
 <part name="C49" library="SparkFun-Capacitors" library_urn="urn:adsk.eagle:library:510" deviceset="1.0NF/1000PF" device="-0603-50V-10%" package3d_urn="urn:adsk.eagle:package:37414/1" value="1nF"/>
 <part name="C50" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="C-US" device="C0603" package3d_urn="urn:adsk.eagle:package:23616/2" value="ESD"/>
-<part name="R30" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="100KOHM" device="-0603-1/10W-1%" package3d_urn="urn:adsk.eagle:package:39650/1" value="100k"/>
 <part name="GND65" library="SparkFun-PowerSymbols" library_urn="urn:adsk.eagle:library:530" deviceset="GND" device=""/>
 <part name="R31" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="200KOHM" device="-0603-1/10W-1%" package3d_urn="urn:adsk.eagle:package:39650/1" value="200k"/>
 <part name="R32" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="33KOHM" device="-0603-1/10W-1%" package3d_urn="urn:adsk.eagle:package:39650/1" value="33k"/>
@@ -10456,6 +10356,12 @@ Source: AVX .. aphvc.pdf</description>
 <part name="GND70" library="SparkFun-PowerSymbols" library_urn="urn:adsk.eagle:library:530" deviceset="GND" device=""/>
 <part name="GND71" library="SparkFun-PowerSymbols" library_urn="urn:adsk.eagle:library:530" deviceset="GND" device=""/>
 <part name="GND73" library="SparkFun-PowerSymbols" library_urn="urn:adsk.eagle:library:530" deviceset="GND" device=""/>
+<part name="S1" library="D6R Push Button" deviceset="D6R90F1LFS" device=""/>
+<part name="GND72" library="SparkFun-PowerSymbols" library_urn="urn:adsk.eagle:library:530" deviceset="GND" device=""/>
+<part name="R22" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="200KOHM" device="-0603-1/10W-1%" package3d_urn="urn:adsk.eagle:package:39650/1" value="200k"/>
+<part name="R27" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="200KOHM" device="-0603-1/10W-1%" package3d_urn="urn:adsk.eagle:package:39650/1" value="200k"/>
+<part name="R24" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="200KOHM" device="-0603-1/10W-1%" package3d_urn="urn:adsk.eagle:package:39650/1" value="200k"/>
+<part name="R21" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="82OHM" device="-0603-1/10W-1%" package3d_urn="urn:adsk.eagle:package:39650/1" value="80.6k"/>
 </parts>
 <sheets>
 <sheet>
@@ -10874,6 +10780,13 @@ Source: AVX .. aphvc.pdf</description>
 <instance part="GND73" gate="1" x="48.26" y="58.42" smashed="yes" rot="R180">
 <attribute name="VALUE" x="48.26" y="58.674" size="1.778" layer="96" rot="R180" align="top-center"/>
 </instance>
+<instance part="S1" gate="G$1" x="22.86" y="101.6" smashed="yes">
+<attribute name="NAME" x="39.37" y="109.22" size="1.778" layer="95" align="center-left"/>
+<attribute name="VALUE" x="39.37" y="106.68" size="1.778" layer="96" align="center-left"/>
+</instance>
+<instance part="GND72" gate="1" x="330.2" y="187.96" smashed="yes">
+<attribute name="VALUE" x="330.2" y="187.706" size="1.778" layer="96" align="top-center"/>
+</instance>
 </instances>
 <busses>
 </busses>
@@ -11218,6 +11131,21 @@ Source: AVX .. aphvc.pdf</description>
 <pinref part="VR1" gate="G$1" pin="MH2"/>
 <wire x1="48.26" y1="53.34" x2="48.26" y2="55.88" width="0.1524" layer="91"/>
 <pinref part="GND73" gate="1" pin="GND"/>
+</segment>
+<segment>
+<pinref part="S1" gate="G$1" pin="1"/>
+<wire x1="22.86" y1="101.6" x2="20.32" y2="101.6" width="0.1524" layer="91"/>
+<label x="17.78" y="101.6" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="S1" gate="G$1" pin="2"/>
+<wire x1="22.86" y1="99.06" x2="20.32" y2="99.06" width="0.1524" layer="91"/>
+<label x="17.78" y="99.06" size="1.778" layer="95"/>
+</segment>
+<segment>
+<wire x1="330.2" y1="193.04" x2="330.2" y2="190.5" width="0.1524" layer="91"/>
+<pinref part="C18" gate="G$1" pin="2"/>
+<pinref part="GND72" gate="1" pin="GND"/>
 </segment>
 </net>
 <net name="+3V3_A" class="0">
@@ -11779,12 +11707,6 @@ Source: AVX .. aphvc.pdf</description>
 <label x="86.36" y="170.18" size="1.778" layer="95"/>
 </segment>
 </net>
-<net name="N$28" class="0">
-<segment>
-<wire x1="330.2" y1="193.04" x2="330.2" y2="190.5" width="0.1524" layer="91"/>
-<pinref part="C18" gate="G$1" pin="2"/>
-</segment>
-</net>
 <net name="ENC_1_CLICK" class="0">
 <segment>
 <pinref part="U1" gate="G$1" pin="NO"/>
@@ -11981,6 +11903,23 @@ Source: AVX .. aphvc.pdf</description>
 <wire x1="292.1" y1="40.64" x2="294.64" y2="40.64" width="0.1524" layer="91"/>
 <pinref part="R18" gate="G$1" pin="2"/>
 <label x="294.64" y="38.1" size="1.778" layer="95"/>
+</segment>
+</net>
+<net name="BACK_BUTTON" class="0">
+<segment>
+<pinref part="S1" gate="G$1" pin="4"/>
+<wire x1="43.18" y1="101.6" x2="45.72" y2="101.6" width="0.1524" layer="91"/>
+<label x="43.18" y="101.6" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="S1" gate="G$1" pin="3"/>
+<wire x1="43.18" y1="99.06" x2="45.72" y2="99.06" width="0.1524" layer="91"/>
+<label x="43.18" y="99.06" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="IC2" gate="G$$1" pin="PC7/I2S3_MCK"/>
+<wire x1="208.28" y1="170.18" x2="210.82" y2="170.18" width="0.1524" layer="91"/>
+<label x="210.82" y="170.18" size="1.778" layer="95"/>
 </segment>
 </net>
 </nets>
@@ -12182,10 +12121,6 @@ Source: AVX .. aphvc.pdf</description>
 <attribute name="NAME" x="171.196" y="102.235" size="1.778" layer="95"/>
 <attribute name="VALUE" x="171.196" y="97.409" size="1.778" layer="96"/>
 </instance>
-<instance part="R21" gate="G$1" x="180.34" y="106.68" smashed="yes">
-<attribute name="NAME" x="180.34" y="108.204" size="1.778" layer="95" font="vector" align="bottom-center"/>
-<attribute name="VALUE" x="180.34" y="105.156" size="1.778" layer="96" font="vector" align="top-center"/>
-</instance>
 <instance part="GND59" gate="1" x="30.48" y="88.9" smashed="yes">
 <attribute name="VALUE" x="30.48" y="88.646" size="1.778" layer="96" align="top-center"/>
 </instance>
@@ -12198,10 +12133,6 @@ Source: AVX .. aphvc.pdf</description>
 <instance part="GND62" gate="1" x="170.18" y="91.44" smashed="yes">
 <attribute name="VALUE" x="170.18" y="91.186" size="1.778" layer="96" align="top-center"/>
 </instance>
-<instance part="R22" gate="G$1" x="177.8" y="116.84" smashed="yes">
-<attribute name="NAME" x="177.8" y="118.364" size="1.778" layer="95" font="vector" align="bottom-center"/>
-<attribute name="VALUE" x="177.8" y="115.316" size="1.778" layer="96" font="vector" align="top-center"/>
-</instance>
 <instance part="R23" gate="G$1" x="195.58" y="114.3" smashed="yes">
 <attribute name="NAME" x="195.58" y="115.824" size="1.778" layer="95" font="vector" align="bottom-center"/>
 <attribute name="VALUE" x="195.58" y="112.776" size="1.778" layer="96" font="vector" align="top-center"/>
@@ -12213,10 +12144,6 @@ Source: AVX .. aphvc.pdf</description>
 <instance part="C46" gate="G$1" x="170.18" y="66.04" smashed="yes">
 <attribute name="NAME" x="171.196" y="66.675" size="1.778" layer="95"/>
 <attribute name="VALUE" x="171.196" y="61.849" size="1.778" layer="96"/>
-</instance>
-<instance part="R24" gate="G$1" x="180.34" y="71.12" smashed="yes">
-<attribute name="NAME" x="180.34" y="72.644" size="1.778" layer="95" font="vector" align="bottom-center"/>
-<attribute name="VALUE" x="180.34" y="69.596" size="1.778" layer="96" font="vector" align="top-center"/>
 </instance>
 <instance part="GND63" gate="1" x="170.18" y="55.88" smashed="yes">
 <attribute name="VALUE" x="170.18" y="55.626" size="1.778" layer="96" align="top-center"/>
@@ -12237,10 +12164,6 @@ Source: AVX .. aphvc.pdf</description>
 <attribute name="NAME" x="255.016" y="102.235" size="1.778" layer="95"/>
 <attribute name="VALUE" x="255.016" y="97.409" size="1.778" layer="96"/>
 </instance>
-<instance part="R27" gate="G$1" x="264.16" y="106.68" smashed="yes">
-<attribute name="NAME" x="264.16" y="108.204" size="1.778" layer="95" font="vector" align="bottom-center"/>
-<attribute name="VALUE" x="264.16" y="105.156" size="1.778" layer="96" font="vector" align="top-center"/>
-</instance>
 <instance part="GND64" gate="1" x="254" y="91.44" smashed="yes">
 <attribute name="VALUE" x="254" y="91.186" size="1.778" layer="96" align="top-center"/>
 </instance>
@@ -12259,10 +12182,6 @@ Source: AVX .. aphvc.pdf</description>
 <instance part="C50" gate="G$1" x="254" y="66.04" smashed="yes">
 <attribute name="NAME" x="255.016" y="66.675" size="1.778" layer="95"/>
 <attribute name="VALUE" x="255.016" y="61.849" size="1.778" layer="96"/>
-</instance>
-<instance part="R30" gate="G$1" x="264.16" y="71.12" smashed="yes">
-<attribute name="NAME" x="264.16" y="72.644" size="1.778" layer="95" font="vector" align="bottom-center"/>
-<attribute name="VALUE" x="264.16" y="69.596" size="1.778" layer="96" font="vector" align="top-center"/>
 </instance>
 <instance part="GND65" gate="1" x="254" y="55.88" smashed="yes">
 <attribute name="VALUE" x="254" y="55.626" size="1.778" layer="96" align="top-center"/>
@@ -12287,6 +12206,22 @@ Source: AVX .. aphvc.pdf</description>
 </instance>
 <instance part="GND68" gate="1" x="248.92" y="96.52" smashed="yes">
 <attribute name="VALUE" x="248.92" y="96.266" size="1.778" layer="96" align="top-center"/>
+</instance>
+<instance part="R22" gate="G$1" x="264.16" y="71.12" smashed="yes">
+<attribute name="NAME" x="264.16" y="72.644" size="1.778" layer="95" font="vector" align="bottom-center"/>
+<attribute name="VALUE" x="264.16" y="69.596" size="1.778" layer="96" font="vector" align="top-center"/>
+</instance>
+<instance part="R27" gate="G$1" x="264.16" y="106.68" smashed="yes">
+<attribute name="NAME" x="264.16" y="108.204" size="1.778" layer="95" font="vector" align="bottom-center"/>
+<attribute name="VALUE" x="264.16" y="105.156" size="1.778" layer="96" font="vector" align="top-center"/>
+</instance>
+<instance part="R24" gate="G$1" x="180.34" y="71.12" smashed="yes">
+<attribute name="NAME" x="180.34" y="72.644" size="1.778" layer="95" font="vector" align="bottom-center"/>
+<attribute name="VALUE" x="180.34" y="69.596" size="1.778" layer="96" font="vector" align="top-center"/>
+</instance>
+<instance part="R21" gate="G$1" x="180.34" y="106.68" smashed="yes">
+<attribute name="NAME" x="180.34" y="108.204" size="1.778" layer="95" font="vector" align="bottom-center"/>
+<attribute name="VALUE" x="180.34" y="105.156" size="1.778" layer="96" font="vector" align="top-center"/>
 </instance>
 </instances>
 <busses>
@@ -12712,11 +12647,6 @@ Source: AVX .. aphvc.pdf</description>
 <pinref part="C32" gate="G$1" pin="1"/>
 </segment>
 <segment>
-<wire x1="172.72" y1="116.84" x2="170.18" y2="116.84" width="0.1524" layer="91"/>
-<pinref part="R22" gate="G$1" pin="1"/>
-<label x="157.48" y="116.84" size="1.778" layer="95"/>
-</segment>
-<segment>
 <wire x1="172.72" y1="81.28" x2="170.18" y2="81.28" width="0.1524" layer="91"/>
 <pinref part="R25" gate="G$1" pin="1"/>
 <label x="160.02" y="81.28" size="1.778" layer="95"/>
@@ -12781,22 +12711,18 @@ Source: AVX .. aphvc.pdf</description>
 <label x="43.18" y="119.38" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="R21" gate="G$1" pin="2"/>
 <wire x1="185.42" y1="106.68" x2="187.96" y2="106.68" width="0.1524" layer="91"/>
 <wire x1="190.5" y1="106.68" x2="187.96" y2="106.68" width="0.1524" layer="91"/>
 <wire x1="187.96" y1="106.68" x2="187.96" y2="114.3" width="0.1524" layer="91"/>
 <junction x="187.96" y="106.68"/>
-<wire x1="187.96" y1="114.3" x2="187.96" y2="116.84" width="0.1524" layer="91"/>
 <junction x="187.96" y="114.3"/>
-<wire x1="187.96" y1="116.84" x2="187.96" y2="121.92" width="0.1524" layer="91"/>
-<junction x="187.96" y="116.84"/>
-<wire x1="187.96" y1="116.84" x2="182.88" y2="116.84" width="0.1524" layer="91"/>
-<pinref part="R22" gate="G$1" pin="2"/>
+<wire x1="187.96" y1="114.3" x2="187.96" y2="121.92" width="0.1524" layer="91"/>
 <wire x1="187.96" y1="114.3" x2="190.5" y2="114.3" width="0.1524" layer="91"/>
 <pinref part="R23" gate="G$1" pin="1"/>
 <wire x1="187.96" y1="121.92" x2="193.04" y2="121.92" width="0.1524" layer="91"/>
 <pinref part="C45" gate="G$1" pin="1"/>
 <label x="187.96" y="104.14" size="1.778" layer="95"/>
+<pinref part="R21" gate="G$1" pin="2"/>
 </segment>
 </net>
 <net name="VINB-" class="0">
@@ -12806,7 +12732,6 @@ Source: AVX .. aphvc.pdf</description>
 <label x="43.18" y="109.22" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="R24" gate="G$1" pin="2"/>
 <wire x1="185.42" y1="71.12" x2="187.96" y2="71.12" width="0.1524" layer="91"/>
 <wire x1="190.5" y1="71.12" x2="187.96" y2="71.12" width="0.1524" layer="91"/>
 <wire x1="187.96" y1="71.12" x2="187.96" y2="78.74" width="0.1524" layer="91"/>
@@ -12822,6 +12747,7 @@ Source: AVX .. aphvc.pdf</description>
 <wire x1="187.96" y1="86.36" x2="193.04" y2="86.36" width="0.1524" layer="91"/>
 <pinref part="C47" gate="G$1" pin="1"/>
 <label x="187.96" y="68.58" size="1.778" layer="95"/>
+<pinref part="R24" gate="G$1" pin="2"/>
 </segment>
 </net>
 <net name="ADC_AMT_CV" class="0">
@@ -12851,7 +12777,6 @@ Source: AVX .. aphvc.pdf</description>
 <label x="83.82" y="119.38" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="R30" gate="G$1" pin="2"/>
 <wire x1="269.24" y1="71.12" x2="271.78" y2="71.12" width="0.1524" layer="91"/>
 <wire x1="274.32" y1="71.12" x2="271.78" y2="71.12" width="0.1524" layer="91"/>
 <wire x1="271.78" y1="71.12" x2="271.78" y2="78.74" width="0.1524" layer="91"/>
@@ -12867,6 +12792,7 @@ Source: AVX .. aphvc.pdf</description>
 <wire x1="271.78" y1="86.36" x2="276.86" y2="86.36" width="0.1524" layer="91"/>
 <pinref part="C51" gate="G$1" pin="1"/>
 <label x="271.78" y="68.58" size="1.778" layer="95"/>
+<pinref part="R22" gate="G$1" pin="2"/>
 </segment>
 </net>
 <net name="ADC_MORPH_CV" class="0">
@@ -12896,7 +12822,6 @@ Source: AVX .. aphvc.pdf</description>
 <label x="83.82" y="109.22" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="R27" gate="G$1" pin="2"/>
 <wire x1="269.24" y1="106.68" x2="271.78" y2="106.68" width="0.1524" layer="91"/>
 <wire x1="274.32" y1="106.68" x2="271.78" y2="106.68" width="0.1524" layer="91"/>
 <wire x1="271.78" y1="106.68" x2="271.78" y2="114.3" width="0.1524" layer="91"/>
@@ -12912,6 +12837,7 @@ Source: AVX .. aphvc.pdf</description>
 <wire x1="271.78" y1="121.92" x2="276.86" y2="121.92" width="0.1524" layer="91"/>
 <pinref part="C49" gate="G$1" pin="1"/>
 <label x="271.78" y="104.14" size="1.778" layer="95"/>
+<pinref part="R27" gate="G$1" pin="2"/>
 </segment>
 </net>
 <net name="ADC_FX_CV" class="0">
@@ -12972,8 +12898,8 @@ Source: AVX .. aphvc.pdf</description>
 <wire x1="170.18" y1="71.12" x2="170.18" y2="68.58" width="0.1524" layer="91"/>
 <pinref part="C46" gate="G$1" pin="1"/>
 <wire x1="170.18" y1="71.12" x2="175.26" y2="71.12" width="0.1524" layer="91"/>
-<pinref part="R24" gate="G$1" pin="1"/>
 <pinref part="J5" gate="G$1" pin="1"/>
+<pinref part="R24" gate="G$1" pin="1"/>
 </segment>
 </net>
 <net name="N$17" class="0">
@@ -12981,10 +12907,10 @@ Source: AVX .. aphvc.pdf</description>
 <wire x1="254" y1="106.68" x2="254" y2="104.14" width="0.1524" layer="91"/>
 <pinref part="C48" gate="G$1" pin="1"/>
 <wire x1="254" y1="106.68" x2="259.08" y2="106.68" width="0.1524" layer="91"/>
-<pinref part="R27" gate="G$1" pin="1"/>
 <pinref part="J4" gate="G$1" pin="1"/>
 <wire x1="254" y1="106.68" x2="246.38" y2="106.68" width="0.1524" layer="91"/>
 <junction x="254" y="106.68"/>
+<pinref part="R27" gate="G$1" pin="1"/>
 </segment>
 </net>
 <net name="N$23" class="0">
@@ -12994,8 +12920,8 @@ Source: AVX .. aphvc.pdf</description>
 <wire x1="254" y1="71.12" x2="254" y2="68.58" width="0.1524" layer="91"/>
 <pinref part="C50" gate="G$1" pin="1"/>
 <wire x1="254" y1="71.12" x2="259.08" y2="71.12" width="0.1524" layer="91"/>
-<pinref part="R30" gate="G$1" pin="1"/>
 <pinref part="J3" gate="G$1" pin="1"/>
+<pinref part="R22" gate="G$1" pin="1"/>
 </segment>
 </net>
 </nets>
