@@ -1,4 +1,4 @@
-// Copyright 2015 Emilie Gillet.
+// Copyright 2013 Emilie Gillet.
 //
 // Author: Emilie Gillet (emilie.o.gillet@gmail.com)
 //
@@ -24,28 +24,27 @@
 //
 // -----------------------------------------------------------------------------
 //
-// System-level initialization.
+// Driver for dumping log messages to the UART (TX pin).
 
-#ifndef WAVES_DRIVERS_SYSTEM_H_
-#define WAVES_DRIVERS_SYSTEM_H_
+#ifndef WAVES_DRIVERS_UART_LOGGER_H_
+#define WAVES_DRIVERS_UART_LOGGER_H_
 
 #include "stmlib/stmlib.h"
-#include <stm32f4xx_conf.h>
 
 namespace waves {
 
-class System {
+class UartLogger {
  public:
-  System() { }
-  ~System() { }
+  UartLogger() { }
+  ~UartLogger() { }
   
-  void Init(bool application);
-  void StartTimers();
- 
- private:
-  DISALLOW_COPY_AND_ASSIGN(System);
+  void Init(uint32_t baud_rate);
+  void Trace(uint8_t byte);
+  
+ private:  
+  DISALLOW_COPY_AND_ASSIGN(UartLogger);
 };
 
 }  // namespace waves
 
-#endif  // WAVES_DRIVERS_SYSTEM_H_
+#endif  // WAVES_DRIVERS_UART_LOGGER_H_

@@ -23,6 +23,7 @@
 // See http://creativecommons.org/licenses/MIT/ for more information.
 
 #include <stm32f4xx_conf.h>
+#include <cstdio>
 
 // #include "waves/drivers/clock_inputs.h"
 // #include "waves/drivers/dac.h"
@@ -33,7 +34,7 @@
 #include "waves/drivers/system.h"
 #include "stmlib/system/system_clock.h"
 #include "waves/drivers/audio_dac.h"
-
+#include "waves/drivers/uart_logger.h"
 // #include "waves/ramp/ramp_extractor.h"
 // #include "waves/random/random_generator.h"
 // #include "waves/random/random_stream.h"
@@ -83,6 +84,7 @@ AudioDac audio_dac;
 // ScaleRecorder scale_recorder;
 // Settings settings;
 // Ui ui;
+UartLogger logger;
 
 // RandomGenerator random_generator;
 // RandomStream random_stream;
@@ -90,6 +92,26 @@ AudioDac audio_dac;
 // XYGenerator xy_generator;
 
 // Default interrupt handlers.
+
+
+/* Debug Exception and Monitor Control Register base address */
+// #define DEMCR                 *((volatile uint32_t*) 0xE000EDFCu)
+
+/* ITM register addresses */
+// #define ITM_STIMULUS_PORT0    *((volatile uint32_t*) 0xE0000000u)
+// #define ITM_TRACE_EN          *((volatile uint32_t*) 0xE0000E00u)
+
+
+/* Override low-level _write system call */
+int _write(int file, char *ptr, int len) {
+    int DataIdx;
+    for (DataIdx = 0; DataIdx < len; DataIdx++) {
+        ITM_SendChar(*ptr++);
+    }
+    return len;
+}
+
+
 extern "C" {
 
 int __errno;
@@ -114,6 +136,60 @@ void SysTick_Handler() {
   //     debug_port.Write(response);
   //   }
   // }
+}
+
+int counter = 0;
+
+void TIM1_UP_TIM10_IRQHandler(void) {
+  if (!(TIM1->SR & TIM_IT_Update)) {
+    return;
+  }
+  TIM1->SR = (uint16_t)~TIM_IT_Update;
+  
+  counter++;
+
+  // if(counter > 48000)
+    // counter++;
+  if(counter % 2 == 0)
+    GPIO_SetBits(GPIOB, GPIO_Pin_1);
+  else {
+    GPIO_ResetBits(GPIOB, GPIO_Pin_1);
+  }
+
+  // printf("test");
+  // logger.Trace('h');
+  // ITM_SendChar('h');
+  _write(0, (char*)"hi\n", 3);
+  // GPIOB->BSRR = GPIO_Pin_1;
+  // dac.Write(-audio_samples[playback_block][current_sample] + 32768);
+
+  // bool trigger_detected = gate_input.raised();
+  // sync_samples[playback_block][current_sample] = trigger_detected;
+  // trigger_detected_flag = trigger_detected_flag | trigger_detected;
+  
+  // current_sample = current_sample + 1;
+  // if (current_sample >= kBlockSize) {
+  //   current_sample = 0;
+  //   playback_block = (playback_block + 1) % kNumBlocks;
+  // }
+  
+  // bool adc_scan_cycle_complete = adc.PipelinedScan();
+  // if (adc_scan_cycle_complete) {
+  //   ui.UpdateCv(adc.channel(0), adc.channel(1), adc.channel(2), adc.channel(3));
+  //   if (trigger_detected_flag) {
+  //     trigger_delay = settings.trig_delay()
+  //         ? (1 << settings.trig_delay()) : 0;
+  //     ++trigger_delay;
+  //     trigger_detected_flag = false;
+  //   }
+  //   if (trigger_delay) {
+  //     --trigger_delay;
+  //     if (trigger_delay == 0) {
+  //       trigger_flag = true;
+  //     }
+  //   }
+  // }
+  // HAL_DAC_SetValue(&hdac, DAC_CHANNEL_1, DAC_ALIGN_12B_R, var);
 }
 
 }
@@ -484,11 +560,18 @@ void FillBuffer(AudioDac::Frame* output, size_t size) {
 //   }
 // }
 
+
 void Init() {
   System sys;
   sys.Init(true);
-  audio_dac.Init(kSampleRate, kBlockSize);
-  audio_dac.Start(&FillBuffer);
+
+  // Enable TRCENA
+  // DEMCR |= ( 1 << 24);
+  // Enable stimulus port 0
+  // ITM_TRACE_EN |= ( 1 << 0);
+
+  // audio_dac.Init(kSampleRate, kBlockSize);
+  // audio_dac.Start(&FillBuffer);
 
   // settings.Init();
   
@@ -528,6 +611,8 @@ void Init() {
   // }
   
   sys.StartTimers();
+
+  logger.Init(9600);
   // dac.Start(&FillBuffer);
 }
 
