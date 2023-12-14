@@ -1,0 +1,15 @@
+
+#ifndef WAVES_GLOBALS_H_
+#define WAVES_GLOBALS_H_
+
+
+#define USER_WAVE_COUNT         512
+#define FACTORY_WAVE_COUNT      512
+    
+#define USER_SNAPSHOT_COUNT     64
+#define FACTORY_SNAPSHOT_COUNT  0
+    
+#define USER_WAVETABLE_COUNT    16
+#define FACTORY_WAVETABLE_COUNT 16
+    
+#endif
