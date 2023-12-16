@@ -44,19 +44,19 @@ void System::Init(bool application) {
   // RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);
   // RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);
 
-  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
+  // RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
 
-  GPIO_InitTypeDef gpio_init;
-  gpio_init.GPIO_Mode = GPIO_Mode_OUT;
-  gpio_init.GPIO_OType = GPIO_OType_PP;
-  gpio_init.GPIO_Speed = GPIO_Speed_25MHz;
-  gpio_init.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  gpio_init.GPIO_Pin = GPIO_Pin_1;
-  GPIO_Init(GPIOB, &gpio_init);
+  // GPIO_InitTypeDef gpio_init;
+  // gpio_init.GPIO_Mode = GPIO_Mode_OUT;
+  // gpio_init.GPIO_OType = GPIO_OType_PP;
+  // gpio_init.GPIO_Speed = GPIO_Speed_25MHz;
+  // gpio_init.GPIO_PuPd = GPIO_PuPd_NOPULL;
+  // gpio_init.GPIO_Pin = GPIO_Pin_1;
+  // GPIO_Init(GPIOB, &gpio_init);
 
   TIM_TimeBaseInitTypeDef timer_init;
   timer_init.TIM_Period = 50000-1;//F_CPU - 1;
-  timer_init.TIM_Prescaler = (uint16_t) ((SystemCoreClock / 2) / 50000) - 1;
+  timer_init.TIM_Prescaler = (uint16_t) ((SystemCoreClock / 2) / 25000) - 1;
   timer_init.TIM_ClockDivision = TIM_CKD_DIV1;
   timer_init.TIM_CounterMode = TIM_CounterMode_Up;
   timer_init.TIM_RepetitionCounter = 0;

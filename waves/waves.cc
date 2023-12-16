@@ -23,8 +23,10 @@
 // See http://creativecommons.org/licenses/MIT/ for more information.
 
 #include <stm32f4xx_conf.h>
-#include <cstdio>
-
+// #include <cstdio>
+// #include <cstring>
+// #include <stdio.h>
+// #include <cstdlib>
 // #include "waves/drivers/clock_inputs.h"
 // #include "waves/drivers/dac.h"
 // #include "waves/drivers/debug_pin.h"
@@ -34,7 +36,8 @@
 #include "waves/drivers/system.h"
 #include "stmlib/system/system_clock.h"
 #include "waves/drivers/audio_dac.h"
-#include "waves/drivers/uart_logger.h"
+#include "waves/drivers/flash.h"
+// #include "waves/drivers/uart_logger.h"
 // #include "waves/ramp/ramp_extractor.h"
 // #include "waves/random/random_generator.h"
 // #include "waves/random/random_stream.h"
@@ -69,7 +72,7 @@ const int kGateDelay = 2;
 const size_t kMaxBlockSize = 24;
 const size_t kBlockSize = 12;
 
-AudioDac audio_dac;
+// AudioDac audio_dac;
 
 // ClockInputs clock_inputs;
 // ClockSelfPatchingDetector self_patching_detector[kNumGateOutputs];
@@ -84,7 +87,8 @@ AudioDac audio_dac;
 // ScaleRecorder scale_recorder;
 // Settings settings;
 // Ui ui;
-UartLogger logger;
+// UartLogger logger;
+Flash flash;
 
 // RandomGenerator random_generator;
 // RandomStream random_stream;
@@ -150,16 +154,45 @@ void TIM1_UP_TIM10_IRQHandler(void) {
 
   // if(counter > 48000)
     // counter++;
-  if(counter % 2 == 0)
-    GPIO_SetBits(GPIOB, GPIO_Pin_1);
-  else {
-    GPIO_ResetBits(GPIOB, GPIO_Pin_1);
-  }
+  // if(counter % 2 == 0)
+  //   GPIO_SetBits(GPIOA, kPinFactorySS);
+  // else {
+  //   GPIO_ResetBits(GPIOA, kPinFactorySS);
+  // }
 
   // printf("test");
   // logger.Trace('h');
+  // int16_t sample = flash.LoadWaveSample(counter % (2048 * 16 * 1), counter % (2048 * 16), counter % (2048));
+  // int16_t sample = flash.LoadWaveSample(0, 0, 0);
   // ITM_SendChar('h');
-  _write(0, (char*)"hi\n", 3);
+  
+  char value[40];
+  // sample += 1;
+
+  if(counter % 5 == 0)
+    {
+      // flash.Test(12);
+      // flash.Sector_Erase4K(0, kPinFactorySS);
+      // flash.Program(0, kPinFactorySS);
+    }
+
+  uint8_t result = 2;
+    // uint8_t result = flash.Read(0);
+
+  // if(counter == 20)
+  //   flash.Sector_Erase4K(0, kPinFactorySS);
+  // if(counter == 30)
+  //   flash.Program(0, kPinFactorySS);
+
+  
+  snprintf(value, 40, "c=%d, s=%d, sr=%d\n", counter, result, flash.ReadID());
+  // sample += 1;
+  _write(0, (char*)value, 40);
+
+
+      // GPIO_ResetBits(GPIOA, kPinFactorySS);
+
+
   // GPIOB->BSRR = GPIO_Pin_1;
   // dac.Write(-audio_samples[playback_block][current_sample] + 32768);
 
@@ -565,6 +598,8 @@ void Init() {
   System sys;
   sys.Init(true);
 
+  // printf("hi\n");
+
   // Enable TRCENA
   // DEMCR |= ( 1 << 24);
   // Enable stimulus port 0
@@ -609,10 +644,13 @@ void Init() {
   // for (size_t i = 0; i < kNumGateOutputs; ++i) {
   //   self_patching_detector[i].Init(i);
   // }
+  flash.Init();
+  flash.InitMemory();
+
   
   sys.StartTimers();
 
-  logger.Init(9600);
+  // logger.Init(9600);
   // dac.Start(&FillBuffer);
 }
 

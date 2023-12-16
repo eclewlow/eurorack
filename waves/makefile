@@ -39,8 +39,6 @@ UPLOAD_COMMAND  = upload_combo_jtag_erase_first
 TARGET         = waves
 PACKAGES       = waves \
 		waves/drivers \
-		waves/ramp \
-		waves/random \
 		stmlib/dsp \
 		stmlib/utils \
 		stmlib/system

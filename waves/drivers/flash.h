@@ -51,7 +51,21 @@ class Flash {
   Flash() { }
   ~Flash() { }
   
-  void Init(int sample_rate);
+  void HIGH(GPIO_TypeDef* GPIOx, uint16_t pin) {
+    GPIO_SetBits(GPIOx, pin);
+  }
+
+  void LOW(GPIO_TypeDef* GPIOx, uint16_t pin) {
+    GPIO_ResetBits(GPIOx, pin);
+  }
+
+  uint8_t READ(GPIO_TypeDef* GPIOx, uint16_t pin) {
+    return GPIO_ReadInputDataBit(GPIOx, pin);
+  }
+
+
+
+  void Init();
   
   // void Start(NextSampleFn next_sample_fn) {
   //   next_sample_fn_ = next_sample_fn;
@@ -187,7 +201,8 @@ class Flash {
       SPI_I2S_SendData(SPI1, (address) & 0xFF); // Send Address
 
 
-      while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET);
+    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET);
+    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_BSY) == SET);
 
       while (size)
       {
@@ -216,15 +231,17 @@ class Flash {
   int16_t LoadWaveSample(uint8_t table, uint8_t frame, uint16_t index) {
     int16_t value = 0;
   
-    WAVETABLE wt = GetWavetable(table);
+    // WAVETABLE wt = GetWavetable(table);
     
     // read 2 bytes from memory location + offset
     uint8_t size = 2;
     uint8_t buffer[2];
     uint8_t * data = &buffer[0];
-    uint32_t address = wt.waves[frame].memory_location + index * 2;
-    uint8_t pin = wt.waves[frame].factory_preset ? kPinFactorySS : kPinUserSS;
+    // uint32_t address = wt.waves[frame].memory_location + index * 2;
+    // uint8_t pin = wt.waves[frame].factory_preset ? kPinFactorySS : kPinUserSS;
 
+    uint32_t address = 2048 * 16 * 2 * table + 2048 * 2 * frame + index * 2;
+    uint8_t pin = kPinFactorySS;
 
     GPIO_ResetBits(GPIOA, pin);
 
@@ -239,8 +256,11 @@ class Flash {
     while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET);
     SPI_I2S_SendData(SPI1, (address) & 0xFF); // Send Address
 
+    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET);
+    SPI_I2S_SendData(SPI1, 0x00);
 
     while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET);
+    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_BSY) == SET);
 
     while (size)
     {
@@ -256,12 +276,13 @@ class Flash {
 
     GPIO_SetBits(GPIOA, pin);
 
-    value = (buffer[0] << 8) | buffer[1];
+    memcpy(&value, buffer, 2);
+    // value = (buffer[0] << 8) | buffer[1];
     return value;
 
   }
 
-  void LoadWaveSample(int16_t * wavedata, int16_t table, int16_t frame) {
+  void LoadWaveSample(int16_t * wavedata, uint8_t table, uint8_t frame, int16_t index) {
     WAVETABLE wt = GetWavetable(table);
     
     // read 2 bytes from memory location + offset
@@ -285,6 +306,10 @@ class Flash {
     SPI_I2S_SendData(SPI1, (address) & 0xFF); // Send Address
 
     while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET);
+    SPI_I2S_SendData(SPI1, 0x00);
+
+    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET);
+    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_BSY) == SET);
 
     while (size)
     {
@@ -358,13 +383,15 @@ bool ResetFactoryWavetables() {
 void CMD(uint8_t code, uint8_t pin) {
     GPIO_ResetBits(GPIOA, pin);
 
-    SPI_I2S_SendData(SPI1, code); // WRITE ENABLE 
+    SPI_I2S_SendData(SPI1, code);
 
     while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET);
     while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_BSY) == SET);
 
     GPIO_SetBits(GPIOA, pin);  
 }
+
+
 
 bool Sector_Erase4K(uint32_t address, uint8_t pin) {
 
@@ -389,21 +416,24 @@ bool Sector_Erase4K(uint32_t address, uint8_t pin) {
 
     GPIO_SetBits(GPIOA, pin);
 
+    while(ReadStatusRegister() & 0x01);  // BUSY
+
     CMD(WRITE_DISABLE, pin);
 
     return true;
 }
 
+
 bool AAI_Word_Program(uint32_t address, uint8_t * buffer, int32_t size, uint8_t pin) {
     if(size < 1) return false;
 
     // ebsy
-    CMD(ENABLE_BSY, pin);
+    // CMD(ENABLE_BSY, pin);
 
     // wren
     CMD(WRITE_ENABLE, pin);
 
-    uint8_t * data = &buffer[0];
+    // uint8_t * data = &buffer[0];
 
     GPIO_ResetBits(GPIOA, pin);
 
@@ -419,14 +449,15 @@ bool AAI_Word_Program(uint32_t address, uint8_t * buffer, int32_t size, uint8_t 
     SPI_I2S_SendData(SPI1, (address) & 0xFF); // Send Address
 
     while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET);
-    SPI_I2S_SendData(SPI1, *data++); // Send byte 1
+    SPI_I2S_SendData(SPI1, 0); // Send byte 1
     size--;
 
     while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET);
-    SPI_I2S_SendData(SPI1, size == 0 ? 0 : *data++); // Send byte 2
+    SPI_I2S_SendData(SPI1, 0); // Send byte 2
     size--;
 
     while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET);
+    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_BSY) == SET);
 
     GPIO_SetBits(GPIOA, pin);
 
@@ -437,14 +468,17 @@ bool AAI_Word_Program(uint32_t address, uint8_t * buffer, int32_t size, uint8_t 
         SPI_I2S_SendData(SPI1, 0xAD); // AAI Mode write
 
         while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET);
-        SPI_I2S_SendData(SPI1, *data++); // Send byte 1
+        while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_BSY) == SET);
+        SPI_I2S_SendData(SPI1, 0); // Send byte 1
         size--;
 
         while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET);
-        SPI_I2S_SendData(SPI1, size == 0 ? 0 : *data++); // Send byte 2
+        while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_BSY) == SET);
+        SPI_I2S_SendData(SPI1, 0); // Send byte 2
         size--;
 
         while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET);
+        while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_BSY) == SET);
 
         GPIO_SetBits(GPIOA, pin);
     }
@@ -453,7 +487,7 @@ bool AAI_Word_Program(uint32_t address, uint8_t * buffer, int32_t size, uint8_t 
     CMD(WRITE_DISABLE, pin);
 
     // dbsy
-    CMD(DISABLE_BSY, pin);
+    // CMD(DISABLE_BSY, pin);
 
     // rdsr
     CMD(READ_STATUS_REGISTER, pin);
@@ -496,15 +530,242 @@ bool SaveWave(const char * name, int16_t * data, uint8_t table, uint8_t frame) {
     return true;
 }
 
-bool InitMemory() {
-    for(uint8_t table = 0; table < FACTORY_WAVETABLE_COUNT; table++) {
-        for(uint8_t frame = 0; frame < 16; frame++) {
-              uint32_t address = table * 2048 * 16 * 2 + frame * 2048 * 2;
-              Sector_Erase4K(address, kPinFactorySS);
-              AAI_Word_Program(address, (uint8_t *)&ROM[table * 2048 * 16 + frame * 2048], 2048 * 2, kPinFactorySS);
-        }
+bool Test(uint8_t bits) {
+    CMD(WRITE_ENABLE, kPinFactorySS);
 
+    CMD(ENABLE_WRITE_STATUS_REGISTER, kPinFactorySS);
+
+    GPIO_ResetBits(GPIOA, kPinFactorySS);
+
+    SPI_I2S_SendData(SPI1, WRITE_STATUS_REGISTER);
+
+    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET);
+    // while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_BSY) == SET);
+
+    SPI_I2S_SendData(SPI1, bits);
+
+    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET);
+    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_BSY) == SET);
+
+    GPIO_SetBits(GPIOA, kPinFactorySS);
+
+    return true;
+}
+
+
+bool Program(uint32_t address, uint8_t pin) {
+        // wren
+    CMD(WRITE_ENABLE, pin);
+
+    GPIO_ResetBits(GPIOA, pin);
+
+    SPI_I2S_SendData(SPI1, 0x02);
+
+    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET);
+    SPI_I2S_SendData(SPI1, (address >> 16) & 0xFF); // Send Address
+
+    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET);
+    SPI_I2S_SendData(SPI1, (address >> 8) & 0xFF); // Send Address
+
+    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET);
+    SPI_I2S_SendData(SPI1, (address) & 0xFF); // Send Address
+
+    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET);
+    SPI_I2S_SendData(SPI1, 10); // Send byte 1
+
+    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET);
+    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_BSY) == SET);
+
+    uint8_t temp = SPI1->DR;
+    temp = SPI1->SR;
+    temp++;
+
+    GPIO_SetBits(GPIOA, pin);
+
+    while(ReadStatusRegister() & 0x01);  // BUSY
+
+
+    // wrdi
+    CMD(WRITE_DISABLE, pin);
+
+    return true;
+
+}
+
+uint8_t Read(uint32_t address) {
+        // wren
+    // CMD(WRITE_ENABLE, pin);
+
+    GPIO_ResetBits(GPIOA, kPinFactorySS);
+
+    SPI_I2S_SendData(SPI1, 0x03); // Read Instruction High speed 0x0B.  normal speed is 0x03
+
+    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET);
+    SPI_I2S_SendData(SPI1, (address >> 16) & 0xFF); // Send Address
+
+    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET);
+    SPI_I2S_SendData(SPI1, (address >> 8) & 0xFF); // Send Address
+
+    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET);
+    SPI_I2S_SendData(SPI1, (address) & 0xFF); // Send Address
+
+    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET);
+    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_BSY) == SET);
+
+    uint8_t result;
+
+    SPI_I2S_SendData(SPI1, 0x00);
+    // while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET);
+    // SPI1->DR = 0;  // send dummy data
+    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE) == RESET);
+    // while (!((SPI1->SR) &(1<<0))){};  // Wait for RXNE to set -> This will indicate that the Rx buffer is not empty
+    result = SPI_I2S_ReceiveData(SPI1);
+
+    GPIO_SetBits(GPIOA, kPinFactorySS);
+
+    // wrdi
+    // CMD(WRITE_DISABLE, pin);
+
+    return result;
+
+}
+
+uint8_t ReadStatusRegister() {
+
+    GPIOA->BSRRH = GPIO_Pin_4;
+
+    SPI1->DR = 0x05;
+    // while (!((SPI1->SR) & (1 << 1))) {}; // wait for TXE bit to set -> This will indicate that the buffer is empty
+    // while (((SPI1->SR) & (1 << 7))) {}; // wait for BSY bit to Reset -> This will indicate that SPI is not busy in communication
+
+    while (!(SPI1->SR & SPI_SR_TXE)); //Tx buffer not empty.
+    // while (SPI1->SR & SPI_SR_BSY); //SPI (or I2S) is busy in communication or Tx buffer is not empty.
+
+    //  Clear the Overrun flag by reading DR and SR
+    // uint8_t temp = SPI1->DR;
+    // temp = SPI1->SR;
+    // temp++;
+
+    // SPI1->DR = 0;
+    uint8_t result;
+
+
+    while (!(SPI1->SR & SPI_SR_RXNE));
+    result = SPI1->DR;
+
+    GPIOA->BSRRL = GPIO_Pin_4;
+
+    return result;
+
+}
+
+uint8_t ReadID() {
+
+    //clock low
+    LOW(eeprom_clock_gpio, eeprom_clock_pin);
+
+    HIGH(eeprom_ss_gpio, eeprom_ss_pin);
+
+    Wait<2>();
+
+    LOW(eeprom_ss_gpio, eeprom_ss_pin);
+
+    uint8_t cmd = 0x9f;
+
+
+    for(int i = 7; i >= 0; i--) {
+
+        //clock low
+        LOW(eeprom_clock_gpio, eeprom_clock_pin);
+    
+        Wait<2>();
+
+        bool set = (cmd >> i) & 0x1;
+        if(set)
+            HIGH(eeprom_mosi_gpio, eeprom_mosi_pin);
+        else
+            LOW(eeprom_mosi_gpio, eeprom_mosi_pin);
+
+        //clock high
+        HIGH(eeprom_clock_gpio, eeprom_clock_pin);
+
+        Wait<2>();
     }
+
+    // catch the clock tail
+    uint8_t byte = 0;
+
+    for(int i = 7; i >= 0; i--) {
+
+        //clock low
+        LOW(eeprom_clock_gpio, eeprom_clock_pin);
+
+        Wait<2>();
+
+        bool set = READ(eeprom_miso_gpio, eeprom_miso_pin);
+        if(set)
+            byte |= (0x1 << i);
+        else
+            byte |= (0x0 << i);
+
+        //clock high
+        HIGH(eeprom_clock_gpio, eeprom_clock_pin);
+
+        Wait<2>();
+    }
+
+    
+
+    HIGH(eeprom_ss_gpio, eeprom_ss_pin);
+
+    //clock low
+    LOW(eeprom_clock_gpio, eeprom_clock_pin);
+
+    return byte;
+}
+
+uint8_t ReadIDOld() {
+
+    GPIOA->BSRRL = GPIO_Pin_4;
+
+    GPIOA->BSRRH = GPIO_Pin_4;
+
+
+    uint8_t result;
+    SPI1->DR = 0x9f;
+    // Wait<128>();
+    // while (!(SPI1->SR & SPI_SR_TXE)); //Tx buffer not empty.
+    // while (SPI1->SR & SPI_SR_BSY); //SPI (or I2S) is busy in communication or Tx buffer is not empty.
+
+    while (!(SPI1->SR & SPI_SR_RXNE));
+    result = SPI1->DR;
+
+    SPI1->DR = 0;
+    while (!(SPI1->SR & SPI_SR_RXNE));
+    SPI1->DR;
+
+    SPI1->DR = 0;
+    while (!(SPI1->SR & SPI_SR_RXNE));
+    SPI1->DR;
+
+    GPIOA->BSRRL = GPIO_Pin_4;
+
+    return result;
+
+}
+bool InitMemory() {
+    // Test(12);
+    // Sector_Erase4K(0, kPinFactorySS);
+    // Program(0, kPinFactorySS);
+    // for(uint8_t table = 0; table < 1; table++) {
+    //     for(uint8_t frame = 0; frame < 16; frame++) {
+    //           uint32_t address = table * 2048 * 16 * 2 + frame * 2048 * 2;
+    //           Sector_Erase4K(address, kPinFactorySS);
+    //           // AAI_Word_Program(address, (uint8_t *)&ROM[table * 2048 * 16 + frame * 2048], 2048 * 2, kPinFactorySS);
+              
+    //     }
+
+    // }
   return true;
 }
 

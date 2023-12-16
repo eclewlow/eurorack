@@ -34,10 +34,12 @@ namespace waves {
 /* static */
 // Flash* Flash::instance_;
 
-void Flash::Init(int sample_rate) {
+void Flash::Init() {
   // instance_ = this;
 
+
   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, ENABLE);
 
   // Initialize 3 ROM SS pin.
@@ -46,41 +48,85 @@ void Flash::Init(int sample_rate) {
   gpio_init.GPIO_OType = GPIO_OType_PP;
   gpio_init.GPIO_Speed = GPIO_Speed_50MHz;
   gpio_init.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  gpio_init.GPIO_Pin = kPinFactorySS;
-  GPIO_Init(GPIOA, &gpio_init);
+  gpio_init.GPIO_Pin = eeprom_ss_pin;
+  GPIO_Init(eeprom_ss_gpio, &gpio_init);
 
-  gpio_init.GPIO_Pin = kPinUserSS;
-  GPIO_Init(GPIOA, &gpio_init);
+  // gpio_init.GPIO_Pin = kPinUserSS;
+  // GPIO_Init(GPIOA, &gpio_init);
 
-  gpio_init.GPIO_Pin = kPinPersistentSS;
-  GPIO_Init(GPIOA, &gpio_init);
+  // gpio_init.GPIO_Pin = kPinPersistentSS;
+  // GPIO_Init(GPIOA, &gpio_init);
 
-  
-  // Initialize MOSI and SCK pins.
-  gpio_init.GPIO_Mode = GPIO_Mode_AF;
-  gpio_init.GPIO_Pin = GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7;
+  // miso
+  gpio_init.GPIO_Mode = GPIO_Mode_IN;
   gpio_init.GPIO_OType = GPIO_OType_PP;
   gpio_init.GPIO_Speed = GPIO_Speed_50MHz;
   gpio_init.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  GPIO_PinAFConfig(GPIOA, GPIO_PinSource5, GPIO_AF_SPI1);
-  GPIO_PinAFConfig(GPIOA, GPIO_PinSource6, GPIO_AF_SPI1);
-  GPIO_PinAFConfig(GPIOA, GPIO_PinSource7, GPIO_AF_SPI1);
+  gpio_init.GPIO_Pin = eeprom_miso_pin;
+  GPIO_Init(eeprom_miso_gpio, &gpio_init);
+
+  // mosi
+  gpio_init.GPIO_Mode = GPIO_Mode_OUT;
+  gpio_init.GPIO_OType = GPIO_OType_PP;
+  gpio_init.GPIO_Speed = GPIO_Speed_50MHz;
+  gpio_init.GPIO_PuPd = GPIO_PuPd_NOPULL;
+  gpio_init.GPIO_Pin = eeprom_mosi_pin;
+  GPIO_Init(eeprom_mosi_gpio, &gpio_init);
+
+  // clock
+  gpio_init.GPIO_Mode = GPIO_Mode_OUT;
+  gpio_init.GPIO_OType = GPIO_OType_PP;
+  gpio_init.GPIO_Speed = GPIO_Speed_50MHz;
+  gpio_init.GPIO_PuPd = GPIO_PuPd_NOPULL;
+  gpio_init.GPIO_Pin = eeprom_clock_pin;
+  GPIO_Init(eeprom_clock_gpio, &gpio_init);
+  
+  HIGH(eeprom_ss_gpio, eeprom_ss_pin);
+  LOW(eeprom_clock_gpio, eeprom_clock_pin);
+  /*
+  // Initialize MOSI and SCK pins.
+  gpio_init.GPIO_Mode = GPIO_Mode_AF;
+  gpio_init.GPIO_OType = GPIO_OType_PP;
+  gpio_init.GPIO_Speed = GPIO_Speed_2MHz;
+  gpio_init.GPIO_PuPd = GPIO_PuPd_NOPULL;
+  gpio_init.GPIO_Pin = GPIO_Pin_5;  
   GPIO_Init(GPIOA, &gpio_init);
+
+  gpio_init.GPIO_Pin = GPIO_Pin_5;
+  GPIO_Init(GPIOB, &gpio_init);
+
+  gpio_init.GPIO_Pin = GPIO_Pin_4;
+  GPIO_Init(GPIOB, &gpio_init);
+
+  // GPIO_PinAFConfig(GPIOA, GPIO_PinSource4, GPIO_AF_SPI1);
+  GPIO_PinAFConfig(GPIOA, GPIO_PinSource5, GPIO_AF_SPI1);
+  GPIO_PinAFConfig(GPIOB, GPIO_PinSource4, GPIO_AF_SPI1);
+  GPIO_PinAFConfig(GPIOB, GPIO_PinSource5, GPIO_AF_SPI1);
   
   // Initialize SPI.
   SPI_InitTypeDef spi_init;
   spi_init.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
   spi_init.SPI_Mode = SPI_Mode_Master;
   spi_init.SPI_DataSize = SPI_DataSize_8b;
+  // spi_init.SPI_CPOL = SPI_CPOL_Low;
   spi_init.SPI_CPOL = SPI_CPOL_High;
   spi_init.SPI_CPHA = SPI_CPHA_1Edge;
+  // spi_init.SPI_CPHA = SPI_CPHA_2Edge;
   spi_init.SPI_NSS = SPI_NSS_Soft;
-  spi_init.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_4;
+  spi_init.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_16;
   spi_init.SPI_FirstBit = SPI_FirstBit_MSB;
   spi_init.SPI_CRCPolynomial = 7;
   SPI_Init(SPI1, &spi_init);
+
+  GPIOA->BSRRL = GPIO_Pin_4;
+
   SPI_Cmd(SPI1, ENABLE);
+
+//*/
   
+  // GPIO_SetBits(GPIOA, kPinUserSS);
+  // GPIO_SetBits(GPIOA, kPinPersistentSS);
+
   // GPIOA->BSRR = GPIO_Pin_15;
   // GPIOA->BRR = GPIO_Pin_15;
   // SPI3->DR = 0x090a;

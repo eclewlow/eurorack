@@ -243,14 +243,14 @@ void SysTick_Handler() {
 // }
 
 void Init() {
-  System sys;
+  // System sys;
   // switches.Init();
-  sys.Init(false);
+  // sys.Init(false);
   // system_clock.Init();
   // adc.Init(true);
   // dac.Init(48000, 1);
   // leds.Init();
-  sys.StartTimers();
+  // sys.StartTimers();
   // dac.Start(&FillBuffer);
 }
 
