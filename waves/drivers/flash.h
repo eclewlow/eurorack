@@ -380,15 +380,44 @@ bool ResetFactoryWavetables() {
 #define ENABLE_BSY                    (0x70)
 #define DISABLE_BSY                   (0x80)
 
+
 void CMD(uint8_t code, uint8_t pin) {
-    GPIO_ResetBits(GPIOA, pin);
+ //clock low
+    LOW(eeprom_clock_gpio, eeprom_clock_pin);
 
-    SPI_I2S_SendData(SPI1, code);
+    HIGH(eeprom_ss_gpio, eeprom_ss_pin);
 
-    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET);
-    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_BSY) == SET);
+    Wait<2>();
 
-    GPIO_SetBits(GPIOA, pin);  
+    LOW(eeprom_ss_gpio, eeprom_ss_pin);
+
+    uint8_t size = 8;
+
+    while(size) {
+
+        //clock low
+        LOW(eeprom_clock_gpio, eeprom_clock_pin);
+    
+        Wait<2>();
+
+        bool set = (code >> (size - 1)) & 0x1;
+        if(set)
+            HIGH(eeprom_mosi_gpio, eeprom_mosi_pin);
+        else
+            LOW(eeprom_mosi_gpio, eeprom_mosi_pin);
+
+        //clock high
+        HIGH(eeprom_clock_gpio, eeprom_clock_pin);
+
+        Wait<2>();
+
+        size--;
+    }
+
+    HIGH(eeprom_ss_gpio, eeprom_ss_pin);
+
+    //clock low
+    LOW(eeprom_clock_gpio, eeprom_clock_pin);
 }
 
 
@@ -659,6 +688,63 @@ uint8_t ReadStatusRegister() {
 
 }
 
+void Write(uint8_t * buf, uint8_t size) {
+    for(int i = 0; i < size; i++) {
+
+        uint8_t bsize = 8;
+
+        while(bsize) {
+            //clock low
+            LOW(eeprom_clock_gpio, eeprom_clock_pin);
+        
+            Wait<2>();
+
+            bool set = (buf[i] >> (bsize - 1)) & 0x1;
+            if(set)
+                HIGH(eeprom_mosi_gpio, eeprom_mosi_pin);
+            else
+                LOW(eeprom_mosi_gpio, eeprom_mosi_pin);
+
+            //clock high
+            HIGH(eeprom_clock_gpio, eeprom_clock_pin);
+
+            Wait<2>();
+
+            bsize--;
+        }
+    }
+
+}
+
+
+void Read(uint8_t * buf, uint8_t size) {
+    for(int i = 0; i < size; i++) {
+
+        uint8_t bsize = 8;
+
+        while(bsize) {
+            //clock low
+            LOW(eeprom_clock_gpio, eeprom_clock_pin);
+        
+            Wait<2>();
+
+            bool set = READ(eeprom_miso_gpio, eeprom_miso_pin);
+            if(set)
+                buf[i] |= (0x1 << (bsize - 1));
+            else
+                buf[i] |= (0x0 << (bsize - 1));
+
+
+            //clock high
+            HIGH(eeprom_clock_gpio, eeprom_clock_pin);
+
+            Wait<2>();
+
+            bsize--;
+        }
+    }
+}
+
 uint8_t ReadID() {
 
     //clock low
@@ -666,55 +752,15 @@ uint8_t ReadID() {
 
     HIGH(eeprom_ss_gpio, eeprom_ss_pin);
 
-    Wait<2>();
-
     LOW(eeprom_ss_gpio, eeprom_ss_pin);
 
-    uint8_t cmd = 0x9f;
+    uint8_t buf[1] = {0x9f};
 
+    Write(buf, 1);
 
-    for(int i = 7; i >= 0; i--) {
-
-        //clock low
-        LOW(eeprom_clock_gpio, eeprom_clock_pin);
-    
-        Wait<2>();
-
-        bool set = (cmd >> i) & 0x1;
-        if(set)
-            HIGH(eeprom_mosi_gpio, eeprom_mosi_pin);
-        else
-            LOW(eeprom_mosi_gpio, eeprom_mosi_pin);
-
-        //clock high
-        HIGH(eeprom_clock_gpio, eeprom_clock_pin);
-
-        Wait<2>();
-    }
-
-    // catch the clock tail
     uint8_t byte = 0;
 
-    for(int i = 7; i >= 0; i--) {
-
-        //clock low
-        LOW(eeprom_clock_gpio, eeprom_clock_pin);
-
-        Wait<2>();
-
-        bool set = READ(eeprom_miso_gpio, eeprom_miso_pin);
-        if(set)
-            byte |= (0x1 << i);
-        else
-            byte |= (0x0 << i);
-
-        //clock high
-        HIGH(eeprom_clock_gpio, eeprom_clock_pin);
-
-        Wait<2>();
-    }
-
-    
+    Read(&byte, 1);
 
     HIGH(eeprom_ss_gpio, eeprom_ss_pin);
 
@@ -724,35 +770,36 @@ uint8_t ReadID() {
     return byte;
 }
 
-uint8_t ReadIDOld() {
+// uint8_t ReadIDOld() {
 
-    GPIOA->BSRRL = GPIO_Pin_4;
+//     GPIOA->BSRRL = GPIO_Pin_4;
 
-    GPIOA->BSRRH = GPIO_Pin_4;
+//     GPIOA->BSRRH = GPIO_Pin_4;
 
 
-    uint8_t result;
-    SPI1->DR = 0x9f;
-    // Wait<128>();
-    // while (!(SPI1->SR & SPI_SR_TXE)); //Tx buffer not empty.
-    // while (SPI1->SR & SPI_SR_BSY); //SPI (or I2S) is busy in communication or Tx buffer is not empty.
+//     uint8_t result;
+//     SPI1->DR = 0x9f;
+//     // Wait<128>();
+//     // while (!(SPI1->SR & SPI_SR_TXE)); //Tx buffer not empty.
+//     // while (SPI1->SR & SPI_SR_BSY); //SPI (or I2S) is busy in communication or Tx buffer is not empty.
 
-    while (!(SPI1->SR & SPI_SR_RXNE));
-    result = SPI1->DR;
+//     while (!(SPI1->SR & SPI_SR_RXNE));
+//     result = SPI1->DR;
 
-    SPI1->DR = 0;
-    while (!(SPI1->SR & SPI_SR_RXNE));
-    SPI1->DR;
+//     SPI1->DR = 0;
+//     while (!(SPI1->SR & SPI_SR_RXNE));
+//     SPI1->DR;
 
-    SPI1->DR = 0;
-    while (!(SPI1->SR & SPI_SR_RXNE));
-    SPI1->DR;
+//     SPI1->DR = 0;
+//     while (!(SPI1->SR & SPI_SR_RXNE));
+//     SPI1->DR;
 
-    GPIOA->BSRRL = GPIO_Pin_4;
+//     GPIOA->BSRRL = GPIO_Pin_4;
 
-    return result;
+//     return result;
 
-}
+// }
+
 bool InitMemory() {
     // Test(12);
     // Sector_Erase4K(0, kPinFactorySS);
