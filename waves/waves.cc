@@ -176,7 +176,6 @@ void TIM1_UP_TIM10_IRQHandler(void) {
       // flash.Program(0, kPinFactorySS);
     }
 
-  uint8_t result = 2;
     // uint8_t result = flash.Read(0);
 
   // if(counter == 20)
@@ -184,8 +183,15 @@ void TIM1_UP_TIM10_IRQHandler(void) {
   // if(counter == 30)
   //   flash.Program(0, kPinFactorySS);
 
+  uint16_t sample = 0;
+
+  uint8_t status = flash.ReadStatusRegister(EEPROM_FACTORY_SS);
+
+  flash.Read25Mhz((uint8_t *)&sample, 2, 0, EEPROM_FACTORY_SS);
+
+  // flash.Read25Mhz(&status, 1, 0, EEPROM_FACTORY_SS);
   
-  snprintf(value, 40, "c=%d, s=%d, sr=%d\n", counter, result, flash.ReadID());
+  snprintf(value, 40, "c=%d, sr=%d, s=%d\n", counter, status, sample);
   // sample += 1;
   _write(0, (char*)value, 40);
 

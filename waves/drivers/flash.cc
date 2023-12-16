@@ -48,8 +48,8 @@ void Flash::Init() {
   gpio_init.GPIO_OType = GPIO_OType_PP;
   gpio_init.GPIO_Speed = GPIO_Speed_50MHz;
   gpio_init.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  gpio_init.GPIO_Pin = eeprom_ss_pin;
-  GPIO_Init(eeprom_ss_gpio, &gpio_init);
+  gpio_init.GPIO_Pin = eeprom[EEPROM_FACTORY_SS].pin;
+  GPIO_Init(eeprom[EEPROM_FACTORY_SS].gpio, &gpio_init);
 
   // gpio_init.GPIO_Pin = kPinUserSS;
   // GPIO_Init(GPIOA, &gpio_init);
@@ -62,27 +62,27 @@ void Flash::Init() {
   gpio_init.GPIO_OType = GPIO_OType_PP;
   gpio_init.GPIO_Speed = GPIO_Speed_50MHz;
   gpio_init.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  gpio_init.GPIO_Pin = eeprom_miso_pin;
-  GPIO_Init(eeprom_miso_gpio, &gpio_init);
+  gpio_init.GPIO_Pin = eeprom[EEPROM_MISO].pin;
+  GPIO_Init(eeprom[EEPROM_MISO].gpio, &gpio_init);
 
   // mosi
   gpio_init.GPIO_Mode = GPIO_Mode_OUT;
   gpio_init.GPIO_OType = GPIO_OType_PP;
   gpio_init.GPIO_Speed = GPIO_Speed_50MHz;
   gpio_init.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  gpio_init.GPIO_Pin = eeprom_mosi_pin;
-  GPIO_Init(eeprom_mosi_gpio, &gpio_init);
+  gpio_init.GPIO_Pin = eeprom[EEPROM_MOSI].pin;
+  GPIO_Init(eeprom[EEPROM_MOSI].gpio, &gpio_init);
 
   // clock
   gpio_init.GPIO_Mode = GPIO_Mode_OUT;
   gpio_init.GPIO_OType = GPIO_OType_PP;
   gpio_init.GPIO_Speed = GPIO_Speed_50MHz;
   gpio_init.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  gpio_init.GPIO_Pin = eeprom_clock_pin;
-  GPIO_Init(eeprom_clock_gpio, &gpio_init);
+  gpio_init.GPIO_Pin = eeprom[EEPROM_CLOCK].pin;
+  GPIO_Init(eeprom[EEPROM_CLOCK].gpio, &gpio_init);
   
-  HIGH(eeprom_ss_gpio, eeprom_ss_pin);
-  LOW(eeprom_clock_gpio, eeprom_clock_pin);
+  HIGH(EEPROM_FACTORY_SS);
+  LOW(EEPROM_CLOCK);
   /*
   // Initialize MOSI and SCK pins.
   gpio_init.GPIO_Mode = GPIO_Mode_AF;
