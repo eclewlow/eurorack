@@ -186,23 +186,30 @@ void TIM1_UP_TIM10_IRQHandler(void) {
   // if(counter == 30)
   //   flash.Program(0, kPinFactorySS);
 
-  uint16_t sample = 0;
+  int16_t sample = 0;
 
-  uint8_t status = flash.ReadStatusRegister(EEPROM_FACTORY_SS);
+  uint8_t status = 0;
+  // flash.ReadStatusRegister(EEPROM_FACTORY_SS);
 
-  flash.Read25Mhz((uint8_t *)&sample, 2, 0, EEPROM_FACTORY_SS);
+  // flash.Read25Mhz((uint8_t *)&sample, 2, 0, EEPROM_FACTORY_SS);
 
   // flash.Read25Mhz(&status, 1, 0, EEPROM_FACTORY_SS);
   // float test = 20.0f;
   
-  snprintf(value, 40, "c=%d, sr=%d, s=%d, f=%f\n", counter, status, sample, phase);
-  snprintf(value, 40, "f=%d\n", static_cast<int>(phase*100.0f));
+  snprintf(value, 40, "c=%d, sr=%d, s=%d\n", counter, status, sample);
+  // snprintf(value, 40, "f=%d\n", static_cast<int>(phase*100.0f));
   // sample += 1;
   _write(0, (char*)value, 40);
 
 
       // GPIO_ResetBits(GPIOA, kPinFactorySS);
 
+  if(flash.trigger_load) {
+    flash.trigger_load = false;
+    flash.loading = true;
+    flash.Load_BackBuffer();
+    flash.Swap_Buffers();
+  }
 
   // GPIOB->BSRR = GPIO_Pin_1;
   // dac.Write(-audio_samples[playback_block][current_sample] + 32768);
@@ -249,7 +256,7 @@ void FillBuffer(AudioDac::Frame* output, size_t size) {
 //   IWDG_ReloadCounter();
   
 //   ui.Poll();
-  float phase_increment = 50.0f / 47992.0f;
+  float phase_increment = 25.0f / 47992.0f;
 //   if (test_adc_noise) {
 //     static float note_lp = 0.0f;
 //     float note = modulations.note;
@@ -263,8 +270,8 @@ void FillBuffer(AudioDac::Frame* output, size_t size) {
 //   } else if (ui.test_mode()) {
 //     // 100 Hz ascending and descending ramps.
     while (size--) {
-      float sample = sin(2 * M_PI * phase);
-      // sample += 0.0f;
+      float sample = 0;//sin(2 * M_PI * phase);
+      sample += 0.0f;
       // int16_t shortsample = static_cast<int16_t>(32767.0f * sample);
       // shortsample = 0xffff;
       // if(phase < 0.5)
@@ -279,9 +286,14 @@ void FillBuffer(AudioDac::Frame* output, size_t size) {
       // takes 480 to increment once.
       // if rate is 48000, it can output 100hz
 
+
+      float interpolated16 = flash.LoadWaveSample(0, 0.0f, phase);
+
       // test_ramp = static_cast<uint32_t>(4294967296 * (sample + 1.0f) / 2.0f);
       // output->l = static_cast<int32_t>(32767.0f * (sample + 1.0f) / 2.0f);
-      output->l = static_cast<int32_t>(20000.0f * sample);
+      // output->l = static_cast<int32_t>(20000.0f * sample);
+      output->l = static_cast<int16_t>(interpolated16 / 1.5f);
+      // output->l = static_cast<int32_t>(26000.0f * sample);
       // output->l = ~test_ramp >> 16;
       // output->l = 0;
       output->r = test_ramp >> 16;

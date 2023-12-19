@@ -36,6 +36,7 @@
 #include <stm32f4xx_conf.h>
 #include <cstring>
 #include <stdio.h>
+#include "math.h"
 
 namespace waves {
 
@@ -450,7 +451,7 @@ void Write(uint8_t * buf, uint32_t size) {
             //clock low
             LOW(EEPROM_CLOCK);
         
-            Wait<1>();
+            // Wait<1>();
 
             bool set = (buf[i] >> (bsize - 1)) & 0x1;
             if(set)
@@ -461,7 +462,7 @@ void Write(uint8_t * buf, uint32_t size) {
             //clock high
             HIGH(EEPROM_CLOCK);
 
-            Wait<1>();
+            // Wait<1>();
 
             bsize--;
         }
@@ -503,7 +504,7 @@ void Read(uint8_t * buf, uint32_t size) {
             //clock low
             LOW(EEPROM_CLOCK);
         
-            Wait<1>();
+            // Wait<1>();
 
             bool set = READ(EEPROM_MISO);
             if(set)
@@ -515,7 +516,7 @@ void Read(uint8_t * buf, uint32_t size) {
             //clock high
             HIGH(EEPROM_CLOCK);
 
-            Wait<1>();
+            // Wait<1>();
 
             bsize--;
         }
@@ -673,7 +674,7 @@ void Read66Mhz(uint8_t * buf, uint32_t size, uint32_t address, uint8_t pin) {
     send_buf[3] = ((address) & 0xFF);
     send_buf[4] = 0x00;
 
-    Write(send_buf, 4);
+    Write(send_buf, 5);
 
     ReadFast(buf, size);
 
@@ -794,6 +795,8 @@ bool InitMemory() {
         }
 
     }
+
+    Read66Mhz((uint8_t * )buffer0, 4096, 0, EEPROM_FACTORY_SS);
     // Program(0, EEPROM_FACTORY_SS);
   return true;
 }
@@ -812,7 +815,96 @@ bool InitMemory() {
   // }
   
   // static FirmwareUpdateDac* GetInstance() { return instance_; }
-  
+    void Swap_Buffers() {
+        if(wavetable_engine_front_buffer_1 == buffer0) {
+            wavetable_engine_back_buffer_1  = buffer0;
+            wavetable_engine_back_buffer_2  = buffer1;
+            wavetable_engine_front_buffer_1 = buffer2;
+            wavetable_engine_front_buffer_2 = buffer3;
+        } else {
+            wavetable_engine_front_buffer_1 = buffer0;
+            wavetable_engine_front_buffer_2 = buffer1;
+            wavetable_engine_back_buffer_1  = buffer2;
+            wavetable_engine_back_buffer_2  = buffer3;            
+        }
+        current_frame = target_frame;
+    }
+
+    void Load_BackBuffer() {
+        Read66Mhz((uint8_t *)wavetable_engine_back_buffer_1, 4096, target_frame * 4096, EEPROM_FACTORY_SS);
+        if(target_frame < 15)
+            Read66Mhz((uint8_t *)wavetable_engine_back_buffer_2, 4096, (target_frame + 1) * 4096, EEPROM_FACTORY_SS);
+        else
+            Read66Mhz((uint8_t *)wavetable_engine_back_buffer_2, 4096, (target_frame) * 4096, EEPROM_FACTORY_SS);
+    }
+
+    float LoadWaveSample(int table, float morph, float phase) {
+
+      float index = phase * 2048.0;
+      uint16_t integral = floor(index);
+      float fractional = index - integral;
+      
+      uint16_t nextIntegral = (integral + 1) % 2048;
+      
+      int16_t s1 = 0;
+      int16_t s2 = 0;
+
+      int16_t t1 = 0;
+      int16_t t2 = 0;
+
+        // morph is 0 to 15
+      float frame = morph * 15.0f;
+
+        uint16_t frame_integral = floor(frame);
+        float frame_fractional = frame - frame_integral;
+
+        if (static_cast<uint8_t>(frame) != current_frame) {
+            // trigger load
+            trigger_load = true;
+            target_frame = static_cast<uint8_t>(frame);
+        }
+
+       s1 = wavetable_engine_front_buffer_1[integral];
+       s2 = wavetable_engine_front_buffer_1[nextIntegral];
+
+       t1 = wavetable_engine_front_buffer_2[integral];
+       t2 = wavetable_engine_front_buffer_2[nextIntegral];
+
+      float s_interpolated = (s1 + (s2 - s1) * fractional) / 32768.0f;
+      float t_interpolated = (t1 + (t2 - t1) * fractional) / 32768.0f;
+
+        float sample = s_interpolated * (1.0f - frame_fractional) + t_interpolated * frame_fractional;
+
+        // if(morph)
+        // WAVETABLE * t = GetWavetable(table);
+            
+        // TODO: this should be a read to ROM data
+        // the wavetable struct data exists in MCU flash
+        // and the wave struct data exists in MCU flash
+        // but the wave struct data field points to a memory location in ROM.
+        // return ROM[t->waves[frame].memory_location + index];
+            return sample;
+    }
+/*
+
+    if target 2 wavetable / frame != current 2 wavetable / frame-morph
+    -   start loading target 2 table/frames into 2 back buffer    
+    -   once loading is finished, swap 2 back with 2 front buffer.
+*/
+    int16_t *wavetable_engine_front_buffer_1;
+    int16_t *wavetable_engine_front_buffer_2;
+    int16_t *wavetable_engine_back_buffer_1;
+    int16_t *wavetable_engine_back_buffer_2;
+    uint8_t current_table;
+    uint8_t current_frame;
+    uint8_t target_table;
+    uint8_t target_frame;
+    bool trigger_load;
+    bool loading;
+  int16_t buffer0[2048];
+  int16_t buffer1[2048];
+  int16_t buffer2[2048];
+  int16_t buffer3[2048];
  private:
   // NextSampleFn next_sample_fn_;
   // static FirmwareUpdateDac* instance_;
