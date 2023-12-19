@@ -84,9 +84,10 @@ void AudioDac::InitializeAudioInterface(int sample_rate) {
 
 
 
-  RCC_PLLI2SConfig(16, 344, 2, 7, 2);
+  // RCC_PLLI2SConfig(16, 344, 2, 7, 2);
+  RCC_PLLI2SConfig(8, 344, 2, 7, 2);
 
-  RCC_SAIPLLI2SClkDivConfig(1);
+  RCC_SAIPLLI2SClkDivConfig(2);
 
   RCC_SAICLKConfig(RCC_SAIInstance_SAI1, RCC_SAICLKSource_PLLI2S);
 
