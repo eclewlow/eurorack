@@ -5313,15 +5313,25 @@ Source: &lt;a href="http://www.microchip.com/mymicrochip/filehandler.aspx?ddocna
 <net name="GND" class="0">
 <segment>
 <pinref part="QUANTIZEDSIGNAL" gate="G$1" pin="1"/>
-<wire x1="149.86" y1="223.52" x2="154.94" y2="223.52" width="0.1524" layer="91"/>
+<wire x1="149.86" y1="223.52" x2="152.4" y2="223.52" width="0.1524" layer="91"/>
 <pinref part="GND8" gate="1" pin="GND"/>
+<wire x1="152.4" y1="223.52" x2="154.94" y2="223.52" width="0.1524" layer="91"/>
 <wire x1="154.94" y1="223.52" x2="154.94" y2="220.98" width="0.1524" layer="91"/>
+<pinref part="QUANTIZEDSIGNAL" gate="G$1" pin="2"/>
+<wire x1="149.86" y1="226.06" x2="152.4" y2="226.06" width="0.1524" layer="91"/>
+<wire x1="152.4" y1="226.06" x2="152.4" y2="223.52" width="0.1524" layer="91"/>
+<junction x="152.4" y="223.52"/>
 </segment>
 <segment>
 <pinref part="SIGNALIN" gate="G$1" pin="1"/>
-<wire x1="22.86" y1="208.28" x2="30.48" y2="208.28" width="0.1524" layer="91"/>
+<wire x1="22.86" y1="208.28" x2="25.4" y2="208.28" width="0.1524" layer="91"/>
 <pinref part="GND7" gate="1" pin="GND"/>
+<wire x1="25.4" y1="208.28" x2="30.48" y2="208.28" width="0.1524" layer="91"/>
 <wire x1="30.48" y1="208.28" x2="30.48" y2="213.36" width="0.1524" layer="91"/>
+<pinref part="SIGNALIN" gate="G$1" pin="2"/>
+<wire x1="22.86" y1="205.74" x2="25.4" y2="205.74" width="0.1524" layer="91"/>
+<wire x1="25.4" y1="205.74" x2="25.4" y2="208.28" width="0.1524" layer="91"/>
+<junction x="25.4" y="208.28"/>
 </segment>
 <segment>
 <pinref part="IC9" gate="G$1" pin="1IN+"/>

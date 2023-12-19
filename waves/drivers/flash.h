@@ -687,6 +687,8 @@ bool AAI_Word_Program(uint8_t * buffer, uint32_t size, uint32_t address, uint8_t
     if(size < 2) return false;
     if(size % 2 != 0) return false;
 
+    // TODO: USE HARDWARE BSY FOR FASTER WRITE
+
     // ebsy
     // CMD(ENABLE_BSY, pin);
     // CMD(DISABLE_BSY, pin);
@@ -748,7 +750,7 @@ bool AAI_Word_Program(uint8_t * buffer, uint32_t size, uint32_t address, uint8_t
     return true;
 }
 
-bool Program(uint32_t address, uint8_t pin) {
+bool Program(uint8_t byte, uint32_t address, uint8_t pin) {
     // wren
     CMD(WRITE_ENABLE, pin);
 
@@ -759,14 +761,14 @@ bool Program(uint32_t address, uint8_t pin) {
 
     LOW(pin);
 
-    uint8_t send_buf[5];
-    send_buf[0] = BYTE_PROGRAM;
-    send_buf[1] = ((address >> 16) & 0xFF);
-    send_buf[2] = ((address >> 8) & 0xFF);
-    send_buf[3] = ((address) & 0xFF);
-    send_buf[4] = 20;
+    uint8_t buf[5];
+    buf[0] = BYTE_PROGRAM;
+    buf[1] = ((address >> 16) & 0xFF);
+    buf[2] = ((address >> 8) & 0xFF);
+    buf[3] = ((address) & 0xFF);
+    buf[4] = byte;
 
-    Write(send_buf, 5);
+    Write(buf, 5);
 
     HIGH(pin);
 
@@ -784,17 +786,11 @@ bool Program(uint32_t address, uint8_t pin) {
 
 bool InitMemory() {
     WriteStatusRegister(0, EEPROM_FACTORY_SS);
-    // SectorErase4K(0, EEPROM_FACTORY_SS);
-    // Test(12);
-    // Sector_Erase4K(0, EEPROM_FACTORY_SS);
     for(uint8_t table = 0; table < 1; table++) {
         for(uint8_t frame = 0; frame < 16; frame++) {
-              uint32_t address = table * 2048 * 16 * 2 + frame * 2048 * 2;
-              SectorErase4K(address, EEPROM_FACTORY_SS);
-              // uint8_t bytes[2] = {1, 1};
-              // Program(address, EEPROM_FACTORY_SS);
-              // AAI_Word_Program((uint8_t *)bytes, 2, address, EEPROM_FACTORY_SS);
-              AAI_Word_Program((uint8_t *)&ROM[table * 2048 * 16 + frame * 2048], 2048 * 2, address, EEPROM_FACTORY_SS);
+              // uint32_t address = table * 2048 * 16 * 2 + frame * 2048 * 2;
+              // SectorErase4K(address, EEPROM_FACTORY_SS);
+              // AAI_Word_Program((uint8_t *)&ROM[table * 2048 * 16 + frame * 2048], 2048 * 2, address, EEPROM_FACTORY_SS);
         }
 
     }

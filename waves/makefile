@@ -28,6 +28,7 @@ F_CPU          = 168000000L
 SYSCLOCK       = SYSCLK_FREQ_168MHz
 FAMILY         = f4xx
 # USB            = enabled
+# EXTRA_DEFINES  = -DSTM32F446xx
 
 APPLICATION_LARGE = TRUE
 BOOTLOADER        = waves_bootloader

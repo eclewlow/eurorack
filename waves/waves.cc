@@ -27,6 +27,7 @@
 // #include <cstring>
 // #include <stdio.h>
 // #include <cstdlib>
+#include "math.h"
 // #include "waves/drivers/clock_inputs.h"
 // #include "waves/drivers/dac.h"
 // #include "waves/drivers/debug_pin.h"
@@ -66,13 +67,13 @@ using namespace stmlib;
 
 const bool test_adc_noise = false;
 
-const int kSampleRate = 96000;
+const int kSampleRate = 48000;
 const int kGateDelay = 2;
 
 const size_t kMaxBlockSize = 24;
 const size_t kBlockSize = 12;
 
-// AudioDac audio_dac;
+AudioDac audio_dac;
 
 // ClockInputs clock_inputs;
 // ClockSelfPatchingDetector self_patching_detector[kNumGateOutputs];
@@ -143,6 +144,8 @@ void SysTick_Handler() {
 }
 
 int counter = 0;
+float phase = 0.0f;
+
 
 void TIM1_UP_TIM10_IRQHandler(void) {
   if (!(TIM1->SR & TIM_IT_Update)) {
@@ -190,8 +193,10 @@ void TIM1_UP_TIM10_IRQHandler(void) {
   flash.Read25Mhz((uint8_t *)&sample, 2, 0, EEPROM_FACTORY_SS);
 
   // flash.Read25Mhz(&status, 1, 0, EEPROM_FACTORY_SS);
+  // float test = 20.0f;
   
-  snprintf(value, 40, "c=%d, sr=%d, s=%d\n", counter, status, sample);
+  snprintf(value, 40, "c=%d, sr=%d, s=%d, f=%f\n", counter, status, sample, phase);
+  snprintf(value, 40, "f=%d\n", static_cast<int>(phase*100.0f));
   // sample += 1;
   _write(0, (char*)value, 40);
 
@@ -233,6 +238,9 @@ void TIM1_UP_TIM10_IRQHandler(void) {
 
 }
 
+uint32_t test_ramp;
+
+
 void FillBuffer(AudioDac::Frame* output, size_t size) {
 // #ifdef PROFILE_INTERRUPT
 //   TIC
@@ -241,7 +249,7 @@ void FillBuffer(AudioDac::Frame* output, size_t size) {
 //   IWDG_ReloadCounter();
   
 //   ui.Poll();
-  
+  float phase_increment = 50.0f / 47992.0f;
 //   if (test_adc_noise) {
 //     static float note_lp = 0.0f;
 //     float note = modulations.note;
@@ -254,12 +262,47 @@ void FillBuffer(AudioDac::Frame* output, size_t size) {
 //     }
 //   } else if (ui.test_mode()) {
 //     // 100 Hz ascending and descending ramps.
-//     while (size--) {
-//       output->l = ~test_ramp >> 16;
-//       output->r = test_ramp >> 16;
-//       test_ramp += 8947848;
-//       ++output;
-//     }
+    while (size--) {
+      float sample = sin(2 * M_PI * phase);
+      // sample += 0.0f;
+      // int16_t shortsample = static_cast<int16_t>(32767.0f * sample);
+      // shortsample = 0xffff;
+      // if(phase < 0.5)
+        // shortsample = 0x0000;
+
+      // output->l = shortsample;
+      // output->r = shortsample;
+      // ++output;
+
+      // +/- 2.74V, 2.69, 2.79, 2.84 , 2.54 fluctuates
+
+      // takes 480 to increment once.
+      // if rate is 48000, it can output 100hz
+
+      // test_ramp = static_cast<uint32_t>(4294967296 * (sample + 1.0f) / 2.0f);
+      // output->l = static_cast<int32_t>(32767.0f * (sample + 1.0f) / 2.0f);
+      output->l = static_cast<int32_t>(20000.0f * sample);
+      // output->l = ~test_ramp >> 16;
+      // output->l = 0;
+      output->r = test_ramp >> 16;
+      test_ramp += 8947848;  // 480.. 48000
+      /*
+      480 cycles per one wavelength
+      12 hz.  12 * 480 cycles per second
+      5760 cycles per second
+
+
+
+      //*/
+      ++output;
+
+      phase += phase_increment;
+      if(phase >= 1.0f)
+        phase -= 1.0f;
+
+    }
+
+
 //   } else {
 //     if (modulations.timbre_patched) {
 //       PacketDecoderState state = user_data_receiver.Process(modulations.timbre);
@@ -611,9 +654,6 @@ void Init() {
   // Enable stimulus port 0
   // ITM_TRACE_EN |= ( 1 << 0);
 
-  // audio_dac.Init(kSampleRate, kBlockSize);
-  // audio_dac.Start(&FillBuffer);
-
   // settings.Init();
   
   // clock_inputs.Init();
@@ -655,6 +695,10 @@ void Init() {
 
   
   sys.StartTimers();
+
+  audio_dac.Init(48000, kBlockSize);
+  audio_dac.Start(&FillBuffer);
+
 
   // logger.Init(9600);
   // dac.Start(&FillBuffer);

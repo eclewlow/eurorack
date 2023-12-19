@@ -3672,15 +3672,25 @@ Source: &lt;a href="https://www.onsemi.com/pub/Collateral/MMBT3904LT1-D.PDF"&gt;
 <net name="GND" class="0">
 <segment>
 <pinref part="J1" gate="G$1" pin="1"/>
-<wire x1="38.1" y1="213.36" x2="43.18" y2="213.36" width="0.1524" layer="91"/>
+<wire x1="38.1" y1="213.36" x2="40.64" y2="213.36" width="0.1524" layer="91"/>
+<wire x1="40.64" y1="213.36" x2="43.18" y2="213.36" width="0.1524" layer="91"/>
 <wire x1="43.18" y1="213.36" x2="43.18" y2="208.28" width="0.1524" layer="91"/>
 <pinref part="GND1" gate="1" pin="GND"/>
+<pinref part="J1" gate="G$1" pin="2"/>
+<wire x1="38.1" y1="215.9" x2="40.64" y2="215.9" width="0.1524" layer="91"/>
+<wire x1="40.64" y1="215.9" x2="40.64" y2="213.36" width="0.1524" layer="91"/>
+<junction x="40.64" y="213.36"/>
 </segment>
 <segment>
 <pinref part="J2" gate="G$1" pin="1"/>
-<wire x1="353.06" y1="200.66" x2="347.98" y2="200.66" width="0.1524" layer="91"/>
+<wire x1="353.06" y1="200.66" x2="350.52" y2="200.66" width="0.1524" layer="91"/>
+<wire x1="350.52" y1="200.66" x2="347.98" y2="200.66" width="0.1524" layer="91"/>
 <wire x1="347.98" y1="200.66" x2="347.98" y2="193.04" width="0.1524" layer="91"/>
 <pinref part="GND2" gate="1" pin="GND"/>
+<pinref part="J2" gate="G$1" pin="2"/>
+<wire x1="353.06" y1="203.2" x2="350.52" y2="203.2" width="0.1524" layer="91"/>
+<wire x1="350.52" y1="203.2" x2="350.52" y2="200.66" width="0.1524" layer="91"/>
+<junction x="350.52" y="200.66"/>
 </segment>
 <segment>
 <pinref part="R2" gate="G$1" pin="A"/>

@@ -1124,6 +1124,8 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <via x="4.3" y="57.89" extent="1-16" drill="0.508"/>
 <via x="11.05" y="47.64" extent="1-16" drill="0.508"/>
 <via x="23.77" y="37.95" extent="1-16" drill="0.508"/>
+<contactref element="J1" pad="P2"/>
+<contactref element="J2" pad="P2"/>
 </signal>
 <signal name="5V">
 <contactref element="R1" pad="3"/>

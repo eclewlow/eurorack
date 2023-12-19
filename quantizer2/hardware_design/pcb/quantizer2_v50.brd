@@ -1672,6 +1672,8 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <via x="22.2" y="62.2" extent="1-16" drill="0.35"/>
 <via x="21.4" y="82.1" extent="1-16" drill="0.35"/>
 <via x="5.4" y="94.1" extent="1-16" drill="0.35"/>
+<contactref element="SIGNALIN" pad="P2"/>
+<contactref element="QUANTIZEDSIGNAL" pad="P2"/>
 </signal>
 <signal name="VCC">
 <contactref element="IC9" pad="8"/>

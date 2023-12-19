@@ -11943,11 +11943,11 @@ Source: &lt;a href="https://www.ckswitches.com/media/1341/d6.pdf"&gt; Datasheet 
 <attribute name="NAME" x="77.47" y="129.54" size="1.778" layer="95" align="center-left"/>
 <attribute name="VALUE" x="77.47" y="127" size="1.778" layer="96" align="center-left"/>
 </instance>
-<instance part="J3" gate="G$1" x="241.3" y="68.58" smashed="yes" rot="R180">
-<attribute name="NAME" x="243.84" y="64.516" size="1.778" layer="95" rot="R180"/>
+<instance part="J3" gate="G$1" x="241.3" y="68.58" smashed="yes" rot="MR0">
+<attribute name="NAME" x="243.84" y="72.644" size="1.778" layer="95" rot="MR0"/>
 </instance>
-<instance part="J4" gate="G$1" x="241.3" y="104.14" smashed="yes" rot="R180">
-<attribute name="NAME" x="243.84" y="100.076" size="1.778" layer="95" rot="R180"/>
+<instance part="J4" gate="G$1" x="241.3" y="104.14" smashed="yes" rot="MR0">
+<attribute name="NAME" x="243.84" y="108.204" size="1.778" layer="95" rot="MR0"/>
 </instance>
 <instance part="+3V10" gate="G$1" x="347.98" y="198.12" smashed="yes">
 <attribute name="VALUE" x="345.44" y="193.04" size="1.778" layer="96" rot="R90"/>
@@ -11983,11 +11983,11 @@ Source: &lt;a href="https://www.ckswitches.com/media/1341/d6.pdf"&gt; Datasheet 
 <instance part="+3V13" gate="G$1" x="312.42" y="165.1" smashed="yes" rot="R180">
 <attribute name="VALUE" x="314.96" y="170.18" size="1.778" layer="96" rot="R270"/>
 </instance>
-<instance part="J5" gate="G$1" x="157.48" y="68.58" smashed="yes" rot="R180">
-<attribute name="NAME" x="160.02" y="64.516" size="1.778" layer="95" rot="R180"/>
+<instance part="J5" gate="G$1" x="157.48" y="68.58" smashed="yes" rot="MR0">
+<attribute name="NAME" x="160.02" y="72.644" size="1.778" layer="95" rot="MR0"/>
 </instance>
-<instance part="J6" gate="G$1" x="157.48" y="104.14" smashed="yes" rot="R180">
-<attribute name="NAME" x="160.02" y="100.076" size="1.778" layer="95" rot="R180"/>
+<instance part="J6" gate="G$1" x="157.48" y="104.14" smashed="yes" rot="MR0">
+<attribute name="NAME" x="160.02" y="108.204" size="1.778" layer="95" rot="MR0"/>
 </instance>
 <instance part="JP1" gate="A" x="35.56" y="187.96" smashed="yes">
 <attribute name="NAME" x="29.21" y="196.215" size="1.778" layer="95"/>
@@ -12439,14 +12439,14 @@ Source: &lt;a href="https://www.ckswitches.com/media/1341/d6.pdf"&gt; Datasheet 
 <pinref part="GND61" gate="1" pin="GND"/>
 </segment>
 <segment>
-<pinref part="J6" gate="G$1" pin="2"/>
-<wire x1="162.56" y1="104.14" x2="165.1" y2="104.14" width="0.1524" layer="91"/>
 <wire x1="165.1" y1="104.14" x2="165.1" y2="101.6" width="0.1524" layer="91"/>
-<pinref part="J6" gate="G$1" pin="3"/>
-<wire x1="165.1" y1="101.6" x2="162.56" y2="101.6" width="0.1524" layer="91"/>
-<wire x1="165.1" y1="101.6" x2="165.1" y2="99.06" width="0.1524" layer="91"/>
-<junction x="165.1" y="101.6"/>
 <pinref part="GND60" gate="1" pin="GND"/>
+<pinref part="J6" gate="G$1" pin="2"/>
+<wire x1="165.1" y1="101.6" x2="165.1" y2="99.06" width="0.1524" layer="91"/>
+<wire x1="162.56" y1="104.14" x2="165.1" y2="104.14" width="0.1524" layer="91"/>
+<pinref part="J6" gate="G$1" pin="1"/>
+<wire x1="162.56" y1="101.6" x2="165.1" y2="101.6" width="0.1524" layer="91"/>
+<junction x="165.1" y="101.6"/>
 </segment>
 <segment>
 <pinref part="C44" gate="G$1" pin="2"/>
@@ -12469,34 +12469,34 @@ Source: &lt;a href="https://www.ckswitches.com/media/1341/d6.pdf"&gt; Datasheet 
 <pinref part="GND65" gate="1" pin="GND"/>
 </segment>
 <segment>
-<pinref part="J5" gate="G$1" pin="2"/>
-<wire x1="162.56" y1="68.58" x2="165.1" y2="68.58" width="0.1524" layer="91"/>
 <wire x1="165.1" y1="68.58" x2="165.1" y2="66.04" width="0.1524" layer="91"/>
-<pinref part="J5" gate="G$1" pin="3"/>
-<wire x1="165.1" y1="66.04" x2="162.56" y2="66.04" width="0.1524" layer="91"/>
-<wire x1="165.1" y1="66.04" x2="165.1" y2="63.5" width="0.1524" layer="91"/>
-<junction x="165.1" y="66.04"/>
 <pinref part="GND66" gate="1" pin="GND"/>
+<pinref part="J5" gate="G$1" pin="2"/>
+<wire x1="165.1" y1="66.04" x2="165.1" y2="63.5" width="0.1524" layer="91"/>
+<wire x1="162.56" y1="68.58" x2="165.1" y2="68.58" width="0.1524" layer="91"/>
+<pinref part="J5" gate="G$1" pin="1"/>
+<wire x1="162.56" y1="66.04" x2="165.1" y2="66.04" width="0.1524" layer="91"/>
+<junction x="165.1" y="66.04"/>
 </segment>
 <segment>
-<pinref part="J3" gate="G$1" pin="2"/>
-<wire x1="246.38" y1="68.58" x2="248.92" y2="68.58" width="0.1524" layer="91"/>
 <wire x1="248.92" y1="68.58" x2="248.92" y2="66.04" width="0.1524" layer="91"/>
-<pinref part="J3" gate="G$1" pin="3"/>
-<wire x1="248.92" y1="66.04" x2="246.38" y2="66.04" width="0.1524" layer="91"/>
-<wire x1="248.92" y1="66.04" x2="248.92" y2="63.5" width="0.1524" layer="91"/>
-<junction x="248.92" y="66.04"/>
 <pinref part="GND67" gate="1" pin="GND"/>
+<pinref part="J3" gate="G$1" pin="2"/>
+<wire x1="248.92" y1="66.04" x2="248.92" y2="63.5" width="0.1524" layer="91"/>
+<wire x1="246.38" y1="68.58" x2="248.92" y2="68.58" width="0.1524" layer="91"/>
+<pinref part="J3" gate="G$1" pin="1"/>
+<wire x1="246.38" y1="66.04" x2="248.92" y2="66.04" width="0.1524" layer="91"/>
+<junction x="248.92" y="66.04"/>
 </segment>
 <segment>
-<pinref part="J4" gate="G$1" pin="2"/>
-<wire x1="246.38" y1="104.14" x2="248.92" y2="104.14" width="0.1524" layer="91"/>
 <wire x1="248.92" y1="104.14" x2="248.92" y2="101.6" width="0.1524" layer="91"/>
-<pinref part="J4" gate="G$1" pin="3"/>
-<wire x1="248.92" y1="101.6" x2="246.38" y2="101.6" width="0.1524" layer="91"/>
-<wire x1="248.92" y1="101.6" x2="248.92" y2="99.06" width="0.1524" layer="91"/>
-<junction x="248.92" y="101.6"/>
 <pinref part="GND68" gate="1" pin="GND"/>
+<pinref part="J4" gate="G$1" pin="2"/>
+<wire x1="248.92" y1="101.6" x2="248.92" y2="99.06" width="0.1524" layer="91"/>
+<wire x1="246.38" y1="104.14" x2="248.92" y2="104.14" width="0.1524" layer="91"/>
+<pinref part="J4" gate="G$1" pin="1"/>
+<wire x1="246.38" y1="101.6" x2="248.92" y2="101.6" width="0.1524" layer="91"/>
+<junction x="248.92" y="101.6"/>
 </segment>
 </net>
 <net name="ROM_MOSI" class="0">
@@ -12862,13 +12862,13 @@ Source: &lt;a href="https://www.ckswitches.com/media/1341/d6.pdf"&gt; Datasheet 
 </net>
 <net name="N$16" class="0">
 <segment>
-<pinref part="J6" gate="G$1" pin="1"/>
-<wire x1="162.56" y1="106.68" x2="170.18" y2="106.68" width="0.1524" layer="91"/>
-<junction x="170.18" y="106.68"/>
 <wire x1="170.18" y1="106.68" x2="170.18" y2="104.14" width="0.1524" layer="91"/>
 <pinref part="C44" gate="G$1" pin="1"/>
 <wire x1="170.18" y1="106.68" x2="175.26" y2="106.68" width="0.1524" layer="91"/>
 <pinref part="R21" gate="G$1" pin="1"/>
+<pinref part="J6" gate="G$1" pin="3"/>
+<wire x1="162.56" y1="106.68" x2="170.18" y2="106.68" width="0.1524" layer="91"/>
+<junction x="170.18" y="106.68"/>
 </segment>
 </net>
 <net name="ADC_TUNE_CV" class="0">
@@ -12893,13 +12893,13 @@ Source: &lt;a href="https://www.ckswitches.com/media/1341/d6.pdf"&gt; Datasheet 
 </net>
 <net name="N$15" class="0">
 <segment>
-<wire x1="162.56" y1="71.12" x2="170.18" y2="71.12" width="0.1524" layer="91"/>
-<junction x="170.18" y="71.12"/>
 <wire x1="170.18" y1="71.12" x2="170.18" y2="68.58" width="0.1524" layer="91"/>
 <pinref part="C46" gate="G$1" pin="1"/>
 <wire x1="170.18" y1="71.12" x2="175.26" y2="71.12" width="0.1524" layer="91"/>
-<pinref part="J5" gate="G$1" pin="1"/>
 <pinref part="R24" gate="G$1" pin="1"/>
+<pinref part="J5" gate="G$1" pin="3"/>
+<wire x1="162.56" y1="71.12" x2="170.18" y2="71.12" width="0.1524" layer="91"/>
+<junction x="170.18" y="71.12"/>
 </segment>
 </net>
 <net name="N$17" class="0">
@@ -12907,21 +12907,21 @@ Source: &lt;a href="https://www.ckswitches.com/media/1341/d6.pdf"&gt; Datasheet 
 <wire x1="254" y1="106.68" x2="254" y2="104.14" width="0.1524" layer="91"/>
 <pinref part="C48" gate="G$1" pin="1"/>
 <wire x1="254" y1="106.68" x2="259.08" y2="106.68" width="0.1524" layer="91"/>
-<pinref part="J4" gate="G$1" pin="1"/>
-<wire x1="254" y1="106.68" x2="246.38" y2="106.68" width="0.1524" layer="91"/>
-<junction x="254" y="106.68"/>
 <pinref part="R27" gate="G$1" pin="1"/>
+<pinref part="J4" gate="G$1" pin="3"/>
+<wire x1="246.38" y1="106.68" x2="254" y2="106.68" width="0.1524" layer="91"/>
+<junction x="254" y="106.68"/>
 </segment>
 </net>
 <net name="N$23" class="0">
 <segment>
-<wire x1="246.38" y1="71.12" x2="254" y2="71.12" width="0.1524" layer="91"/>
-<junction x="254" y="71.12"/>
 <wire x1="254" y1="71.12" x2="254" y2="68.58" width="0.1524" layer="91"/>
 <pinref part="C50" gate="G$1" pin="1"/>
 <wire x1="254" y1="71.12" x2="259.08" y2="71.12" width="0.1524" layer="91"/>
-<pinref part="J3" gate="G$1" pin="1"/>
 <pinref part="R22" gate="G$1" pin="1"/>
+<pinref part="J3" gate="G$1" pin="3"/>
+<wire x1="246.38" y1="71.12" x2="254" y2="71.12" width="0.1524" layer="91"/>
+<junction x="254" y="71.12"/>
 </segment>
 </net>
 </nets>
