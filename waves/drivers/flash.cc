@@ -39,14 +39,14 @@ void Flash::Init() {
 
 
   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
-  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
-  RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, ENABLE);
+  // RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
+  // RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, ENABLE);
 
   // Initialize 3 ROM SS pin.
   GPIO_InitTypeDef gpio_init;
   gpio_init.GPIO_Mode = GPIO_Mode_OUT;
   gpio_init.GPIO_OType = GPIO_OType_PP;
-  gpio_init.GPIO_Speed = GPIO_Speed_50MHz;
+  gpio_init.GPIO_Speed = GPIO_Speed_100MHz;
   gpio_init.GPIO_PuPd = GPIO_PuPd_NOPULL;
   gpio_init.GPIO_Pin = eeprom[EEPROM_FACTORY_SS].pin;
   GPIO_Init(eeprom[EEPROM_FACTORY_SS].gpio, &gpio_init);
@@ -60,7 +60,7 @@ void Flash::Init() {
   // miso
   gpio_init.GPIO_Mode = GPIO_Mode_IN;
   gpio_init.GPIO_OType = GPIO_OType_PP;
-  gpio_init.GPIO_Speed = GPIO_Speed_50MHz;
+  gpio_init.GPIO_Speed = GPIO_Speed_100MHz;
   gpio_init.GPIO_PuPd = GPIO_PuPd_NOPULL;
   gpio_init.GPIO_Pin = eeprom[EEPROM_MISO].pin;
   GPIO_Init(eeprom[EEPROM_MISO].gpio, &gpio_init);
@@ -68,7 +68,7 @@ void Flash::Init() {
   // mosi
   gpio_init.GPIO_Mode = GPIO_Mode_OUT;
   gpio_init.GPIO_OType = GPIO_OType_PP;
-  gpio_init.GPIO_Speed = GPIO_Speed_50MHz;
+  gpio_init.GPIO_Speed = GPIO_Speed_100MHz;
   gpio_init.GPIO_PuPd = GPIO_PuPd_NOPULL;
   gpio_init.GPIO_Pin = eeprom[EEPROM_MOSI].pin;
   GPIO_Init(eeprom[EEPROM_MOSI].gpio, &gpio_init);
@@ -76,7 +76,7 @@ void Flash::Init() {
   // clock
   gpio_init.GPIO_Mode = GPIO_Mode_OUT;
   gpio_init.GPIO_OType = GPIO_OType_PP;
-  gpio_init.GPIO_Speed = GPIO_Speed_50MHz;
+  gpio_init.GPIO_Speed = GPIO_Speed_2MHz;
   gpio_init.GPIO_PuPd = GPIO_PuPd_NOPULL;
   gpio_init.GPIO_Pin = eeprom[EEPROM_CLOCK].pin;
   GPIO_Init(eeprom[EEPROM_CLOCK].gpio, &gpio_init);

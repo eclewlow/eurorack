@@ -34,11 +34,11 @@ namespace waves {
   
 void Adc::Init(bool single_channel) {
   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA2, ENABLE);
-  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
-  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
+  // RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+  // RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE);
-  RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC2, ENABLE);
+  // RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC2, ENABLE);
   
   DMA_InitTypeDef dma_init;
   ADC_CommonInitTypeDef adc_common_init;
@@ -46,17 +46,17 @@ void Adc::Init(bool single_channel) {
   GPIO_InitTypeDef gpio_init;
   
   // Initialize A0..A7 (ADC0..ADC7)
-  gpio_init.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3;
-  gpio_init.GPIO_Pin |= GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7;
-  gpio_init.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  gpio_init.GPIO_Mode = GPIO_Mode_AN;
-  GPIO_Init(GPIOA, &gpio_init);
+  // gpio_init.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3;
+  // gpio_init.GPIO_Pin |= GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7;
+  // gpio_init.GPIO_PuPd = GPIO_PuPd_NOPULL;
+  // gpio_init.GPIO_Mode = GPIO_Mode_AN;
+  // GPIO_Init(GPIOA, &gpio_init);
 
   // Initialize B0..B1 (ADC8..ADC9)
-  gpio_init.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1;
-  gpio_init.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  gpio_init.GPIO_Mode = GPIO_Mode_AN;
-  GPIO_Init(GPIOB, &gpio_init);
+  // gpio_init.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1;
+  // gpio_init.GPIO_PuPd = GPIO_PuPd_NOPULL;
+  // gpio_init.GPIO_Mode = GPIO_Mode_AN;
+  // GPIO_Init(GPIOB, &gpio_init);
 
   // Initialize C0..C5 (ADC10..ADC11)
   gpio_init.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3;
@@ -68,9 +68,9 @@ void Adc::Init(bool single_channel) {
   // Use DMA to automatically copy ADC data register to values_ buffer.
   dma_init.DMA_Channel = DMA_Channel_0;
   dma_init.DMA_PeripheralBaseAddr = (uint32_t)&ADC1->DR;
-  dma_init.DMA_Memory0BaseAddr = (uint32_t)&values_[ADC_GROUP_POT];
+  dma_init.DMA_Memory0BaseAddr = (uint32_t)&values_[0];
   dma_init.DMA_DIR = DMA_DIR_PeripheralToMemory;
-  dma_init.DMA_BufferSize = single_channel ? 1 : ADC_CHANNEL_LAST;
+  dma_init.DMA_BufferSize = 6;
   dma_init.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
   dma_init.DMA_MemoryInc = DMA_MemoryInc_Enable; 
   dma_init.DMA_PeripheralDataSize = DMA_PeripheralDataSize_HalfWord;
@@ -84,11 +84,11 @@ void Adc::Init(bool single_channel) {
   DMA_Init(DMA2_Stream0, &dma_init);
   DMA_Cmd(DMA2_Stream0, ENABLE);
   
-  dma_init.DMA_Channel = DMA_Channel_1;
-  dma_init.DMA_PeripheralBaseAddr = (uint32_t)&ADC2->DR;
-  dma_init.DMA_Memory0BaseAddr = (uint32_t)&values_[ADC_GROUP_CV];
-  DMA_Init(DMA2_Stream2, &dma_init);
-  DMA_Cmd(DMA2_Stream2, ENABLE);
+  // dma_init.DMA_Channel = DMA_Channel_1;
+  // dma_init.DMA_PeripheralBaseAddr = (uint32_t)&ADC2->DR;
+  // dma_init.DMA_Memory0BaseAddr = (uint32_t)&values_[ADC_GROUP_CV];
+  // DMA_Init(DMA2_Stream2, &dma_init);
+  // DMA_Cmd(DMA2_Stream2, ENABLE);
   
   adc_common_init.ADC_Mode = ADC_Mode_Independent;
   adc_common_init.ADC_Prescaler = ADC_Prescaler_Div8;
@@ -102,61 +102,58 @@ void Adc::Init(bool single_channel) {
   adc_init.ADC_ExternalTrigConv = ADC_ExternalTrigConv_T1_CC1;
   adc_init.ADC_ExternalTrigConvEdge = ADC_ExternalTrigConvEdge_None;
   adc_init.ADC_DataAlign = ADC_DataAlign_Left;
-  adc_init.ADC_NbrOfConversion = single_channel ? 1 : ADC_CHANNEL_LAST;
+  adc_init.ADC_NbrOfConversion = 6;
   ADC_Init(ADC1, &adc_init);
-  ADC_Init(ADC2, &adc_init);
+  // ADC_Init(ADC2, &adc_init);
   
   // 168M / 2 / 8 / (8 x (144 + 20)) = 8.001kHz.
-  if (single_channel) {
-    ADC_RegularChannelConfig(ADC1, ADC_Channel_12, 1, ADC_SampleTime_144Cycles);
-  } else {
-    ADC_RegularChannelConfig(ADC1, ADC_Channel_13, 1, ADC_SampleTime_144Cycles);
-    ADC_RegularChannelConfig(ADC1, ADC_Channel_9, 2, ADC_SampleTime_144Cycles); 
-    ADC_RegularChannelConfig(ADC1, ADC_Channel_12,3, ADC_SampleTime_144Cycles); 
-    ADC_RegularChannelConfig(ADC1, ADC_Channel_2,4, ADC_SampleTime_144Cycles); 
-    ADC_RegularChannelConfig(ADC1, ADC_Channel_15,5, ADC_SampleTime_144Cycles); 
-    ADC_RegularChannelConfig(ADC1, ADC_Channel_10,6, ADC_SampleTime_144Cycles); 
-    ADC_RegularChannelConfig(ADC1, ADC_Channel_11, 7, ADC_SampleTime_144Cycles);
-    ADC_RegularChannelConfig(ADC1, ADC_Channel_8, 8, ADC_SampleTime_144Cycles); 
-  }
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_10, 1, ADC_SampleTime_144Cycles);
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_11, 2, ADC_SampleTime_144Cycles); 
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_12, 3, ADC_SampleTime_144Cycles); 
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_13, 4, ADC_SampleTime_144Cycles); 
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_14, 5, ADC_SampleTime_144Cycles); 
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_15, 6, ADC_SampleTime_144Cycles); 
+  //   ADC_RegularChannelConfig(ADC1, ADC_Channel_11, 7, ADC_SampleTime_144Cycles);
+  //   ADC_RegularChannelConfig(ADC1, ADC_Channel_8, 8, ADC_SampleTime_144Cycles); 
+  // }
   
-  if (single_channel) {
-    ADC_RegularChannelConfig(ADC2, ADC_Channel_3, 1, ADC_SampleTime_144Cycles); 
-  } else {
-    ADC_RegularChannelConfig(ADC2, ADC_Channel_5, 1, ADC_SampleTime_144Cycles);
-    ADC_RegularChannelConfig(ADC2, ADC_Channel_0, 2, ADC_SampleTime_144Cycles); 
-    ADC_RegularChannelConfig(ADC2, ADC_Channel_3, 3, ADC_SampleTime_144Cycles); 
-    ADC_RegularChannelConfig(ADC2, ADC_Channel_1, 4, ADC_SampleTime_144Cycles); 
-    ADC_RegularChannelConfig(ADC2, ADC_Channel_4, 5, ADC_SampleTime_144Cycles); 
-    ADC_RegularChannelConfig(ADC2, ADC_Channel_7, 6, ADC_SampleTime_144Cycles); 
-    ADC_RegularChannelConfig(ADC2, ADC_Channel_14,7, ADC_SampleTime_144Cycles);
-    ADC_RegularChannelConfig(ADC2, ADC_Channel_6, 8, ADC_SampleTime_144Cycles); 
-  }
+  // if (single_channel) {
+  //   ADC_RegularChannelConfig(ADC2, ADC_Channel_3, 1, ADC_SampleTime_144Cycles); 
+  // } else {
+  //   ADC_RegularChannelConfig(ADC2, ADC_Channel_5, 1, ADC_SampleTime_144Cycles);
+  //   ADC_RegularChannelConfig(ADC2, ADC_Channel_0, 2, ADC_SampleTime_144Cycles); 
+  //   ADC_RegularChannelConfig(ADC2, ADC_Channel_3, 3, ADC_SampleTime_144Cycles); 
+  //   ADC_RegularChannelConfig(ADC2, ADC_Channel_1, 4, ADC_SampleTime_144Cycles); 
+  //   ADC_RegularChannelConfig(ADC2, ADC_Channel_4, 5, ADC_SampleTime_144Cycles); 
+  //   ADC_RegularChannelConfig(ADC2, ADC_Channel_7, 6, ADC_SampleTime_144Cycles); 
+  //   ADC_RegularChannelConfig(ADC2, ADC_Channel_14,7, ADC_SampleTime_144Cycles);
+  //   ADC_RegularChannelConfig(ADC2, ADC_Channel_6, 8, ADC_SampleTime_144Cycles); 
+  // }
   
   ADC_DMARequestAfterLastTransferCmd(ADC1, ENABLE);
-  ADC_DMARequestAfterLastTransferCmd(ADC2, ENABLE);
+  // ADC_DMARequestAfterLastTransferCmd(ADC2, ENABLE);
   ADC_Cmd(ADC1, ENABLE);
-  ADC_Cmd(ADC2, ENABLE);
+  // ADC_Cmd(ADC2, ENABLE);
   ADC_DMACmd(ADC1, ENABLE);
-  ADC_DMACmd(ADC2, ENABLE);
+  // ADC_DMACmd(ADC2, ENABLE);
   Convert();
 }
 
 void Adc::DeInit() {
   DMA_Cmd(DMA2_Stream0, DISABLE);
-  DMA_Cmd(DMA2_Stream2, DISABLE);
+  // DMA_Cmd(DMA2_Stream2, DISABLE);
   ADC_DMARequestAfterLastTransferCmd(ADC1, DISABLE);
-  ADC_DMARequestAfterLastTransferCmd(ADC2, DISABLE);
+  // ADC_DMARequestAfterLastTransferCmd(ADC2, DISABLE);
   ADC_Cmd(ADC1, DISABLE);
-  ADC_Cmd(ADC2, DISABLE);
+  // ADC_Cmd(ADC2, DISABLE);
   ADC_DMACmd(ADC1, DISABLE);
-  ADC_DMACmd(ADC2, DISABLE);
+  // ADC_DMACmd(ADC2, DISABLE);
   ADC_DeInit();
 }
 
 void Adc::Convert() {
   ADC_SoftwareStartConv(ADC1);
-  ADC_SoftwareStartConv(ADC2);
+  // ADC_SoftwareStartConv(ADC2);
 }
 
 }  // namespace waves

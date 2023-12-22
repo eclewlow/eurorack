@@ -33,24 +33,6 @@
 
 namespace waves {
 
-enum AdcParameter {
-  ADC_CHANNEL_DEJA_VU_AMOUNT,
-  ADC_CHANNEL_DEJA_VU_LENGTH,
-  ADC_CHANNEL_X_SPREAD_2 = ADC_CHANNEL_DEJA_VU_LENGTH,
-  ADC_CHANNEL_T_RATE,
-  ADC_CHANNEL_T_BIAS,
-  ADC_CHANNEL_T_JITTER,
-  ADC_CHANNEL_X_SPREAD,
-  ADC_CHANNEL_X_BIAS,
-  ADC_CHANNEL_X_STEPS,
-  ADC_CHANNEL_LAST
-};
-
-enum AdcGroup {
-  ADC_GROUP_POT = 0,
-  ADC_GROUP_CV = ADC_CHANNEL_LAST
-};
-
 class Adc {
  public:
   Adc() { }
@@ -71,7 +53,7 @@ class Adc {
   }
   
  private:
-  uint16_t values_[ADC_CHANNEL_LAST * 2];
+  uint16_t values_[6];
   
   DISALLOW_COPY_AND_ASSIGN(Adc);
 };

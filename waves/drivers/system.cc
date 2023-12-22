@@ -55,8 +55,10 @@ void System::Init(bool application) {
   // GPIO_Init(GPIOB, &gpio_init);
 
   TIM_TimeBaseInitTypeDef timer_init;
-  timer_init.TIM_Period = 50000-1;//F_CPU - 1;
-  timer_init.TIM_Prescaler = (uint16_t) ((SystemCoreClock / 2) / 25000) - 1;
+  timer_init.TIM_Period = F_CPU / 100 - 1;
+  timer_init.TIM_Prescaler = 0;
+  // timer_init.TIM_Period = 50000-1;
+  // timer_init.TIM_Prescaler = (uint16_t) ((SystemCoreClock / 2) / 25000) - 1;
   timer_init.TIM_ClockDivision = TIM_CKD_DIV1;
   timer_init.TIM_CounterMode = TIM_CounterMode_Up;
   timer_init.TIM_RepetitionCounter = 0;

@@ -17,6 +17,6 @@ EEPROM_PIN eeprom[6] = {
 	{ GPIOA, GPIO_Pin_3 },
 	{ GPIOA, GPIO_Pin_2 },
 	{ GPIOA, GPIO_Pin_5 },
-	{ GPIOB, GPIO_Pin_5 },
-	{ GPIOB, GPIO_Pin_4 },
+	{ GPIOA, GPIO_Pin_7 },
+	{ GPIOA, GPIO_Pin_6 },
 };

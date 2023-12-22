@@ -50,28 +50,70 @@ class Flash {
   ~Flash() { }
   
   void HIGH(GPIO_TypeDef* GPIOx, uint16_t pin) {
-    GPIO_SetBits(GPIOx, pin);
+    // GPIO_SetBits(GPIOx, pin);
+    GPIOx->BSRRL = pin;
   }
 
   void LOW(GPIO_TypeDef* GPIOx, uint16_t pin) {
-    GPIO_ResetBits(GPIOx, pin);
+    // GPIO_ResetBits(GPIOx, pin);
+    GPIOx->BSRRH = pin;
   }
 
   uint8_t READ(GPIO_TypeDef* GPIOx, uint16_t pin) {
-    return GPIO_ReadInputDataBit(GPIOx, pin);
+      uint8_t bitstatus = 0x00;
+
+      if ((GPIOx->IDR & pin) != (uint32_t)Bit_RESET)
+      {
+        bitstatus = (uint8_t)Bit_SET;
+      }
+      else
+      {
+        bitstatus = (uint8_t)Bit_RESET;
+      }
+      return bitstatus;
+
+    // return GPIO_ReadInputDataBit(GPIOx, pin);
   }
 
+  static const uint16_t wait_time = 4;
+  static const uint16_t wait_time_2 = 1;
 
   void HIGH(uint8_t index) {
-    GPIO_SetBits(eeprom[index].gpio, eeprom[index].pin);
+    eeprom[index].gpio->BSRRL = eeprom[index].pin;
+    if(index == EEPROM_CLOCK)
+        Wait<wait_time>();
+    else
+        Wait<wait_time_2>();
+    // GPIO_SetBits(eeprom[index].gpio, eeprom[index].pin);
   }
 
   void LOW(uint8_t index) {
-    GPIO_ResetBits(eeprom[index].gpio, eeprom[index].pin);
+    eeprom[index].gpio->BSRRH = eeprom[index].pin;
+    if(index == EEPROM_CLOCK)
+        Wait<wait_time>();
+    else
+        Wait<wait_time_2>();
+    // GPIO_ResetBits(eeprom[index].gpio, eeprom[index].pin);
   }
 
   uint8_t READ(uint8_t index) {
-    return GPIO_ReadInputDataBit(eeprom[index].gpio, eeprom[index].pin);
+    // return GPIO_ReadInputDataBit(eeprom[index].gpio, eeprom[index].pin);
+
+      uint8_t bitstatus = 0x00;
+
+      if ((eeprom[index].gpio->IDR & eeprom[index].pin) != (uint32_t)Bit_RESET)
+      {
+        bitstatus = (uint8_t)Bit_SET;
+      }
+      else
+      {
+        bitstatus = (uint8_t)Bit_RESET;
+      }
+    // if(index == EEPROM_CLOCK)
+        // Wait<4>();
+    // else
+        // Wait<1>();
+      return bitstatus;
   }
 
 
@@ -422,11 +464,6 @@ bool WriteStatusRegister(uint8_t byte, uint8_t pin) {
 
     CMD(ENABLE_WRITE_STATUS_REGISTER, pin);
 
-    //clock low
-    LOW(EEPROM_CLOCK);
-
-    HIGH(pin);
-
     LOW(pin);
 
     uint8_t buf[2] = { WRITE_STATUS_REGISTER, byte };
@@ -435,23 +472,19 @@ bool WriteStatusRegister(uint8_t byte, uint8_t pin) {
 
     HIGH(pin);
 
-    //clock low
-    LOW(EEPROM_CLOCK);
+    CMD(WRITE_DISABLE, pin);
 
     return true;
 }
 
 
 void Write(uint8_t * buf, uint32_t size) {
+
     for(uint32_t i = 0; i < size; i++) {
 
         uint8_t bsize = 8;
 
         while(bsize) {
-            //clock low
-            LOW(EEPROM_CLOCK);
-        
-            // Wait<1>();
 
             bool set = (buf[i] >> (bsize - 1)) & 0x1;
             if(set)
@@ -464,6 +497,9 @@ void Write(uint8_t * buf, uint32_t size) {
 
             // Wait<1>();
 
+            //clock low
+            LOW(EEPROM_CLOCK);
+
             bsize--;
         }
     }
@@ -472,51 +508,53 @@ void Write(uint8_t * buf, uint32_t size) {
 
 
 void ReadFast(uint8_t * buf, uint32_t size) {
+
     for(uint32_t i = 0; i < size; i++) {
 
         uint8_t bsize = 8;
 
         while(bsize) {
-            //clock low
-            LOW(EEPROM_CLOCK);
 
             bool set = READ(EEPROM_MISO);
             if(set)
                 buf[i] |= (0x1 << (bsize - 1));
-            else
-                buf[i] |= (0x0 << (bsize - 1));
+            // else
+                // buf[i] |= (0x0 << (bsize - 1));
 
 
             //clock high
             HIGH(EEPROM_CLOCK);
 
             bsize--;
+
+            //clock low
+            LOW(EEPROM_CLOCK);
         }
     }
 }
 
 void Read(uint8_t * buf, uint32_t size) {
+
     for(uint32_t i = 0; i < size; i++) {
 
         uint8_t bsize = 8;
 
         while(bsize) {
-            //clock low
-            LOW(EEPROM_CLOCK);
-        
-            // Wait<1>();
 
             bool set = READ(EEPROM_MISO);
             if(set)
                 buf[i] |= (0x1 << (bsize - 1));
-            else
-                buf[i] |= (0x0 << (bsize - 1));
+            // else
+                // buf[i] |= (0x0 << (bsize - 1));
 
 
             //clock high
             HIGH(EEPROM_CLOCK);
 
             // Wait<1>();
+
+            //clock low
+            LOW(EEPROM_CLOCK);
 
             bsize--;
         }
@@ -524,10 +562,6 @@ void Read(uint8_t * buf, uint32_t size) {
 }
 
 void CMD(uint8_t code, uint8_t pin) {
-    //clock low
-    LOW(EEPROM_CLOCK);
-
-    HIGH(pin);
 
     LOW(pin);
 
@@ -536,17 +570,9 @@ void CMD(uint8_t code, uint8_t pin) {
     Write(buf, 1);
 
     HIGH(pin);
-
-    //clock low
-    LOW(EEPROM_CLOCK);
 }
 
-uint8_t Jedec_ID_Read() {
-
-    //clock low
-    LOW(EEPROM_CLOCK);
-
-    HIGH(EEPROM_FACTORY_SS);
+uint32_t Jedec_ID_Read() {
 
     LOW(EEPROM_FACTORY_SS);
 
@@ -554,25 +580,17 @@ uint8_t Jedec_ID_Read() {
 
     Write(buf, 1);
 
-    uint8_t byte = 0;
+    uint32_t result = 0;
 
-    Read(&byte, 1);
+    Read((uint8_t*)&result, 4);
 
     HIGH(EEPROM_FACTORY_SS);
 
-    //clock low
-    LOW(EEPROM_CLOCK);
-
-    return byte;
+    return result;
 }
 
 
 uint8_t ReadStatusRegister(uint8_t pin) {
-
-    //clock low
-    LOW(EEPROM_CLOCK);
-
-    HIGH(pin);
 
     LOW(pin);
 
@@ -586,9 +604,6 @@ uint8_t ReadStatusRegister(uint8_t pin) {
 
     HIGH(pin);
 
-    //clock low
-    LOW(EEPROM_CLOCK);
-
     return byte;
 }
 
@@ -596,11 +611,6 @@ bool SectorErase4K(uint32_t address, uint8_t pin) {
 
     // SET WREN first
     CMD(WRITE_ENABLE, pin);
-
-    //clock low
-    LOW(EEPROM_CLOCK);
-
-    HIGH(pin);
 
     LOW(pin);
 
@@ -619,9 +629,6 @@ bool SectorErase4K(uint32_t address, uint8_t pin) {
 
     HIGH(pin);
 
-    //clock low
-    LOW(EEPROM_CLOCK);
-
     while(ReadStatusRegister(pin) & 0x01);  // BUSY
 
     CMD(WRITE_DISABLE, pin);
@@ -630,11 +637,6 @@ bool SectorErase4K(uint32_t address, uint8_t pin) {
 }
 
 void Read25Mhz(uint8_t * buf, uint32_t size, uint32_t address, uint8_t pin) {
-
-    //clock low
-    LOW(EEPROM_CLOCK);
-
-    HIGH(pin);
 
     LOW(pin);
 
@@ -654,16 +656,9 @@ void Read25Mhz(uint8_t * buf, uint32_t size, uint32_t address, uint8_t pin) {
 
     HIGH(pin);
 
-    //clock low
-    LOW(EEPROM_CLOCK);
 }
 
 void Read66Mhz(uint8_t * buf, uint32_t size, uint32_t address, uint8_t pin) {
-
-    //clock low
-    LOW(EEPROM_CLOCK);
-
-    HIGH(pin);
 
     LOW(pin);
 
@@ -679,9 +674,6 @@ void Read66Mhz(uint8_t * buf, uint32_t size, uint32_t address, uint8_t pin) {
     ReadFast(buf, size);
 
     HIGH(pin);
-
-    //clock low
-    LOW(EEPROM_CLOCK);
 }
 
 bool AAI_Word_Program(uint8_t * buffer, uint32_t size, uint32_t address, uint8_t pin) {
@@ -690,17 +682,12 @@ bool AAI_Word_Program(uint8_t * buffer, uint32_t size, uint32_t address, uint8_t
 
     // TODO: USE HARDWARE BSY FOR FASTER WRITE
 
-    // ebsy
-    // CMD(ENABLE_BSY, pin);
-    // CMD(DISABLE_BSY, pin);
-
     // wren
     CMD(WRITE_ENABLE, pin);
 
-    //clock low
-    LOW(EEPROM_CLOCK);
-
-    HIGH(pin);
+    // ebsy
+    // CMD(ENABLE_BSY, pin);
+    CMD(DISABLE_BSY, pin);
 
     LOW(pin);
 
@@ -716,15 +703,12 @@ bool AAI_Word_Program(uint8_t * buffer, uint32_t size, uint32_t address, uint8_t
 
     HIGH(pin);
 
-    //clock low
-    LOW(EEPROM_CLOCK);
-
     while(ReadStatusRegister(pin) & 0x01);  // BUSY
 
     uint32_t i = 2;
 
     while(i < size) {
-        HIGH(pin);
+
         LOW(pin);
 
         uint8_t send_buf[3] = {
@@ -736,8 +720,6 @@ bool AAI_Word_Program(uint8_t * buffer, uint32_t size, uint32_t address, uint8_t
         Write(send_buf, 3);
 
         HIGH(pin);
-        //clock low
-        LOW(EEPROM_CLOCK);
 
         while(ReadStatusRegister(pin) & 0x01);  // BUSY
     }
@@ -755,11 +737,6 @@ bool Program(uint8_t byte, uint32_t address, uint8_t pin) {
     // wren
     CMD(WRITE_ENABLE, pin);
 
-    //clock low
-    LOW(EEPROM_CLOCK);
-
-    HIGH(pin);
-
     LOW(pin);
 
     uint8_t buf[5];
@@ -772,9 +749,6 @@ bool Program(uint8_t byte, uint32_t address, uint8_t pin) {
     Write(buf, 5);
 
     HIGH(pin);
-
-    //clock low
-    LOW(EEPROM_CLOCK);
 
     while(ReadStatusRegister(pin) & 0x01);  // BUSY
 
@@ -789,122 +763,17 @@ bool InitMemory() {
     WriteStatusRegister(0, EEPROM_FACTORY_SS);
     for(uint8_t table = 0; table < 1; table++) {
         for(uint8_t frame = 0; frame < 16; frame++) {
-              // uint32_t address = table * 2048 * 16 * 2 + frame * 2048 * 2;
-              // SectorErase4K(address, EEPROM_FACTORY_SS);
-              // AAI_Word_Program((uint8_t *)&ROM[table * 2048 * 16 + frame * 2048], 2048 * 2, address, EEPROM_FACTORY_SS);
+              uint32_t address = table * 2048 * 16 * 2 + frame * 2048 * 2;
+              SectorErase4K(address, EEPROM_FACTORY_SS);
+              AAI_Word_Program((uint8_t *)&ROM[table * 2048 * 16 + frame * 2048], 2048 * 2, address, EEPROM_FACTORY_SS);
         }
 
     }
 
-    Read66Mhz((uint8_t * )buffer0, 4096, 0, EEPROM_FACTORY_SS);
-    // Program(0, EEPROM_FACTORY_SS);
+    // AAI_Word_Program((uint8_t *)&ROM[0 * 2048 * 16 + 0 * 2048], 2048 * 2, 0, EEPROM_FACTORY_SS);
   return true;
 }
 
-
-  // void NextSample() {
-  //   GPIOA->BSRR = GPIO_Pin_15;
-
-  //   uint16_t sample = (*next_sample_fn_)();
-  //   GPIOA->BRR = GPIO_Pin_15;
-
-  //   sample <<= 4;
-  //   SPI3->DR = 0x0340 | (sample >> 12);
-  //   Wait<64>();
-  //   SPI3->DR = (sample << 4);
-  // }
-  
-  // static FirmwareUpdateDac* GetInstance() { return instance_; }
-    void Swap_Buffers() {
-        if(wavetable_engine_front_buffer_1 == buffer0) {
-            wavetable_engine_back_buffer_1  = buffer0;
-            wavetable_engine_back_buffer_2  = buffer1;
-            wavetable_engine_front_buffer_1 = buffer2;
-            wavetable_engine_front_buffer_2 = buffer3;
-        } else {
-            wavetable_engine_front_buffer_1 = buffer0;
-            wavetable_engine_front_buffer_2 = buffer1;
-            wavetable_engine_back_buffer_1  = buffer2;
-            wavetable_engine_back_buffer_2  = buffer3;            
-        }
-        current_frame = target_frame;
-    }
-
-    void Load_BackBuffer() {
-        Read66Mhz((uint8_t *)wavetable_engine_back_buffer_1, 4096, target_frame * 4096, EEPROM_FACTORY_SS);
-        if(target_frame < 15)
-            Read66Mhz((uint8_t *)wavetable_engine_back_buffer_2, 4096, (target_frame + 1) * 4096, EEPROM_FACTORY_SS);
-        else
-            Read66Mhz((uint8_t *)wavetable_engine_back_buffer_2, 4096, (target_frame) * 4096, EEPROM_FACTORY_SS);
-    }
-
-    float LoadWaveSample(int table, float morph, float phase) {
-
-      float index = phase * 2048.0;
-      uint16_t integral = floor(index);
-      float fractional = index - integral;
-      
-      uint16_t nextIntegral = (integral + 1) % 2048;
-      
-      int16_t s1 = 0;
-      int16_t s2 = 0;
-
-      int16_t t1 = 0;
-      int16_t t2 = 0;
-
-        // morph is 0 to 15
-      float frame = morph * 15.0f;
-
-        uint16_t frame_integral = floor(frame);
-        float frame_fractional = frame - frame_integral;
-
-        if (static_cast<uint8_t>(frame) != current_frame) {
-            // trigger load
-            trigger_load = true;
-            target_frame = static_cast<uint8_t>(frame);
-        }
-
-       s1 = wavetable_engine_front_buffer_1[integral];
-       s2 = wavetable_engine_front_buffer_1[nextIntegral];
-
-       t1 = wavetable_engine_front_buffer_2[integral];
-       t2 = wavetable_engine_front_buffer_2[nextIntegral];
-
-      float s_interpolated = (s1 + (s2 - s1) * fractional) / 32768.0f;
-      float t_interpolated = (t1 + (t2 - t1) * fractional) / 32768.0f;
-
-        float sample = s_interpolated * (1.0f - frame_fractional) + t_interpolated * frame_fractional;
-
-        // if(morph)
-        // WAVETABLE * t = GetWavetable(table);
-            
-        // TODO: this should be a read to ROM data
-        // the wavetable struct data exists in MCU flash
-        // and the wave struct data exists in MCU flash
-        // but the wave struct data field points to a memory location in ROM.
-        // return ROM[t->waves[frame].memory_location + index];
-            return sample;
-    }
-/*
-
-    if target 2 wavetable / frame != current 2 wavetable / frame-morph
-    -   start loading target 2 table/frames into 2 back buffer    
-    -   once loading is finished, swap 2 back with 2 front buffer.
-*/
-    int16_t *wavetable_engine_front_buffer_1;
-    int16_t *wavetable_engine_front_buffer_2;
-    int16_t *wavetable_engine_back_buffer_1;
-    int16_t *wavetable_engine_back_buffer_2;
-    uint8_t current_table;
-    uint8_t current_frame;
-    uint8_t target_table;
-    uint8_t target_frame;
-    bool trigger_load;
-    bool loading;
-  int16_t buffer0[2048];
-  int16_t buffer1[2048];
-  int16_t buffer2[2048];
-  int16_t buffer3[2048];
  private:
   // NextSampleFn next_sample_fn_;
   // static FirmwareUpdateDac* instance_;

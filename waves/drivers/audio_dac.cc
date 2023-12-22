@@ -46,17 +46,40 @@ void AudioDac::Init(int sample_rate, size_t block_size) {
 
 void AudioDac::InitializeGPIO() {
   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
+  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
 
   GPIO_InitTypeDef gpio_init;
   gpio_init.GPIO_Mode = GPIO_Mode_AF;
   gpio_init.GPIO_OType = GPIO_OType_PP;
   gpio_init.GPIO_Speed = GPIO_Speed_2MHz;
   gpio_init.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  gpio_init.GPIO_Pin = GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_15;
+
+  gpio_init.GPIO_Pin = GPIO_Pin_12 | GPIO_Pin_15;
   GPIO_Init(GPIOB, &gpio_init);
+
+  gpio_init.GPIO_Pin = GPIO_Pin_13;
+  gpio_init.GPIO_OType = GPIO_OType_PP;
+  gpio_init.GPIO_Speed = GPIO_Speed_2MHz;
+  gpio_init.GPIO_PuPd = GPIO_PuPd_NOPULL;
+  GPIO_Init(GPIOB, &gpio_init);
+
   GPIO_PinAFConfig(GPIOB, GPIO_PinSource12, GPIO_AF_SPI2);
   GPIO_PinAFConfig(GPIOB, GPIO_PinSource13, GPIO_AF_SPI2);
   GPIO_PinAFConfig(GPIOB, GPIO_PinSource15, GPIO_AF_SPI2);
+
+  // gpio_init.GPIO_Pin = GPIO_Pin_1;
+  // GPIO_Init(GPIOC, &gpio_init);
+
+  // gpio_init.GPIO_Pin = GPIO_Pin_9;
+  // GPIO_Init(GPIOB, &gpio_init);
+
+  // gpio_init.GPIO_Pin = GPIO_Pin_10;
+  // GPIO_Init(GPIOB, &gpio_init);
+
+
+  // GPIO_PinAFConfig(GPIOC, GPIO_PinSource1, GPIO_AF_SPI2);
+  // GPIO_PinAFConfig(GPIOB, GPIO_PinSource9, GPIO_AF_SPI2);
+  // GPIO_PinAFConfig(GPIOB, GPIO_PinSource10, GPIO_AF_SPI2);
 }
 
 void AudioDac::InitializeAudioInterface(int sample_rate) {
@@ -85,7 +108,7 @@ void AudioDac::InitializeAudioInterface(int sample_rate) {
 
 
   // RCC_PLLI2SConfig(16, 344, 2, 7, 2);
-  RCC_PLLI2SConfig(8, 344, 2, 7, 2);
+  RCC_PLLI2SConfig(8, 344, 2, 7, 2);  // this seems to be accurate
 
   RCC_SAIPLLI2SClkDivConfig(2);
 

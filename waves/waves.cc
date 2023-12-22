@@ -35,9 +35,11 @@
 // #include "waves/drivers/gate_outputs.h"
 // #include "waves/drivers/rng.h"
 #include "waves/drivers/system.h"
+#include "waves/drivers/adc.h"
 #include "stmlib/system/system_clock.h"
 #include "waves/drivers/audio_dac.h"
 #include "waves/drivers/flash.h"
+#include "waves/drivers/4x_downsampler.h"
 // #include "waves/drivers/uart_logger.h"
 // #include "waves/ramp/ramp_extractor.h"
 // #include "waves/random/random_generator.h"
@@ -74,6 +76,8 @@ const size_t kMaxBlockSize = 24;
 const size_t kBlockSize = 12;
 
 AudioDac audio_dac;
+
+Adc adc;
 
 // ClockInputs clock_inputs;
 // ClockSelfPatchingDetector self_patching_detector[kNumGateOutputs];
@@ -168,7 +172,8 @@ void TIM1_UP_TIM10_IRQHandler(void) {
   // int16_t sample = flash.LoadWaveSample(counter % (2048 * 16 * 1), counter % (2048 * 16), counter % (2048));
   // int16_t sample = flash.LoadWaveSample(0, 0, 0);
   // ITM_SendChar('h');
-  
+  adc.Convert();
+
   char value[40];
   // sample += 1;
 
@@ -186,17 +191,49 @@ void TIM1_UP_TIM10_IRQHandler(void) {
   // if(counter == 30)
   //   flash.Program(0, kPinFactorySS);
 
-  int16_t sample = 0;
+    if(counter == 10) {
+        // int16_t test = 3920;
+        // flash.AAI_Word_Program((uint8_t *)&test, 2, 0, EEPROM_FACTORY_SS);
+    // flash.SectorErase4K(0, EEPROM_FACTORY_SS);
+    // while(flash.ReadStatusRegister(EEPROM_FACTORY_SS) & 0x01);
+    // flash.SectorErase4K(0, EEPROM_FACTORY_SS);
+
+
+        // flash.Program(0x1, 1, EEPROM_FACTORY_SS);
+        // while(flash.ReadStatusRegister(EEPROM_FACTORY_SS) & 0x01);
+        // flash.Program(0x01, 1, EEPROM_FACTORY_SS);
+        // flash.Program(0x01, 2, EEPROM_FACTORY_SS);
+        // flash.Program(0x01, 3, EEPROM_FACTORY_SS);
+
+    }
+    if(counter == 12) {
+        // flash.AAI_Word_Program((uint8_t *)&ROM[0 * 2048 * 16 + 0 * 2048], 2048 * 2, 0, EEPROM_FACTORY_SS);
+        // while(flash.ReadStatusRegister(EEPROM_FACTORY_SS) & 0x01);
+        // flash.Program(0xd0, 1, EEPROM_FACTORY_SS);
+        // while(flash.ReadStatusRegister(EEPROM_FACTORY_SS) & 0x01);
+        // flash.Program(0xc0, 0, EEPROM_FACTORY_SS);
+        // while(flash.ReadStatusRegister(EEPROM_FACTORY_SS) & 0x01);
+        // flash.Program(0x1, 0, EEPROM_FACTORY_SS);
+        // flash.Program(0x01, 0, EEPROM_FACTORY_SS);
+
+    }
+  uint32_t  sample1 = 0;
+  int16_t sample2 = 0;
 
   uint8_t status = 0;
-  // flash.ReadStatusRegister(EEPROM_FACTORY_SS);
+  // status = flash.ReadStatusRegister(EEPROM_FACTORY_SS);
 
-  // flash.Read25Mhz((uint8_t *)&sample, 2, 0, EEPROM_FACTORY_SS);
+
+  // flash.Read66Mhz((uint8_t *)&sample1, 2, 0, EEPROM_FACTORY_SS);
+  // flash.Read25Mhz((uint8_t *)&sample2, 2, 2, EEPROM_FACTORY_SS);
+
+  // sample1 = flash.Jedec_ID_Read();
+  // flash.Read66Mhz((uint8_t *)&sample2, 1, 1, EEPROM_FACTORY_SS);
 
   // flash.Read25Mhz(&status, 1, 0, EEPROM_FACTORY_SS);
   // float test = 20.0f;
-  
-  snprintf(value, 40, "c=%d, sr=%d, s=%d\n", counter, status, sample);
+  // sample = adc.value(0);
+  snprintf(value, 40, "c=%d, sr=%d, s=%08lx, %d\n", counter, status, sample1, sample2);
   // snprintf(value, 40, "f=%d\n", static_cast<int>(phase*100.0f));
   // sample += 1;
   _write(0, (char*)value, 40);
@@ -204,12 +241,12 @@ void TIM1_UP_TIM10_IRQHandler(void) {
 
       // GPIO_ResetBits(GPIOA, kPinFactorySS);
 
-  if(flash.trigger_load) {
-    flash.trigger_load = false;
-    flash.loading = true;
-    flash.Load_BackBuffer();
-    flash.Swap_Buffers();
-  }
+  // if(flash.trigger_load && !flash.loading) {
+  //   flash.trigger_load = false;
+  //   flash.loading = true;
+  //   flash.Load_BackBuffer();
+  //   flash.Swap_Buffers();
+  // }
 
   // GPIOB->BSRR = GPIO_Pin_1;
   // dac.Write(-audio_samples[playback_block][current_sample] + 32768);
@@ -247,6 +284,33 @@ void TIM1_UP_TIM10_IRQHandler(void) {
 
 uint32_t test_ramp;
 
+int16_t GetSample(int16_t wavetable, int16_t frame, float phase) {
+    // float index = phase * 2048.0;
+    // uint16_t integral = floor(index);
+    // float fractional = index - integral;
+    
+    // uint16_t nextIntegral = (integral + 1) % 2048;
+    
+    // int16_t sample1 = 0;
+    // int16_t sample2 = 0;
+
+    // // flash.Read66Mhz((uint8_t *)&sample1, 2, 4096 * frame + integral * 2, EEPROM_FACTORY_SS);
+    // // flash.Read66Mhz((uint8_t *)&sample2, 2, 4096 * frame + nextIntegral * 2, EEPROM_FACTORY_SS);
+    // index += 0;
+    // integral += 0;
+    // nextIntegral += 0;
+    // fractional += 0;
+    // sample1 += 0;
+    // sample2 += 0;
+    // float interpolated16 = sample1 + (sample2 - sample1) * fractional;
+    
+    // float interpolatedFloat = interpolated16 / 32768.0f;
+    
+    // return interpolatedFloat;
+    return 0;
+}
+
+float carrier_fir_;
 
 void FillBuffer(AudioDac::Frame* output, size_t size) {
 // #ifdef PROFILE_INTERRUPT
@@ -256,7 +320,7 @@ void FillBuffer(AudioDac::Frame* output, size_t size) {
 //   IWDG_ReloadCounter();
   
 //   ui.Poll();
-  float phase_increment = 25.0f / 47992.0f;
+  float phase_increment = 440.0f / 47992.0f;
 //   if (test_adc_noise) {
 //     static float note_lp = 0.0f;
 //     float note = modulations.note;
@@ -269,8 +333,19 @@ void FillBuffer(AudioDac::Frame* output, size_t size) {
 //     }
 //   } else if (ui.test_mode()) {
 //     // 100 Hz ascending and descending ramps.
+    Downsampler carrier_downsampler(&carrier_fir_);
+
     while (size--) {
-      float sample = 0;//sin(2 * M_PI * phase);
+
+      // if(1) {//counter < 20) {
+      //   output->l = 0;
+      //   output->r = 0;
+      //   ++output;
+      //   return;
+      // }
+      float sample = 0;//sinf(2 * M_PI * phase);
+      float test = 0;//sinf(2 * M_PI * phase);
+
       sample += 0.0f;
       // int16_t shortsample = static_cast<int16_t>(32767.0f * sample);
       // shortsample = 0xffff;
@@ -286,14 +361,150 @@ void FillBuffer(AudioDac::Frame* output, size_t size) {
       // takes 480 to increment once.
       // if rate is 48000, it can output 100hz
 
+      // float morph = 0;//adc.float_value(0);
+      // float interpolated16 = flash.LoadWaveSample(0, morph, phase);
 
-      float interpolated16 = flash.LoadWaveSample(0, 0.0f, phase);
+      // frame = 0 to 15, morph between two frames
+
+      float frame = adc.float_value(0) * 15.0f;
+      uint16_t frame_integral = floor(frame);
+      float frame_fractional = frame - frame_integral;
+      
+      uint16_t next_frame_integral = (frame_integral + 1) % 16;
+
+      float frame1sample = 0;//GetSample(0, frame_integral, phase);
+      float frame2sample = 0;//GetSample(0, next_frame_integral, phase);
+      next_frame_integral += 0;
+      frame_fractional += 0;
+      // frame1sample = GetSample(0, frame_integral, phase);
+      // frame2sample = GetSample(0, next_frame_integral, phase);
+      // sample = frame1sample * (1.0f - frame_fractional) + frame2sample * frame_fractional;
+      // sample = frame1sample;
+      frame1sample += 0.0f;
+      frame2sample += 0.0f;
+
+    float index = phase * 2048.0;
+    uint16_t integral = floor(index);
+    float fractional = index - integral;
+    
+    uint16_t nextIntegral = (integral + 1) % 2048;
+    
+    int16_t sample1 = 0;
+    int16_t sample2 = 0;
+
+    flash.Read66Mhz((uint8_t *)&sample1, 2, 4096 * frame_integral + integral * 2, EEPROM_FACTORY_SS);
+    flash.Read66Mhz((uint8_t *)&sample2, 2, 4096 * frame + nextIntegral * 2, EEPROM_FACTORY_SS);
+
+    // flash.Read66Mhz((uint8_t *)&sample1, 2, 4096 * frame_integral + integral * 2, EEPROM_FACTORY_SS);
+    // flash.Read66Mhz((uint8_t *)&sample2, 2, 4096 * frame + nextIntegral * 2, EEPROM_FACTORY_SS);
+
+    // flash.Read66Mhz((uint8_t *)&sample2, 2, 4096 * next_frame_integral + integral * 2, EEPROM_FACTORY_SS);
+    // flash.Read66Mhz((uint8_t *)&sample2, 2, 4096 * frame + nextIntegral * 2, EEPROM_FACTORY_SS);
+
+      sample1 = sample1 * (1.0f - frame_fractional) + sample2 * frame_fractional;
+      // sample = sample1;
+
+    index += 0;
+    integral += 0;
+    nextIntegral += 0;
+    fractional += 0;
+    sample1 += 0;
+    sample2 += 0;
+
+      // float index = phase * 2048.0;
+      // uint16_t integral = floor(index);
+      // float fractional = index - integral;
+      // uint16_t nextIntegral = (integral + 1) % 2048;
+
+      // int16_t sample1 = 0;
+      // uint8_t sample2[2];
+      // int16_t sample2 = 0;
+      // int16_t sample3 = 0;
+      // interpolated16 = flash.LoadWaveSample(0, morph, phase);
+      // interpolated16 = flash.LoadWaveSample(0, morph, phase);
+      // interpolated16 = flash.LoadWaveSample(0, morph, phase);
+      // interpolated16 = flash.LoadWaveSample(0, morph, phase);
+      // interpolated16 = flash.LoadWaveSample(0, morph, phase);
+
+      // flash.ReadStatusRegister(EEPROM_FACTORY_SS);
+
+      // flash.Read66Mhz((uint8_t *)&sample1, 2, integral * 2, EEPROM_FACTORY_SS);
+      // flash.Read66Mhz((uint8_t *)&sample2, 2, nextIntegral * 2, EEPROM_FACTORY_SS);
+
+      // sample1 = sample1 + (sample2 - sample1) * fractional;
+    //   for(uint32_t i = 0; i < 256; i++) {
+    //   // flash.HIGH(GPIOC, GPIO_Pin_15);
+    //   // flash.LOW(GPIOC, GPIO_Pin_15);
+
+    //   // GPIOC->BSRRL = GPIO_Pin_15;
+    //   // GPIOC->BSRRH = GPIO_Pin_15;
+    //   flash.HIGH(EEPROM_MOSI);
+    //   // flash.Wait<100>();
+    //   flash.LOW(EEPROM_MOSI);
+    //   // flash.Wait<100>();
+    // }
+
+      // uint32_t address = integral * 2;
+      // flash.LOW(EEPROM_FACTORY_SS);
+      // flash.Wait<200>();
+      // uint8_t buf[5];
+      // buf[0] = READ_66MHZ;
+      // buf[1] = ((address >> 16) & 0xFF);
+      // buf[2] = ((address >> 8) & 0xFF);
+      // buf[3] = ((address) & 0xFF);
+      // buf[4] = 0x00;
+
+      // buf[4] += 0;
+      // flash.HIGH(EEPROM_FACTORY_SS);
+      // flash.LOW(EEPROM_MOSI);
+      // flash.HIGH(EEPROM_MOSI);
+
+      // for(uint32_t i = 0; i < 10; i++) {
+
+      //     uint8_t bsize = 8;
+
+      //     while(bsize) {
+      //         // bool set = (buf[i] >> (bsize - 1)) & 0x1;
+      //         // if(set)
+      //             // flash.HIGH(EEPROM_FACTORY_SS);
+      //         // else
+      //             // flash.LOW(EEPROM_MOSI);
+      //         // sample += 0.0f;
+      //         //clock high
+      //         flash.HIGH(EEPROM_CLOCK);
+
+      //         flash.Wait<1>();
+
+      //         test += 1.1233124124124f;
+      //         sample += 0.0f;
+      //         // clock low
+      //         // flash.LOW(EEPROM_CLOCK);
+
+      //         bsize--;
+      //     }
+      // }
+      // // flash.Write(send_buf, 5);
+
+      // flash.HIGH(EEPROM_FACTORY_SS);
+      test += 0.0f;
+      // while(flash.ReadStatusRegister(EEPROM_FACTORY_SS) & 0x01);  // BUSY
+      // flash.Wait<200>();
+      // sample1 = 0;
+      // flash.Read66Mhz((uint8_t *)&sample1, 2, integral * 2, EEPROM_FACTORY_SS);
+      // flash.Read66Mhz((uint8_t *)&sample3, 2, integral * 2, EEPROM_FACTORY_SS);
+      // flash.Read66Mhz((uint8_t *)&sample3, 2, integral * 2, EEPROM_FACTORY_SS);
+      // flash.Read66Mhz((uint8_t *)&sample3, 2, integral * 2, EEPROM_FACTORY_SS);
+      // flash.Read66Mhz((uint8_t *)&sample3, 2, integral * 2, EEPROM_FACTORY_SS);
+      // flash.Read66Mhz((uint8_t *)&sample3, 2, integral * 2, EEPROM_FACTORY_SS);
 
       // test_ramp = static_cast<uint32_t>(4294967296 * (sample + 1.0f) / 2.0f);
       // output->l = static_cast<int32_t>(32767.0f * (sample + 1.0f) / 2.0f);
       // output->l = static_cast<int32_t>(20000.0f * sample);
-      output->l = static_cast<int16_t>(interpolated16 / 1.5f);
-      // output->l = static_cast<int32_t>(26000.0f * sample);
+      // output->l = static_cast<int16_t>(interpolated16 * 26000.0f);
+      output->l = static_cast<int32_t>(26000.0f * sample);
+      output->l = static_cast<int32_t>(sample1);
+      // output->l = static_cast<int16_t>(sample2 / 1.5f);
+      // output->l = static_cast<int16_t>(sample1 / 1.5f);
       // output->l = ~test_ramp >> 16;
       // output->l = 0;
       output->r = test_ramp >> 16;
@@ -313,41 +524,6 @@ void FillBuffer(AudioDac::Frame* output, size_t size) {
         phase -= 1.0f;
 
     }
-
-
-//   } else {
-//     if (modulations.timbre_patched) {
-//       PacketDecoderState state = user_data_receiver.Process(modulations.timbre);
-//       if (state == PACKET_DECODER_STATE_END_OF_TRANSMISSION) {
-//         if (user_data_receiver.progress() == 1.0f) {
-//           int slot = voice.active_engine();
-//           bool success = user_data.Save(user_data_receiver.rx_buffer(), slot);
-//           if (success) {
-//             voice.ReloadUserData();
-//           } else {
-//             ui.DisplayDataTransferProgress(-1.0f);
-//           }
-//         }
-//         user_data_receiver.Reset();
-//       } else if (state == PACKET_DECODER_STATE_OK) {
-//         ui.DisplayDataTransferProgress(user_data_receiver.progress());
-//       } else if (state == PACKET_DECODER_STATE_ERROR_CRC) {
-//         ui.DisplayDataTransferProgress(-1.0f);
-//       }
-//     }
-//     voice.Render(patch, modulations, (Voice::Frame*)(output), size);
-//     ui.set_active_engine(voice.active_engine());
-//   }
-  
-//   if (debug_port.readable()) {
-//     uint8_t command = debug_port.Read();
-//     uint8_t response = ui.HandleFactoryTestingRequest(command);
-//     debug_port.Write(response);
-//   }
-  
-// #ifdef PROFILE_INTERRUPT
-//   TOC
-// #endif  // PROFILE_INTERRUPT
 }
 
 // IOBuffer::Slice FillBuffer(size_t size) {
@@ -702,9 +878,9 @@ void Init() {
   // for (size_t i = 0; i < kNumGateOutputs; ++i) {
   //   self_patching_detector[i].Init(i);
   // }
+  adc.Init(false);
   flash.Init();
   flash.InitMemory();
-
   
   sys.StartTimers();
 
