@@ -50,11 +50,18 @@ void Flash::Init() {
   gpio_init.GPIO_PuPd = GPIO_PuPd_NOPULL;
   gpio_init.GPIO_Pin = eeprom[EEPROM_FACTORY_SS].pin;
   GPIO_Init(eeprom[EEPROM_FACTORY_SS].gpio, &gpio_init);
-
   // gpio_init.GPIO_Pin = kPinUserSS;
   // GPIO_Init(GPIOA, &gpio_init);
 
   // gpio_init.GPIO_Pin = kPinPersistentSS;
+  // GPIO_Init(GPIOA, &gpio_init);
+
+  // test
+  // gpio_init.GPIO_Mode = GPIO_Mode_OUT;
+  // gpio_init.GPIO_OType = GPIO_OType_PP;
+  // gpio_init.GPIO_Speed = GPIO_Speed_100MHz;
+  // gpio_init.GPIO_PuPd = GPIO_PuPd_NOPULL;
+  // gpio_init.GPIO_Pin = GPIO_Pin_11;
   // GPIO_Init(GPIOA, &gpio_init);
 
   // miso

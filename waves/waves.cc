@@ -225,7 +225,7 @@ void TIM1_UP_TIM10_IRQHandler(void) {
 
 
   // flash.Read66Mhz((uint8_t *)&sample1, 2, 0, EEPROM_FACTORY_SS);
-  // flash.Read25Mhz((uint8_t *)&sample2, 2, 2, EEPROM_FACTORY_SS);
+  flash.Read25Mhz((uint8_t *)&sample2, 2, 2, EEPROM_FACTORY_SS);
 
   // sample1 = flash.Jedec_ID_Read();
   // flash.Read66Mhz((uint8_t *)&sample2, 1, 1, EEPROM_FACTORY_SS);
@@ -335,6 +335,13 @@ void FillBuffer(AudioDac::Frame* output, size_t size) {
 //     // 100 Hz ascending and descending ramps.
     Downsampler carrier_downsampler(&carrier_fir_);
 
+    /*
+  168 mhz
+    48000
+    3500 instructions per frame
+
+    */
+
     while (size--) {
 
       // if(1) {//counter < 20) {
@@ -343,10 +350,10 @@ void FillBuffer(AudioDac::Frame* output, size_t size) {
       //   ++output;
       //   return;
       // }
-      float sample = 0;//sinf(2 * M_PI * phase);
-      float test = 0;//sinf(2 * M_PI * phase);
+      float sample = 0;//inf(2 * M_PI * phase);
+      // float test = 0;//sinf(2 * M_PI * phase);
 
-      sample += 0.0f;
+      // sample += 0.0f;
       // int16_t shortsample = static_cast<int16_t>(32767.0f * sample);
       // shortsample = 0xffff;
       // if(phase < 0.5)
@@ -366,50 +373,51 @@ void FillBuffer(AudioDac::Frame* output, size_t size) {
 
       // frame = 0 to 15, morph between two frames
 
-      float frame = adc.float_value(0) * 15.0f;
-      uint16_t frame_integral = floor(frame);
-      float frame_fractional = frame - frame_integral;
-      
-      uint16_t next_frame_integral = (frame_integral + 1) % 16;
+      // float frame = 0;//adc.float_value(0) * 15.0f;
+      // uint16_t frame_integral = floor(frame);
+      // float frame_fractional = frame - frame_integral;      
+      // uint16_t next_frame_integral = (frame_integral + 1) % 16;
 
-      float frame1sample = 0;//GetSample(0, frame_integral, phase);
-      float frame2sample = 0;//GetSample(0, next_frame_integral, phase);
-      next_frame_integral += 0;
-      frame_fractional += 0;
-      // frame1sample = GetSample(0, frame_integral, phase);
-      // frame2sample = GetSample(0, next_frame_integral, phase);
-      // sample = frame1sample * (1.0f - frame_fractional) + frame2sample * frame_fractional;
-      // sample = frame1sample;
-      frame1sample += 0.0f;
-      frame2sample += 0.0f;
-
-    float index = phase * 2048.0;
-    uint16_t integral = floor(index);
-    float fractional = index - integral;
+    float index = phase * 4096.0;
+    uint16_t integral = static_cast<uint16_t>(index) & ~0x1;
+    // float fractional = index - integral;
     
-    uint16_t nextIntegral = (integral + 1) % 2048;
+    // uint16_t nextIntegral = (integral + 1) % 2048;
     
     int16_t sample1 = 0;
-    int16_t sample2 = 0;
+    // int16_t sample2 = 0;
+    // int16_t samples[32];
 
-    flash.Read66Mhz((uint8_t *)&sample1, 2, 4096 * frame_integral + integral * 2, EEPROM_FACTORY_SS);
-    flash.Read66Mhz((uint8_t *)&sample2, 2, 4096 * frame + nextIntegral * 2, EEPROM_FACTORY_SS);
+    /*
+      one read is:
+          write - 8*5*(4 + 4 + 1 + 1) = 400
+          read - 2 * 8 * (2 + 1 + 4 + 4) = 176
+    */
+    flash.Read66Mhz((uint8_t *)&sample1, 2, integral, EEPROM_FACTORY_SS);
+    // sample1 = 0;
+    flash.Read66Mhz((uint8_t *)&sample1, 2, integral, EEPROM_FACTORY_SS);
+    // flash.Read66Mhz((uint8_t *)&sample1, 2, integral, EEPROM_FACTORY_SS);
+    // flash.Read66Mhz((uint8_t *)&sample1, 2, integral, EEPROM_FACTORY_SS);
+    // flash.Read66Mhz((uint8_t *)samples, 64, 0, EEPROM_FACTORY_SS);
+
+    // flash.Read66Mhz((uint8_t *)&sample1, 2, index, EEPROM_FACTORY_SS);
+    // flash.Read66Mhz((uint8_t *)&sample1, 2, index, EEPROM_FACTORY_SS);
 
     // flash.Read66Mhz((uint8_t *)&sample1, 2, 4096 * frame_integral + integral * 2, EEPROM_FACTORY_SS);
-    // flash.Read66Mhz((uint8_t *)&sample2, 2, 4096 * frame + nextIntegral * 2, EEPROM_FACTORY_SS);
+    // flash.Read66Mhz((uint8_t *)&sample1, 2, 4096 * frame + nextIntegral * 2, EEPROM_FACTORY_SS);
 
     // flash.Read66Mhz((uint8_t *)&sample2, 2, 4096 * next_frame_integral + integral * 2, EEPROM_FACTORY_SS);
     // flash.Read66Mhz((uint8_t *)&sample2, 2, 4096 * frame + nextIntegral * 2, EEPROM_FACTORY_SS);
 
-      sample1 = sample1 * (1.0f - frame_fractional) + sample2 * frame_fractional;
+      // sample1 = sample1 * (1.0f - frame_fractional) + sample2 * frame_fractional;
       // sample = sample1;
 
-    index += 0;
-    integral += 0;
-    nextIntegral += 0;
-    fractional += 0;
-    sample1 += 0;
-    sample2 += 0;
+    // index += 0;
+    // integral += 0;
+    // nextIntegral += 0;
+    // fractional += 0;
+    // sample1 += 0;
+    // sample2 += 0;
 
       // float index = phase * 2048.0;
       // uint16_t integral = floor(index);
@@ -432,17 +440,10 @@ void FillBuffer(AudioDac::Frame* output, size_t size) {
       // flash.Read66Mhz((uint8_t *)&sample2, 2, nextIntegral * 2, EEPROM_FACTORY_SS);
 
       // sample1 = sample1 + (sample2 - sample1) * fractional;
-    //   for(uint32_t i = 0; i < 256; i++) {
-    //   // flash.HIGH(GPIOC, GPIO_Pin_15);
-    //   // flash.LOW(GPIOC, GPIO_Pin_15);
-
-    //   // GPIOC->BSRRL = GPIO_Pin_15;
-    //   // GPIOC->BSRRH = GPIO_Pin_15;
-    //   flash.HIGH(EEPROM_MOSI);
-    //   // flash.Wait<100>();
-    //   flash.LOW(EEPROM_MOSI);
-    //   // flash.Wait<100>();
-    // }
+      for(uint32_t i = 0; i < 128; i++) {
+      flash.HIGH(GPIOA, GPIO_Pin_11);
+      flash.LOW(GPIOA, GPIO_Pin_11);
+      }
 
       // uint32_t address = integral * 2;
       // flash.LOW(EEPROM_FACTORY_SS);
@@ -486,7 +487,7 @@ void FillBuffer(AudioDac::Frame* output, size_t size) {
       // // flash.Write(send_buf, 5);
 
       // flash.HIGH(EEPROM_FACTORY_SS);
-      test += 0.0f;
+      // test += 0.0f;
       // while(flash.ReadStatusRegister(EEPROM_FACTORY_SS) & 0x01);  // BUSY
       // flash.Wait<200>();
       // sample1 = 0;
@@ -502,13 +503,13 @@ void FillBuffer(AudioDac::Frame* output, size_t size) {
       // output->l = static_cast<int32_t>(20000.0f * sample);
       // output->l = static_cast<int16_t>(interpolated16 * 26000.0f);
       output->l = static_cast<int32_t>(26000.0f * sample);
-      output->l = static_cast<int32_t>(sample1);
+      output->l = sample1;
       // output->l = static_cast<int16_t>(sample2 / 1.5f);
       // output->l = static_cast<int16_t>(sample1 / 1.5f);
       // output->l = ~test_ramp >> 16;
       // output->l = 0;
-      output->r = test_ramp >> 16;
-      test_ramp += 8947848;  // 480.. 48000
+      output->r = 0;//test_ramp >> 16;
+      // test_ramp += 8947848;  // 480.. 48000
       /*
       480 cycles per one wavelength
       12 hz.  12 * 480 cycles per second
@@ -884,8 +885,8 @@ void Init() {
   
   sys.StartTimers();
 
-  audio_dac.Init(48000, kBlockSize);
-  audio_dac.Start(&FillBuffer);
+  // audio_dac.Init(48000, kBlockSize);
+  // audio_dac.Start(&FillBuffer);
 
 
   // logger.Init(9600);

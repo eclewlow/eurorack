@@ -49,17 +49,17 @@ class Flash {
   Flash() { }
   ~Flash() { }
   
-  void HIGH(GPIO_TypeDef* GPIOx, uint16_t pin) {
+  inline void HIGH(GPIO_TypeDef* GPIOx, uint16_t pin) {
     // GPIO_SetBits(GPIOx, pin);
     GPIOx->BSRRL = pin;
   }
 
-  void LOW(GPIO_TypeDef* GPIOx, uint16_t pin) {
+  inline void LOW(GPIO_TypeDef* GPIOx, uint16_t pin) {
     // GPIO_ResetBits(GPIOx, pin);
     GPIOx->BSRRH = pin;
   }
 
-  uint8_t READ(GPIO_TypeDef* GPIOx, uint16_t pin) {
+  inline uint8_t READ(GPIO_TypeDef* GPIOx, uint16_t pin) {
       uint8_t bitstatus = 0x00;
 
       if ((GPIOx->IDR & pin) != (uint32_t)Bit_RESET)
@@ -78,25 +78,33 @@ class Flash {
   static const uint16_t wait_time = 4;
   static const uint16_t wait_time_2 = 1;
 
-  void HIGH(uint8_t index) {
+  inline void HIGH(uint8_t index) {
     eeprom[index].gpio->BSRRL = eeprom[index].pin;
-    if(index == EEPROM_CLOCK)
-        Wait<wait_time>();
-    else
-        Wait<wait_time_2>();
+    if(index == EEPROM_CLOCK) {
+        __asm__("nop");
+        __asm__("nop");
+        __asm__("nop");
+        __asm__("nop");
+    }
+    // else
+    //     Wait<wait_time_2>();
     // GPIO_SetBits(eeprom[index].gpio, eeprom[index].pin);
   }
 
-  void LOW(uint8_t index) {
+  inline void LOW(uint8_t index) {
     eeprom[index].gpio->BSRRH = eeprom[index].pin;
-    if(index == EEPROM_CLOCK)
-        Wait<wait_time>();
-    else
-        Wait<wait_time_2>();
+    if(index == EEPROM_CLOCK) {
+        __asm__("nop");
+        __asm__("nop");
+        __asm__("nop");
+        __asm__("nop");
+    }
+    // else
+    //     Wait<wait_time_2>();
     // GPIO_ResetBits(eeprom[index].gpio, eeprom[index].pin);
   }
 
-  uint8_t READ(uint8_t index) {
+  inline uint8_t READ(uint8_t index) {
     // return GPIO_ReadInputDataBit(eeprom[index].gpio, eeprom[index].pin);
 
       uint8_t bitstatus = 0x00;
@@ -478,16 +486,15 @@ bool WriteStatusRegister(uint8_t byte, uint8_t pin) {
 }
 
 
-void Write(uint8_t * buf, uint32_t size) {
+inline void Write(uint8_t * buf, uint32_t size) {
 
     for(uint32_t i = 0; i < size; i++) {
 
-        uint8_t bsize = 8;
+        int8_t bsize = 7;
 
-        while(bsize) {
+        while(bsize >= 0) {
 
-            bool set = (buf[i] >> (bsize - 1)) & 0x1;
-            if(set)
+            if((buf[i] >> bsize) & 0x1)
                 HIGH(EEPROM_MOSI);
             else
                 LOW(EEPROM_MOSI);
@@ -507,17 +514,16 @@ void Write(uint8_t * buf, uint32_t size) {
 }
 
 
-void ReadFast(uint8_t * buf, uint32_t size) {
+inline void ReadFast(uint8_t * buf, uint32_t size) {
 
     for(uint32_t i = 0; i < size; i++) {
 
-        uint8_t bsize = 8;
+        int8_t bsize = 7;
 
-        while(bsize) {
+        while(bsize >= 0) {
 
-            bool set = READ(EEPROM_MISO);
-            if(set)
-                buf[i] |= (0x1 << (bsize - 1));
+            if(READ(EEPROM_MISO))
+                buf[i] |= (0x1 << bsize);
             // else
                 // buf[i] |= (0x0 << (bsize - 1));
 
@@ -533,17 +539,16 @@ void ReadFast(uint8_t * buf, uint32_t size) {
     }
 }
 
-void Read(uint8_t * buf, uint32_t size) {
+inline void Read(uint8_t * buf, uint32_t size) {
 
     for(uint32_t i = 0; i < size; i++) {
 
-        uint8_t bsize = 8;
+        int8_t bsize = 7;
 
-        while(bsize) {
+        while(bsize >= 0) {
 
-            bool set = READ(EEPROM_MISO);
-            if(set)
-                buf[i] |= (0x1 << (bsize - 1));
+            if(READ(EEPROM_MISO))
+                buf[i] |= (0x1 << bsize);
             // else
                 // buf[i] |= (0x0 << (bsize - 1));
 
@@ -658,7 +663,9 @@ void Read25Mhz(uint8_t * buf, uint32_t size, uint32_t address, uint8_t pin) {
 
 }
 
-void Read66Mhz(uint8_t * buf, uint32_t size, uint32_t address, uint8_t pin) {
+inline void Read66Mhz(uint8_t * buf, uint32_t size, uint32_t address, uint8_t pin) {
+
+    memset(buf, 0, size);
 
     LOW(pin);
 
@@ -780,7 +787,6 @@ bool InitMemory() {
   
   DISALLOW_COPY_AND_ASSIGN(Flash);
 };
-
 template<> inline void Flash::Wait<0>() { }
 
 }  // namespace stages
