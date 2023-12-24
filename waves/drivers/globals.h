@@ -41,7 +41,42 @@ typedef struct {
     uint16_t pin;
 } EEPROM_PIN;
 
+typedef enum
+{
+  TM1637 = 0,
+  TM1803 = 1
+} DisplayTypeTypeDef;
+
+typedef enum
+{
+  FLAG_SET = 1,
+  FLAG_CLEAR = 0
+} FlagStateTypeDef;
+
+typedef enum
+{
+  DIR_NEUTRAL = 2,
+  DIR_READ = 1,
+  DIR_WRITE = 0
+} DataDirectionTypeDef;
+
+typedef enum
+{
+  ERR_0 = 0, 
+  ERR_1 = 1, 
+  ERR_2 = 2, 
+  ERR_3 = 3, 
+  ERR_4 = 4,
+  ERR_5 = 5,
+  ERR_6 = 6,
+  ERR_7 = 7,
+  ERR_8 = 8,
+  ERR_9 = 9,
+  NO_ERR = 0xff
+} ErrorState;
 
 extern EEPROM_PIN eeprom[6];
+
+extern uint32_t dataBuffer[1024];
 
 #endif

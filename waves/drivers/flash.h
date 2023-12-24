@@ -43,6 +43,57 @@ namespace waves {
 using namespace std;
 using namespace stmlib;
 
+#define WriteEnable             0x06
+#define WtiteDisable            0x04
+#define Read_JedecID            0x9f
+#define Read_UniqueID           0x4b
+#define Read_DeviceID           0xab
+#define Read_StatusRegister_1   0x05
+#define Read_StatusRegister_2   0x35
+#define Read_StatusRegister_3   0x15
+#define Write_StatusRegister    0x01
+#define Write_StatusRegister_1  0x01
+#define Write_StatusRegister_2  0x31
+#define Write_StatusRegister_3  0x11
+#define PageProgram             0x02
+#define ReadData                0x03
+#define FastRead                0x0b
+#define Erase_Chip              0xc7
+#define Erase_Block_64          0xd8
+#define Erase_Block_32          0x52
+#define Erase_Sector            0x20
+#define Erase_Suspend           0x75
+// #define Erase_Resume            0x7h
+#define PowerDown               0xb9
+#define PowerDown_Release       0xab
+
+#define _BUSY_                  0x01 // Erase or write in progress
+#define _WEL_                   0x02 // Write enable Latch
+#define _BP0_                   0x04 // Block protect bit 0 (non-volatile)
+#define _BP1_                   0x08 // Block protect bit 1 (non-volatile)
+#define _BP2_                   0x10 // Block protect bit 2 (non-volatile)
+#define _TB_                    0x20 // Top/Bottom write protect (non-volatile)
+#define _SEC_                   0x40 // Sector protect (non-volatile)
+#define _SRP0_                  0x80 // Status register protect bit 0 (non-volatile)
+
+#define _SRP1_                  0x01 // Status register protect bit 1 (non-volatile)
+#define _SREQ_                  0x02 // Quad enable
+
+typedef struct
+{
+  uint32_t  ID;
+  uint32_t  UniqID[2];
+  uint16_t  BlockCount;
+    uint32_t  Capacity;
+  uint8_t   Lock;   
+} w25qxx_t;
+
+const uint16_t w25q[10] = { 0x0002, 0x0004, 0x0008, 0x0010, 0x0020, 0x0040, 0x0080, 0x0100, 0x0200, 0x0400 };
+const uint16_t PageSize = 0x0100; // 256
+const uint16_t SectorSize = 0x1000; // 4096
+const uint16_t Block32KSize = 0x8000; // 32768
+const uint32_t BlockSize = 0x00010000; // 65536
+
 
 class Flash {
  public:
@@ -781,7 +832,181 @@ bool InitMemory() {
   return true;
 }
 
+
+// -------------------------------------------------------------  
+void W25Qxx_TransferDMASPI (uint32_t __bytes, DataDirectionTypeDef __dir, uint32_t __offset){
+  // SetFlag(&_EREG_, _DBLF_, FLAG_SET);
+ 
+  uint8_t pump = 0;
+  if (__dir == DIR_WRITE)
+  {
+    DMA_SetCurrDataCounter(DMA2_Stream3, __bytes);
+    DMA2_Stream3->M0AR = ((int)&dataBuffer) + (__offset * 256);
+    DMA_Cmd(DMA2_Stream3, ENABLE);
+    SPI_I2S_DMACmd(SPI1, SPI_I2S_DMAReq_Tx, ENABLE);
+  }
+  else
+  {
+    DMA_SetCurrDataCounter(DMA2_Stream3, __bytes);
+    DMA_SetCurrDataCounter(DMA2_Stream0, __bytes);
+    DMA2_Stream3->M0AR = (int)&pump;
+    DMA2_Stream0->M0AR = (int)&dataBuffer;
+    DMA_Cmd(DMA2_Stream3, ENABLE);
+    DMA_Cmd(DMA2_Stream0, ENABLE);
+    SPI_I2S_DMACmd(SPI1, SPI_I2S_DMAReq_Tx, ENABLE);
+    SPI_I2S_DMACmd(SPI1, SPI_I2S_DMAReq_Rx, ENABLE);
+  }
+
+  while (!DMA_GetFlagStatus(DMA2_Stream3, DMA_FLAG_TCIF3));
+  DMA_ClearFlag(DMA2_Stream3, DMA_FLAG_TCIF3 | DMA_FLAG_HTIF3);
+
+  while (!DMA_GetFlagStatus(DMA2_Stream0, DMA_FLAG_TCIF0));
+  DMA_ClearFlag(DMA2_Stream0, DMA_FLAG_TCIF0 | DMA_FLAG_HTIF0);
+  // Wait<500>();
+  
+  if (__dir == DIR_WRITE)
+  {
+    while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
+    DMA_Cmd(DMA2_Stream3, DISABLE);
+    SPI_I2S_DMACmd(SPI1, SPI_I2S_DMAReq_Tx, DISABLE);
+  }
+  else
+  {
+    while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
+    // SPI_I2S_ReceiveData(SPI1);
+    // uint8_t temp = SPI1->DR;
+    // temp = SPI1->SR;
+    // temp++;
+
+    // while (((SPI1->SR) & (1 << 7))) {}; // wait for BSY bit to Reset -> This will indicate that SPI is not busy in communication
+    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
+    DMA_Cmd(DMA2_Stream3, DISABLE);
+    DMA_Cmd(DMA2_Stream0, DISABLE);
+    SPI_I2S_DMACmd(SPI1, SPI_I2S_DMAReq_Tx, DISABLE);
+    SPI_I2S_DMACmd(SPI1, SPI_I2S_DMAReq_Rx, DISABLE);
+  }
+
+  // SetFlag(&_EREG_, _DBLF_, FLAG_SET);
+}
+
+
+
+
+// -------------------------------------------------------------  
+bool W25Qxx_TransferSPI (uint8_t __command, int32_t __address, uint16_t __bytes, DataDirectionTypeDef __dir, uint32_t __offset)
+{
+  GPIO_WriteBit(GPIOA, GPIO_Pin_4, Bit_RESET);
+  
+  // SPI_Cmd(SPI1, ENABLE);
+
+  SPI_I2S_SendData(SPI1, __command);
+  while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
+  SPI_I2S_ReceiveData(SPI1);
+  while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
+
+  if (__address >= 0)
+  {
+    int i = 4;
+    while (--i)
+    {
+      SPI_I2S_SendData(SPI1, __address >> 8 * i);
+      while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
+      SPI_I2S_ReceiveData(SPI1);
+      while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
+    }
+  }
+  
+  if (__command == FastRead)
+  {
+    SPI_I2S_SendData(SPI1, 0);
+    while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
+    SPI_I2S_ReceiveData(SPI1);
+    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
+  }
+
+  if(__command==Read_JedecID) {
+    SPI_I2S_SendData(SPI1, 0);
+    while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
+    SPI_I2S_ReceiveData(SPI1);
+    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));    
+  }
+
+  if (__command == 0xab)
+  {
+    SPI_I2S_SendData(SPI1, 0);
+    while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
+    SPI_I2S_ReceiveData(SPI1);
+    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
+
+    SPI_I2S_SendData(SPI1, 0);
+    while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
+    SPI_I2S_ReceiveData(SPI1);
+    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
+
+    SPI_I2S_SendData(SPI1, 0);
+    while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
+    SPI_I2S_ReceiveData(SPI1);
+    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
+
+    SPI_I2S_SendData(SPI1, 0);
+    while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
+    SPI_I2S_ReceiveData(SPI1);
+    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
+  }
+  
+  if (__bytes)
+  {
+    W25Qxx_TransferDMASPI(__bytes, __dir, __offset);
+  }
+
+  // SPI_Cmd(SPI1, ENABLE);
+    
+  GPIO_WriteBit(GPIOA, GPIO_Pin_4, Bit_SET);
+
+  return true;
+}
+
+
+
+
+// -------------------------------------------------------------  
+void W25qxx_Init (void)
+{
+  // W25Qxx_TransferSPI(Read_JedecID, -1, 4, DIR_READ, 0);
+  // w25qxx.ID = __REV(dataBuffer[0]);
+  W25Qxx_TransferSPI(0xab, -1, 4, DIR_READ, 0);
+  w25qxx.ID = __REV(dataBuffer[0]);
+
+  // dataBuffer[0] = 0;
+  Wait<500>();
+  W25Qxx_TransferSPI(Read_JedecID, -1, 4, DIR_READ, 0);
+  w25qxx.ID = __REV(dataBuffer[0]);
+
+
+  // W25Qxx_TransferSPI(Read_JedecID, -1, 4, DIR_READ, 0);
+  // w25qxx.ID = __REV(dataBuffer[0]);
+
+
+  // W25Qxx_TransferSPI(Read_JedecID, -1, 4, DIR_READ, 0);
+  // w25qxx.ID = __REV(dataBuffer[0]);
+  // W25Qxx_TransferSPI(Read_JedecID, -1, 4, DIR_READ, 0);
+  // w25qxx.ID = __REV(dataBuffer[0]);
+
+  
+  // W25Qxx_TransferSPI(Read_UniqueID, -1, 12, DIR_READ, 0);
+  // w25qxx.UniqID[0] = __REV(dataBuffer[1]);
+  // w25qxx.UniqID[1] = __REV(dataBuffer[2]);
+
+  // W25Qxx_TransferSPI(Read_DeviceID, -1, 4, DIR_READ, 0);
+  // w25qxx.BlockCount = w25q[(__REV(dataBuffer[0]) & 0x0f)];  
+  // w25qxx.Capacity = w25qxx.BlockCount * BlockSize;
+  
+  // SetFlag(&_EREG_, _DBLF_, FLAG_CLEAR);
+}
+    w25qxx_t    w25qxx;
+
  private:
+
   // NextSampleFn next_sample_fn_;
   // static FirmwareUpdateDac* instance_;
   

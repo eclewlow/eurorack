@@ -172,7 +172,7 @@ void TIM1_UP_TIM10_IRQHandler(void) {
   // int16_t sample = flash.LoadWaveSample(counter % (2048 * 16 * 1), counter % (2048 * 16), counter % (2048));
   // int16_t sample = flash.LoadWaveSample(0, 0, 0);
   // ITM_SendChar('h');
-  adc.Convert();
+  // adc.Convert();
 
   char value[40];
   // sample += 1;
@@ -218,14 +218,14 @@ void TIM1_UP_TIM10_IRQHandler(void) {
 
     }
   uint32_t  sample1 = 0;
-  int16_t sample2 = 0;
+  // int16_t sample2 = 0;
 
   uint8_t status = 0;
   // status = flash.ReadStatusRegister(EEPROM_FACTORY_SS);
 
-
+  sample1 = flash.w25qxx.ID;
   // flash.Read66Mhz((uint8_t *)&sample1, 2, 0, EEPROM_FACTORY_SS);
-  flash.Read25Mhz((uint8_t *)&sample2, 2, 2, EEPROM_FACTORY_SS);
+  // flash.Read25Mhz((uint8_t *)&sample2, 2, 2, EEPROM_FACTORY_SS);
 
   // sample1 = flash.Jedec_ID_Read();
   // flash.Read66Mhz((uint8_t *)&sample2, 1, 1, EEPROM_FACTORY_SS);
@@ -233,7 +233,7 @@ void TIM1_UP_TIM10_IRQHandler(void) {
   // flash.Read25Mhz(&status, 1, 0, EEPROM_FACTORY_SS);
   // float test = 20.0f;
   // sample = adc.value(0);
-  snprintf(value, 40, "c=%d, sr=%d, s=%08lx, %d\n", counter, status, sample1, sample2);
+  snprintf(value, 40, "c=%d, sr=%d, s=%08lx, %lu\n", counter, status, sample1, sample1);
   // snprintf(value, 40, "f=%d\n", static_cast<int>(phase*100.0f));
   // sample += 1;
   _write(0, (char*)value, 40);
@@ -879,9 +879,10 @@ void Init() {
   // for (size_t i = 0; i < kNumGateOutputs; ++i) {
   //   self_patching_detector[i].Init(i);
   // }
-  adc.Init(false);
+  // adc.Init(false);
   flash.Init();
-  flash.InitMemory();
+  // flash.InitMemory();
+  flash.W25qxx_Init();
   
   sys.StartTimers();
 
