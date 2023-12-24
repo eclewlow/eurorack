@@ -126,7 +126,7 @@ void Flash::Init() {
   DMA_Init(DMA2_Stream0, &dma_init);
   
   // Enable the interrupts: half transfer and transfer complete.
-  DMA_ITConfig(DMA2_Stream0, DMA_IT_TC, ENABLE);
+  // DMA_ITConfig(DMA2_Stream0, DMA_IT_TC, ENABLE);
   
   // Enable the IRQ.
   // NVIC_EnableIRQ(DMA2_Stream0_IRQn);
@@ -151,7 +151,7 @@ void Flash::Init() {
   dma_init.DMA_PeripheralBurst = DMA_PeripheralBurst_Single;
   DMA_Init(DMA2_Stream3, &dma_init);
 
-  DMA_ITConfig(DMA2_Stream3, DMA_IT_TC, ENABLE);
+  // DMA_ITConfig(DMA2_Stream3, DMA_IT_TC, ENABLE);
 
   // SPI_I2S_DMACmd(SPI1, SPI_I2S_DMAReq_Tx, ENABLE);
 

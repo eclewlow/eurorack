@@ -33,6 +33,8 @@
 #include "stmlib/stmlib.h"
 #include "waves/drivers/globals.h"
 #include "waves/drivers/wavetables.h"
+#include "stmlib/system/system_clock.h"
+
 #include <stm32f4xx_conf.h>
 #include <cstring>
 #include <stdio.h>
@@ -517,58 +519,6 @@ bool SaveWavetable(WAVETABLE wt, uint8_t table) {
     return true;
 }
 
-
-bool SectorErase4K(uint32_t address, uint8_t pin) {
-
-    // SET WREN first
-    CMD(WRITE_ENABLE, pin);
-
-    LOW(pin);
-
-    uint8_t buf[4];
-
-    buf[0] = SECTOR_ERASE_4K;
-    buf[1] = ((address >> 16) & 0xFF);
-    buf[2] = ((address >> 8) & 0xFF);
-    buf[3] = ((address) & 0xFF);
-
-    // memcpy(buf, &address, 4);
-
-    buf[0] = SECTOR_ERASE_4K;
-
-    Write(buf, 4);
-
-    HIGH(pin);
-
-    while(ReadStatusRegister(pin) & 0x01);  // BUSY
-
-    CMD(WRITE_DISABLE, pin);
-
-    return true;
-}
-
-void Read25Mhz(uint8_t * buf, uint32_t size, uint32_t address, uint8_t pin) {
-
-    LOW(pin);
-
-    uint8_t send_buf[4];
-
-    send_buf[0] = READ_25MHZ;
-    send_buf[1] = ((address >> 16) & 0xFF);
-    send_buf[2] = ((address >> 8) & 0xFF);
-    send_buf[3] = ((address) & 0xFF);
-    // memcpy(send_buf, &address, 4);
-
-    send_buf[0] = READ_25MHZ;
-
-    Write(send_buf, 4);
-
-    Read(buf, size);
-
-    HIGH(pin);
-
-}
-
 inline void Read66Mhz(uint8_t * buf, uint32_t size, uint32_t address, uint8_t pin) {
 
     memset(buf, 0, size);
@@ -587,63 +537,6 @@ inline void Read66Mhz(uint8_t * buf, uint32_t size, uint32_t address, uint8_t pi
     ReadFast(buf, size);
 
     HIGH(pin);
-}
-
-bool AAI_Word_Program(uint8_t * buffer, uint32_t size, uint32_t address, uint8_t pin) {
-    if(size < 2) return false;
-    if(size % 2 != 0) return false;
-
-    // TODO: USE HARDWARE BSY FOR FASTER WRITE
-
-    // wren
-    CMD(WRITE_ENABLE, pin);
-
-    // ebsy
-    // CMD(ENABLE_BSY, pin);
-    CMD(DISABLE_BSY, pin);
-
-    LOW(pin);
-
-    uint8_t send_buf[6];
-    send_buf[0] = AAI_WORD_PROGRAM;
-    send_buf[1] = ((address >> 16) & 0xFF);
-    send_buf[2] = ((address >> 8) & 0xFF);
-    send_buf[3] = ((address) & 0xFF);
-    send_buf[4] = buffer[0];
-    send_buf[5] = buffer[1];
-
-    Write(send_buf, 6);
-
-    HIGH(pin);
-
-    while(ReadStatusRegister(pin) & 0x01);  // BUSY
-
-    uint32_t i = 2;
-
-    while(i < size) {
-
-        LOW(pin);
-
-        uint8_t send_buf[3] = {
-            AAI_WORD_PROGRAM,
-            buffer[i++],
-            buffer[i++],
-        };
-
-        Write(send_buf, 3);
-
-        HIGH(pin);
-
-        while(ReadStatusRegister(pin) & 0x01);  // BUSY
-    }
-
-    // wrdi
-    CMD(WRITE_DISABLE, pin);
-
-    // dbsy
-    // CMD(DISABLE_BSY, pin);
-
-    return true;
 }
 
 
@@ -749,10 +642,10 @@ bool W25Qxx_TransferSPI (uint8_t __command, int32_t __address, uint16_t __bytes,
   }
 
   if(__command==Read_JedecID) {
-    SPI_I2S_SendData(SPI1, 0);
-    while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
-    SPI_I2S_ReceiveData(SPI1);
-    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));    
+    // SPI_I2S_SendData(SPI1, 0);
+    // while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
+    // SPI_I2S_ReceiveData(SPI1);
+    // while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));    
   }
 
   if (__command == 0xab)
@@ -841,32 +734,6 @@ bool ReadWaveframe(int32_t __address, uint8_t pin) {
     return true;
 }
 
-bool Program(uint8_t byte, uint32_t address, uint8_t pin) {
-    // wren
-    CMD(WRITE_ENABLE, pin);
-
-    LOW(pin);
-
-    uint8_t buf[5];
-    buf[0] = BYTE_PROGRAM;
-    buf[1] = ((address >> 16) & 0xFF);
-    buf[2] = ((address >> 8) & 0xFF);
-    buf[3] = ((address) & 0xFF);
-    buf[4] = byte;
-
-    Write(buf, 5);
-
-    HIGH(pin);
-
-    while(ReadStatusRegister(pin) & 0x01);  // BUSY
-
-    // wrdi
-    CMD(WRITE_DISABLE, pin);
-
-    return true;
-
-}
-
 void CMD(uint8_t code, uint8_t pin) {
 
     LOW(pin);
@@ -874,6 +741,8 @@ void CMD(uint8_t code, uint8_t pin) {
     uint8_t buf[1] = { code };
 
     Write(buf, 1);
+
+    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_BSY));
 
     HIGH(pin);
 }
@@ -934,6 +803,8 @@ bool WriteStatusRegister(uint8_t byte, uint8_t pin) {
 
     Write(buf, 2);
 
+    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_BSY));
+
     HIGH(pin);
 
     CMD(WRITE_DISABLE, pin);
@@ -949,37 +820,210 @@ uint8_t ReadStatusRegister(uint8_t pin) {
 
     Write(buf, 1);
 
-    // SPI_I2S_SendData(SPI1, 0);
-    // while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
-    // SPI_I2S_ReceiveData(SPI1);
-    // while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
+    SPI_I2S_SendData(SPI1, 0);
+    while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
+    SPI_I2S_ReceiveData(SPI1);
+    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
 
     uint8_t byte = 0;
 
     Read(&byte, 1);
+
+    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_BSY));
 
     HIGH(pin);
 
     return byte;
 }
 
+bool SectorErase4K(uint32_t address, uint8_t pin) {
+
+    // SET WREN first
+    CMD(WRITE_ENABLE, pin);
+
+    LOW(pin);
+
+    uint8_t buf[4];
+
+    buf[0] = SECTOR_ERASE_4K;
+    buf[1] = ((address >> 16) & 0xFF);
+    buf[2] = ((address >> 8) & 0xFF);
+    buf[3] = ((address) & 0xFF);
+
+    Write(buf, 4);
+
+    // SPI_I2S_SendData(SPI1, 0);
+    // while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
+    // SPI_I2S_ReceiveData(SPI1);
+    // while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
+
+    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_BSY));
+
+    HIGH(pin);
+
+    // while(ReadStatusRegister(pin) & 0x01);  // BUSY
+    system_clock.Delay(25);
+
+
+    CMD(WRITE_DISABLE, pin);
+
+    return true;
+}
+
+void Read25Mhz(uint8_t * buf, uint32_t size, uint32_t address, uint8_t pin) {
+
+    LOW(pin);
+
+    uint8_t send_buf[4];
+
+    send_buf[0] = READ_25MHZ;
+    send_buf[1] = ((address >> 16) & 0xFF);
+    send_buf[2] = ((address >> 8) & 0xFF);
+    send_buf[3] = ((address) & 0xFF);
+    // memcpy(send_buf, &address, 4);
+
+    send_buf[0] = READ_25MHZ;
+
+    Write(send_buf, 4);
+
+    SPI_I2S_SendData(SPI1, 0);
+    while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
+    SPI_I2S_ReceiveData(SPI1);
+    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
+
+    Read(buf, size);
+
+    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_BSY));
+
+    HIGH(pin);
+}
+
+bool Program(uint8_t byte, uint32_t address, uint8_t pin) {
+    // wren
+    CMD(WRITE_ENABLE, pin);
+
+    LOW(pin);
+
+    uint8_t buf[5];
+    buf[0] = BYTE_PROGRAM;
+    buf[1] = ((address >> 16) & 0xFF);
+    buf[2] = ((address >> 8) & 0xFF);
+    buf[3] = ((address) & 0xFF);
+    buf[4] = byte;
+
+    Write(buf, 5);
+
+    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_BSY));
+
+    HIGH(pin);
+
+    // while(ReadStatusRegister(pin) & 0x01);  // BUSY
+    system_clock.Delay(25);
+
+    // wrdi
+    CMD(WRITE_DISABLE, pin);
+
+    return true;
+
+}
+
+bool AAI_Word_Program(uint8_t * buffer, uint32_t size, uint32_t address, uint8_t pin) {
+    if(size < 2) return false;
+    if(size % 2 != 0) return false;
+
+    // TODO: USE HARDWARE BSY FOR FASTER WRITE
+
+    // wren
+    CMD(WRITE_ENABLE, pin);
+
+    // ebsy
+    // CMD(ENABLE_BSY, pin);
+    CMD(DISABLE_BSY, pin);
+
+    LOW(pin);
+
+    uint8_t send_buf[6];
+    send_buf[0] = AAI_WORD_PROGRAM;
+    send_buf[1] = ((address >> 16) & 0xFF);
+    send_buf[2] = ((address >> 8) & 0xFF);
+    send_buf[3] = ((address) & 0xFF);
+    send_buf[4] = buffer[0];
+    send_buf[5] = buffer[1];
+
+    Write(send_buf, 6);
+
+    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_BSY));
+
+    HIGH(pin);
+
+    // while(ReadStatusRegister(pin) & 0x01);  // BUSY
+    system_clock.Delay(1);
+
+    uint32_t i = 2;
+
+    while(i < size) {
+
+        LOW(pin);
+
+        uint8_t send_buf[3] = {
+            AAI_WORD_PROGRAM,
+            buffer[i++],
+            buffer[i++],
+        };
+
+        Write(send_buf, 3);
+
+        while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_BSY));
+
+        HIGH(pin);
+
+        // while(ReadStatusRegister(pin) & 0x01);  // BUSY
+        system_clock.Delay(1);
+    }
+
+    // wrdi
+    CMD(WRITE_DISABLE, pin);
+
+    // dbsy
+    // CMD(DISABLE_BSY, pin);
+
+    return true;
+}
+
 // -------------------------------------------------------------  
 void W25qxx_Init (void)
 {
-    // w25qxx.ID = Jedec_ID_Read();
+    w25qxx.ID = __REV(Jedec_ID_Read());
 
-    // while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_BSY));
+    WriteStatusRegister(0x00, EEPROM_FACTORY_SS);
 
-  W25Qxx_TransferSPI(WRITE_ENABLE, -1, 0, DIR_NEUTRAL, 0);
+    w25qxx.Lock = ReadStatusRegister(EEPROM_FACTORY_SS);
 
-  W25Qxx_TransferSPI(ENABLE_WRITE_STATUS_REGISTER, -1, 0, DIR_NEUTRAL, 0);
+    SectorErase4K(0, EEPROM_FACTORY_SS);
+    // Program(0xef, 0, EEPROM_FACTORY_SS);
+    // Program(0xaa, 1, EEPROM_FACTORY_SS);
 
-  W25Qxx_TransferSPI(WRITE_STATUS_REGISTER, -1, 0, DIR_NEUTRAL, 0);
+    // dataBuffer[0] = 12;
+    AAI_Word_Program((uint8_t *)&ROM[0], 4096, 0, EEPROM_FACTORY_SS);
 
-  W25Qxx_TransferSPI(WRITE_DISABLE, -1, 0, DIR_NEUTRAL, 0);
 
-  W25Qxx_TransferSPI(READ_STATUS_REGISTER, -1, 4, DIR_READ, 0);
-  w25qxx.ID = __REV(dataBuffer[0]);
+    // dataBuffer[0] = 13;
+    int16_t buf;
+    Read25Mhz((uint8_t*)&buf, 2, 4, EEPROM_FACTORY_SS);
+
+    dataBuffer[0] = buf;
+    // memset(dataBuffer, 0, 4);
+    // memcpy(dataBuffer, &buf, 2);
+  // W25Qxx_TransferSPI(WRITE_ENABLE, -1, 0, DIR_NEUTRAL, 0);
+
+  // W25Qxx_TransferSPI(ENABLE_WRITE_STATUS_REGISTER, -1, 0, DIR_NEUTRAL, 0);
+
+  // W25Qxx_TransferSPI(WRITE_STATUS_REGISTER, -1, 0, DIR_NEUTRAL, 0);
+
+  // W25Qxx_TransferSPI(WRITE_DISABLE, -1, 0, DIR_NEUTRAL, 0);
+
+  // W25Qxx_TransferSPI(READ_STATUS_REGISTER, -1, 4, DIR_READ, 0);
+  // w25qxx.Capacity = __REV(dataBuffer[0]);
 
     // w25qxx.ID = ReadStatusRegister(EEPROM_FACTORY_SS);
 

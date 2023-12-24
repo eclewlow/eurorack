@@ -175,48 +175,34 @@ void TIM1_UP_TIM10_IRQHandler(void) {
   // adc.Convert();
 
   char value[80];
-  // sample += 1;
-
-  if(counter % 5 == 0)
-    {
-      // flash.Test(12);
-      // flash.Sector_Erase4K(0, kPinFactorySS);
-      // flash.Program(0, kPinFactorySS);
-    }
-
-    // uint8_t result = flash.Read(0);
-
-  // if(counter == 20)
-  //   flash.Sector_Erase4K(0, kPinFactorySS);
-  // if(counter == 30)
-  //   flash.Program(0, kPinFactorySS);
-
-    if(counter == 10) {
-        // int16_t test = 3920;
-        // flash.AAI_Word_Program((uint8_t *)&test, 2, 0, EEPROM_FACTORY_SS);
-    // flash.SectorErase4K(0, EEPROM_FACTORY_SS);
-    // while(flash.ReadStatusRegister(EEPROM_FACTORY_SS) & 0x01);
-    // flash.SectorErase4K(0, EEPROM_FACTORY_SS);
 
 
-        // flash.Program(0x1, 1, EEPROM_FACTORY_SS);
-        // while(flash.ReadStatusRegister(EEPROM_FACTORY_SS) & 0x01);
-        // flash.Program(0x01, 1, EEPROM_FACTORY_SS);
-        // flash.Program(0x01, 2, EEPROM_FACTORY_SS);
-        // flash.Program(0x01, 3, EEPROM_FACTORY_SS);
+    // if(counter == 9) {
+    //   flash.SectorErase4K(0, EEPROM_FACTORY_SS);
+    //   // system_clock.Delay(25);
+    //   flash.Program(0xec, 0, EEPROM_FACTORY_SS);
+    //   // system_clock.Delay(25);
+    //   flash.Program(0x41, 1, EEPROM_FACTORY_SS);
+    //   // system_clock.Delay(25);
+    //   int16_t buf = 0;
+    //   flash.Read25Mhz((uint8_t*)&buf, 2, 0, EEPROM_FACTORY_SS);
+    //   flash.w25qxx.Capacity = buf;
+    // }
+    // if(counter == 10) {
+    //   flash.SectorErase4K(0, EEPROM_FACTORY_SS);
+    // }
+    // if(counter == 11) {
+    //   flash.Program(0xec, 0, EEPROM_FACTORY_SS);
+    // }
+    // if(counter == 12) {
+    //   flash.Program(0x41, 1, EEPROM_FACTORY_SS);
+    // }
+    // if(counter == 13) {
+    //   int16_t buf = 0;
+    //   flash.Read25Mhz((uint8_t*)&buf, 2, 0, EEPROM_FACTORY_SS);
+    //   flash.w25qxx.Capacity = buf;
+    // }
 
-    }
-    if(counter == 12) {
-        // flash.AAI_Word_Program((uint8_t *)&ROM[0 * 2048 * 16 + 0 * 2048], 2048 * 2, 0, EEPROM_FACTORY_SS);
-        // while(flash.ReadStatusRegister(EEPROM_FACTORY_SS) & 0x01);
-        // flash.Program(0xd0, 1, EEPROM_FACTORY_SS);
-        // while(flash.ReadStatusRegister(EEPROM_FACTORY_SS) & 0x01);
-        // flash.Program(0xc0, 0, EEPROM_FACTORY_SS);
-        // while(flash.ReadStatusRegister(EEPROM_FACTORY_SS) & 0x01);
-        // flash.Program(0x1, 0, EEPROM_FACTORY_SS);
-        // flash.Program(0x01, 0, EEPROM_FACTORY_SS);
-
-    }
   uint32_t  sample1 = 0;
   // int16_t sample2 = 0;
 
@@ -237,7 +223,12 @@ void TIM1_UP_TIM10_IRQHandler(void) {
 
   sample1 += 0;
   status += 0;
-  snprintf(value, 40, "c=%d, sr=%d, s=%08lx, %lu\n", counter, status, sample1, sample1);
+  // snprintf(value, 80, "c=%d, m=%lu, s=%08lx, %08lx\n", counter, system_clock.milliseconds(), sample1, __REV(dataBuffer[0]));
+  // _write(0, (char*)value, 80);
+
+  // int16_t result = 0;
+  // memcpy(&result, dataBuffer, 2);
+  snprintf(value, 80, "%lu\n", dataBuffer[0]);
   // snprintf(value, 80, "buf=%04x, db=%08lx\n, %08lx", buffer[0], dataBuffer[0], flash.w25qxx.ID);
   // snprintf(value, 40, "f=%d\n", static_cast<int>(phase*100.0f));
   // sample += 1;
@@ -887,7 +878,7 @@ void Init() {
   // adc.Init(false);
   flash.Init();
   // flash.InitMemory();
-  flash.W25qxx_Init();
+
   
   sys.StartTimers();
 
@@ -901,7 +892,12 @@ void Init() {
 
 int main(void) {
   Init();
+  bool fresh_start = true;
   while (1) {
+    if(fresh_start) {
+      fresh_start = false;
+      flash.W25qxx_Init();
+    }
     // ui.DoEvents();
     // io_buffer.Process(ui.output_test_mode() ? &ProcessTest : &Process);
   }
