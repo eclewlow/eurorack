@@ -32,10 +32,10 @@
 namespace waves {
 
 /* static */
-// Flash* Flash::instance_;
+Flash* Flash::instance_;
 
 void Flash::Init() {
-  // instance_ = this;
+  instance_ = this;
 
 
   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
@@ -129,7 +129,7 @@ void Flash::Init() {
   DMA_ITConfig(DMA2_Stream0, DMA_IT_TC, ENABLE);
   
   // Enable the IRQ.
-  // NVIC_EnableIRQ(DMA1_Stream2_IRQn);
+  // NVIC_EnableIRQ(DMA2_Stream0_IRQn);
   
   // SPI_I2S_DMACmd(SPI1, SPI_I2S_DMAReq_Rx, ENABLE);
 
@@ -154,6 +154,9 @@ void Flash::Init() {
   DMA_ITConfig(DMA2_Stream3, DMA_IT_TC, ENABLE);
 
   // SPI_I2S_DMACmd(SPI1, SPI_I2S_DMAReq_Tx, ENABLE);
+
+  // Enable the IRQ.
+  // NVIC_EnableIRQ(DMA2_Stream3_IRQn);
 
   /*
   // Initialize MOSI and SCK pins.
@@ -206,15 +209,73 @@ void Flash::Init() {
   // SPI3->DR = 0x0000;
 }
 
-}  // namespace stages
+void Flash::StartDMARead(uint16_t __bytes) {
+  uint8_t pump = 0;
 
-// extern "C" {
+  DMA_SetCurrDataCounter(DMA2_Stream3, __bytes);
+  DMA_SetCurrDataCounter(DMA2_Stream0, __bytes);
+  DMA2_Stream3->M0AR = (int)&pump;
+  DMA2_Stream0->M0AR = (int)&dataBuffer;
+  DMA_Cmd(DMA2_Stream3, ENABLE);
+  DMA_Cmd(DMA2_Stream0, ENABLE);
+  SPI_I2S_DMACmd(SPI1, SPI_I2S_DMAReq_Tx, ENABLE);
+  SPI_I2S_DMACmd(SPI1, SPI_I2S_DMAReq_Rx, ENABLE);
 
-// void TIM2_IRQHandler() {
-//   if (TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET) {
-//     TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
-//     stages::FirmwareUpdateDac::GetInstance()->NextSample();
-//   }
-// }
+  SetFlag(&_EREG_, _RXTC_, FLAG_CLEAR);
+  SetFlag(&_EREG_, _TXTC_, FLAG_CLEAR);
+}
 
-// }
+void Flash::StartDMAWrite(uint16_t __bytes) {
+  DMA_SetCurrDataCounter(DMA2_Stream3, __bytes);
+  DMA2_Stream3->M0AR = (int)&dataBuffer;
+  DMA_Cmd(DMA2_Stream3, ENABLE);
+  SPI_I2S_DMACmd(SPI1, SPI_I2S_DMAReq_Tx, ENABLE);
+
+  SetFlag(&_EREG_, _RXTC_, FLAG_CLEAR);
+  SetFlag(&_EREG_, _TXTC_, FLAG_CLEAR);
+}
+
+void Flash::StopDMA() {
+  while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
+  while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
+  DMA_Cmd(DMA2_Stream3, DISABLE);
+  DMA_Cmd(DMA2_Stream0, DISABLE);
+  SPI_I2S_DMACmd(SPI1, SPI_I2S_DMAReq_Tx, DISABLE);
+  SPI_I2S_DMACmd(SPI1, SPI_I2S_DMAReq_Rx, DISABLE);
+
+  HIGH(EEPROM_FACTORY_SS);
+}
+
+}  // namespace waves
+
+
+extern "C" {
+
+// Rx Transfer complete
+void DMA2_Stream0_IRQHandler(void) {
+  if(DMA_GetFlagStatus(DMA2_Stream0, DMA_FLAG_TCIF0)) {
+    DMA_ClearFlag(DMA2_Stream0, DMA_FLAG_TCIF0 | DMA_FLAG_HTIF0);
+
+    SetFlag(&_EREG_, _RXTC_, FLAG_SET);
+
+    if(GetFlag(&_EREG_, _TXTC_)) {
+      waves::Flash::GetInstance()->StopDMA();
+    }
+  }
+}
+
+// Tx Transfer complete
+void DMA2_Stream3_IRQHandler(void) {
+  if(DMA_GetFlagStatus(DMA2_Stream3, DMA_FLAG_TCIF3)) {
+    DMA_ClearFlag(DMA2_Stream3, DMA_FLAG_TCIF3 | DMA_FLAG_HTIF3);
+
+    SetFlag(&_EREG_, _TXTC_, FLAG_SET);
+
+    if(GetFlag(&_EREG_, _RXTC_)) {
+      waves::Flash::GetInstance()->StopDMA();
+    }
+  }
+}
+
+  
+}

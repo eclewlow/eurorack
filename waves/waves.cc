@@ -174,7 +174,7 @@ void TIM1_UP_TIM10_IRQHandler(void) {
   // ITM_SendChar('h');
   // adc.Convert();
 
-  char value[40];
+  char value[80];
   // sample += 1;
 
   if(counter % 5 == 0)
@@ -233,10 +233,15 @@ void TIM1_UP_TIM10_IRQHandler(void) {
   // flash.Read25Mhz(&status, 1, 0, EEPROM_FACTORY_SS);
   // float test = 20.0f;
   // sample = adc.value(0);
+  // int16_t * buffer = (int16_t *)dataBuffer;
+
+  sample1 += 0;
+  status += 0;
   snprintf(value, 40, "c=%d, sr=%d, s=%08lx, %lu\n", counter, status, sample1, sample1);
+  // snprintf(value, 80, "buf=%04x, db=%08lx\n, %08lx", buffer[0], dataBuffer[0], flash.w25qxx.ID);
   // snprintf(value, 40, "f=%d\n", static_cast<int>(phase*100.0f));
   // sample += 1;
-  _write(0, (char*)value, 40);
+  _write(0, (char*)value, 80);
 
 
       // GPIO_ResetBits(GPIOA, kPinFactorySS);

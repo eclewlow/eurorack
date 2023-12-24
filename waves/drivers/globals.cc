@@ -22,3 +22,28 @@ EEPROM_PIN eeprom[6] = {
 };
 
 uint32_t dataBuffer[1024];
+
+
+
+uint32_t _EREG_ = 0;
+
+FlagStateTypeDef GetFlag(uint32_t* __registry, uint8_t __flag)
+{
+  return (*__registry & (1 << __flag)) ? FLAG_SET : FLAG_CLEAR;
+}
+
+void SetFlag(uint32_t* __registry, uint8_t __flag, FlagStateTypeDef __state)
+{
+  if (__state == FLAG_SET)
+  {
+    *__registry |= (1 << __flag);
+  }
+  else if (__state == FLAG_CLEAR)
+  {
+    *__registry &= ~(1 << __flag);
+  }
+  else
+  {
+    // Error_Handler("Flag Error!");
+  }
+}

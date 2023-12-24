@@ -518,151 +518,6 @@ bool SaveWavetable(WAVETABLE wt, uint8_t table) {
 }
 
 
-bool WriteStatusRegister(uint8_t byte, uint8_t pin) {
-    CMD(WRITE_ENABLE, pin);
-
-    CMD(ENABLE_WRITE_STATUS_REGISTER, pin);
-
-    LOW(pin);
-
-    uint8_t buf[2] = { WRITE_STATUS_REGISTER, byte };
-
-    Write(buf, 2);
-
-    HIGH(pin);
-
-    CMD(WRITE_DISABLE, pin);
-
-    return true;
-}
-
-
-inline void Write(uint8_t * buf, uint32_t size) {
-
-    for(uint32_t i = 0; i < size; i++) {
-
-        int8_t bsize = 7;
-
-        while(bsize >= 0) {
-
-            if((buf[i] >> bsize) & 0x1)
-                HIGH(EEPROM_MOSI);
-            else
-                LOW(EEPROM_MOSI);
-
-            //clock high
-            HIGH(EEPROM_CLOCK);
-
-            // Wait<1>();
-
-            //clock low
-            LOW(EEPROM_CLOCK);
-
-            bsize--;
-        }
-    }
-
-}
-
-
-inline void ReadFast(uint8_t * buf, uint32_t size) {
-
-    for(uint32_t i = 0; i < size; i++) {
-
-        int8_t bsize = 7;
-
-        while(bsize >= 0) {
-
-            if(READ(EEPROM_MISO))
-                buf[i] |= (0x1 << bsize);
-            // else
-                // buf[i] |= (0x0 << (bsize - 1));
-
-
-            //clock high
-            HIGH(EEPROM_CLOCK);
-
-            bsize--;
-
-            //clock low
-            LOW(EEPROM_CLOCK);
-        }
-    }
-}
-
-inline void Read(uint8_t * buf, uint32_t size) {
-
-    for(uint32_t i = 0; i < size; i++) {
-
-        int8_t bsize = 7;
-
-        while(bsize >= 0) {
-
-            if(READ(EEPROM_MISO))
-                buf[i] |= (0x1 << bsize);
-            // else
-                // buf[i] |= (0x0 << (bsize - 1));
-
-
-            //clock high
-            HIGH(EEPROM_CLOCK);
-
-            // Wait<1>();
-
-            //clock low
-            LOW(EEPROM_CLOCK);
-
-            bsize--;
-        }
-    }
-}
-
-void CMD(uint8_t code, uint8_t pin) {
-
-    LOW(pin);
-
-    uint8_t buf[1] = { code };
-
-    Write(buf, 1);
-
-    HIGH(pin);
-}
-
-uint32_t Jedec_ID_Read() {
-
-    LOW(EEPROM_FACTORY_SS);
-
-    uint8_t buf[1] = { JEDEC_ID_READ };
-
-    Write(buf, 1);
-
-    uint32_t result = 0;
-
-    Read((uint8_t*)&result, 4);
-
-    HIGH(EEPROM_FACTORY_SS);
-
-    return result;
-}
-
-
-uint8_t ReadStatusRegister(uint8_t pin) {
-
-    LOW(pin);
-
-    uint8_t buf[1] = { READ_STATUS_REGISTER };
-
-    Write(buf, 1);
-
-    uint8_t byte = 0;
-
-    Read(&byte, 1);
-
-    HIGH(pin);
-
-    return byte;
-}
-
 bool SectorErase4K(uint32_t address, uint8_t pin) {
 
     // SET WREN first
@@ -791,31 +646,6 @@ bool AAI_Word_Program(uint8_t * buffer, uint32_t size, uint32_t address, uint8_t
     return true;
 }
 
-bool Program(uint8_t byte, uint32_t address, uint8_t pin) {
-    // wren
-    CMD(WRITE_ENABLE, pin);
-
-    LOW(pin);
-
-    uint8_t buf[5];
-    buf[0] = BYTE_PROGRAM;
-    buf[1] = ((address >> 16) & 0xFF);
-    buf[2] = ((address >> 8) & 0xFF);
-    buf[3] = ((address) & 0xFF);
-    buf[4] = byte;
-
-    Write(buf, 5);
-
-    HIGH(pin);
-
-    while(ReadStatusRegister(pin) & 0x01);  // BUSY
-
-    // wrdi
-    CMD(WRITE_DISABLE, pin);
-
-    return true;
-
-}
 
 bool InitMemory() {
     WriteStatusRegister(0, EEPROM_FACTORY_SS);
@@ -823,7 +653,7 @@ bool InitMemory() {
         for(uint8_t frame = 0; frame < 16; frame++) {
               uint32_t address = table * 2048 * 16 * 2 + frame * 2048 * 2;
               SectorErase4K(address, EEPROM_FACTORY_SS);
-              AAI_Word_Program((uint8_t *)&ROM[table * 2048 * 16 + frame * 2048], 2048 * 2, address, EEPROM_FACTORY_SS);
+              // AAI_Word_Program((uint8_t *)&ROM[table * 2048 * 16 + frame * 2048], 2048 * 2, address, EEPROM_FACTORY_SS);
         }
 
     }
@@ -873,12 +703,6 @@ void W25Qxx_TransferDMASPI (uint32_t __bytes, DataDirectionTypeDef __dir, uint32
   else
   {
     while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
-    // SPI_I2S_ReceiveData(SPI1);
-    // uint8_t temp = SPI1->DR;
-    // temp = SPI1->SR;
-    // temp++;
-
-    // while (((SPI1->SR) & (1 << 7))) {}; // wait for BSY bit to Reset -> This will indicate that SPI is not busy in communication
     while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
     DMA_Cmd(DMA2_Stream3, DISABLE);
     DMA_Cmd(DMA2_Stream0, DISABLE);
@@ -954,36 +778,233 @@ bool W25Qxx_TransferSPI (uint8_t __command, int32_t __address, uint16_t __bytes,
     while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
   }
   
+    if (__command == WRITE_STATUS_REGISTER)
+  {
+    SPI_I2S_SendData(SPI1, 0x0c);
+    while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
+    SPI_I2S_ReceiveData(SPI1);
+    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
+
+    // SPI_I2S_SendData(SPI1, 1);
+    // while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
+    // SPI_I2S_ReceiveData(SPI1);
+    // while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
+  }
+
+
+    if (__command == READ_STATUS_REGISTER)
+  {
+    SPI_I2S_SendData(SPI1, 0);
+    while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
+    SPI_I2S_ReceiveData(SPI1);
+    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
+  }
+
   if (__bytes)
   {
     W25Qxx_TransferDMASPI(__bytes, __dir, __offset);
   }
 
   // SPI_Cmd(SPI1, ENABLE);
+  while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_BSY));
     
   GPIO_WriteBit(GPIOA, GPIO_Pin_4, Bit_SET);
 
   return true;
 }
 
+bool ReadWaveframe(int32_t __address, uint8_t pin) {
+
+    LOW(pin);
+
+    CMD(READ_66MHZ, EEPROM_FACTORY_SS);
+
+    if (__address >= 0)
+    {
+        int i = 4;
+        while (--i)
+        {
+            SPI_I2S_SendData(SPI1, __address >> 8 * i);
+            while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
+            SPI_I2S_ReceiveData(SPI1);
+            while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
+        }
+    }
+
+    SPI_I2S_SendData(SPI1, 0);
+    while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
+    SPI_I2S_ReceiveData(SPI1);
+    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));    
+
+    StartDMARead(4096);
+
+    return true;
+}
+
+bool Program(uint8_t byte, uint32_t address, uint8_t pin) {
+    // wren
+    CMD(WRITE_ENABLE, pin);
+
+    LOW(pin);
+
+    uint8_t buf[5];
+    buf[0] = BYTE_PROGRAM;
+    buf[1] = ((address >> 16) & 0xFF);
+    buf[2] = ((address >> 8) & 0xFF);
+    buf[3] = ((address) & 0xFF);
+    buf[4] = byte;
+
+    Write(buf, 5);
+
+    HIGH(pin);
+
+    while(ReadStatusRegister(pin) & 0x01);  // BUSY
+
+    // wrdi
+    CMD(WRITE_DISABLE, pin);
+
+    return true;
+
+}
+
+void CMD(uint8_t code, uint8_t pin) {
+
+    LOW(pin);
+
+    uint8_t buf[1] = { code };
+
+    Write(buf, 1);
+
+    HIGH(pin);
+}
+
+inline void Write(uint8_t * buf, uint32_t size) {
+    for(uint32_t i = 0; i < size; i++) {
+        SPI_I2S_SendData(SPI1, buf[i]);
+        while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
+        SPI_I2S_ReceiveData(SPI1);
+        while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
+    }
+}
 
 
+inline void ReadFast(uint8_t * buf, uint32_t size) {
+    for(uint32_t i = 0; i < size; i++) {
+        SPI_I2S_SendData(SPI1, 0);
+        while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
+        buf[i] = SPI_I2S_ReceiveData(SPI1);
+        while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
+    }
+}
+
+inline void Read(uint8_t * buf, uint32_t size) {
+    for(uint32_t i = 0; i < size; i++) {
+        SPI_I2S_SendData(SPI1, 0);
+        while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
+        buf[i] = SPI_I2S_ReceiveData(SPI1);
+        while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
+    }
+}
+
+uint32_t Jedec_ID_Read() {
+
+    LOW(EEPROM_FACTORY_SS);
+
+    uint8_t buf[1] = { JEDEC_ID_READ };
+
+    Write(buf, 1);
+
+    uint32_t result = 0;
+
+    Read((uint8_t*)&result, 4);
+
+    HIGH(EEPROM_FACTORY_SS);
+
+    return result;
+}
+
+bool WriteStatusRegister(uint8_t byte, uint8_t pin) {
+    CMD(WRITE_ENABLE, pin);
+
+    CMD(ENABLE_WRITE_STATUS_REGISTER, pin);
+
+    LOW(pin);
+
+    uint8_t buf[2] = { WRITE_STATUS_REGISTER, byte };
+
+    Write(buf, 2);
+
+    HIGH(pin);
+
+    CMD(WRITE_DISABLE, pin);
+
+    return true;
+}
+
+uint8_t ReadStatusRegister(uint8_t pin) {
+
+    LOW(pin);
+
+    uint8_t buf[1] = { READ_STATUS_REGISTER };
+
+    Write(buf, 1);
+
+    // SPI_I2S_SendData(SPI1, 0);
+    // while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
+    // SPI_I2S_ReceiveData(SPI1);
+    // while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
+
+    uint8_t byte = 0;
+
+    Read(&byte, 1);
+
+    HIGH(pin);
+
+    return byte;
+}
 
 // -------------------------------------------------------------  
 void W25qxx_Init (void)
 {
+    // w25qxx.ID = Jedec_ID_Read();
+
+    // while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_BSY));
+
+  W25Qxx_TransferSPI(WRITE_ENABLE, -1, 0, DIR_NEUTRAL, 0);
+
+  W25Qxx_TransferSPI(ENABLE_WRITE_STATUS_REGISTER, -1, 0, DIR_NEUTRAL, 0);
+
+  W25Qxx_TransferSPI(WRITE_STATUS_REGISTER, -1, 0, DIR_NEUTRAL, 0);
+
+  W25Qxx_TransferSPI(WRITE_DISABLE, -1, 0, DIR_NEUTRAL, 0);
+
+  W25Qxx_TransferSPI(READ_STATUS_REGISTER, -1, 4, DIR_READ, 0);
+  w25qxx.ID = __REV(dataBuffer[0]);
+
+    // w25qxx.ID = ReadStatusRegister(EEPROM_FACTORY_SS);
+
+    // while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_BSY));
+
+    // ReadWaveframe(0, EEPROM_FACTORY_SS);
+
+  // W25Qxx_TransferSPI(0xab, -1, 4, DIR_READ, 0);
+  // w25qxx.ID = __REV(dataBuffer[0]);
+
   // W25Qxx_TransferSPI(Read_JedecID, -1, 4, DIR_READ, 0);
   // w25qxx.ID = __REV(dataBuffer[0]);
-  W25Qxx_TransferSPI(0xab, -1, 4, DIR_READ, 0);
-  w25qxx.ID = __REV(dataBuffer[0]);
 
-  // dataBuffer[0] = 0;
-  Wait<500>();
-  W25Qxx_TransferSPI(Read_JedecID, -1, 4, DIR_READ, 0);
-  w25qxx.ID = __REV(dataBuffer[0]);
+  // W25Qxx_TransferSPI(WRITE_ENABLE, -1, 0, DIR_NEUTRAL, 0);
 
+  // W25Qxx_TransferSPI(ENABLE_WRITE_STATUS_REGISTER, -1, 0, DIR_NEUTRAL, 0);
 
-  // W25Qxx_TransferSPI(Read_JedecID, -1, 4, DIR_READ, 0);
+  // W25Qxx_TransferSPI(WRITE_STATUS_REGISTER, -1, 0, DIR_NEUTRAL, 0);
+
+  // W25Qxx_TransferSPI(WRITE_DISABLE, -1, 0, DIR_NEUTRAL, 0);
+
+  // W25Qxx_TransferSPI(READ_STATUS_REGISTER, -1, 4, DIR_READ, 0);
+  // w25qxx.ID = __REV(dataBuffer[0]);
+
+  // W25Qxx_TransferSPI(Read_JedecID, -1, 0, DIR_WRITE, 0);
   // w25qxx.ID = __REV(dataBuffer[0]);
 
 
@@ -1004,9 +1025,15 @@ void W25qxx_Init (void)
   // SetFlag(&_EREG_, _DBLF_, FLAG_CLEAR);
 }
     w25qxx_t    w25qxx;
+void StartDMARead(uint16_t __bytes);
+void StartDMAWrite(uint16_t __bytes);
+void StopDMA();
+
+static Flash* GetInstance() { return instance_; }
 
  private:
 
+  static Flash* instance_;
   // NextSampleFn next_sample_fn_;
   // static FirmwareUpdateDac* instance_;
   
