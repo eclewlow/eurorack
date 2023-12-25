@@ -215,7 +215,7 @@ void Flash::StartDMARead(uint16_t __bytes) {
   DMA_SetCurrDataCounter(DMA2_Stream3, __bytes);
   DMA_SetCurrDataCounter(DMA2_Stream0, __bytes);
   DMA2_Stream3->M0AR = (int)&pump;
-  DMA2_Stream0->M0AR = (int)&dataBuffer;
+  DMA2_Stream0->M0AR = (int)dataBuffer;
   DMA_Cmd(DMA2_Stream3, ENABLE);
   DMA_Cmd(DMA2_Stream0, ENABLE);
   SPI_I2S_DMACmd(SPI1, SPI_I2S_DMAReq_Tx, ENABLE);
@@ -223,16 +223,18 @@ void Flash::StartDMARead(uint16_t __bytes) {
 
   SetFlag(&_EREG_, _RXTC_, FLAG_CLEAR);
   SetFlag(&_EREG_, _TXTC_, FLAG_CLEAR);
+  SetFlag(&_EREG_, _BUSY_, FLAG_SET);
 }
 
 void Flash::StartDMAWrite(uint16_t __bytes) {
   DMA_SetCurrDataCounter(DMA2_Stream3, __bytes);
-  DMA2_Stream3->M0AR = (int)&dataBuffer;
+  DMA2_Stream3->M0AR = (int)dataBuffer;
   DMA_Cmd(DMA2_Stream3, ENABLE);
   SPI_I2S_DMACmd(SPI1, SPI_I2S_DMAReq_Tx, ENABLE);
 
   SetFlag(&_EREG_, _RXTC_, FLAG_CLEAR);
   SetFlag(&_EREG_, _TXTC_, FLAG_CLEAR);
+  SetFlag(&_EREG_, _BUSY_, FLAG_SET);
 }
 
 void Flash::StopDMA() {
@@ -244,6 +246,8 @@ void Flash::StopDMA() {
   SPI_I2S_DMACmd(SPI1, SPI_I2S_DMAReq_Rx, DISABLE);
 
   HIGH(EEPROM_FACTORY_SS);
+
+  SetFlag(&_EREG_, _BUSY_, FLAG_CLEAR);
 }
 
 }  // namespace waves

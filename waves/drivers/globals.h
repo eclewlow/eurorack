@@ -77,6 +77,7 @@ typedef enum
 
 #define _RXTC_  0 // Rx transfer complete
 #define _TXTC_  1 // Tx transfer complete
+#define _BUSY_  2 // Busy processing
 
 extern uint32_t _EREG_;
 FlagStateTypeDef GetFlag(uint32_t*, uint8_t);
@@ -84,6 +85,6 @@ void SetFlag(uint32_t*, uint8_t, FlagStateTypeDef);
 
 extern EEPROM_PIN eeprom[6];
 
-extern uint32_t dataBuffer[1024];
+extern int16_t dataBuffer[2048];
 
 #endif

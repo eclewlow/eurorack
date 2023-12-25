@@ -69,17 +69,17 @@ using namespace stmlib;
 #define PowerDown               0xb9
 #define PowerDown_Release       0xab
 
-#define _BUSY_                  0x01 // Erase or write in progress
-#define _WEL_                   0x02 // Write enable Latch
-#define _BP0_                   0x04 // Block protect bit 0 (non-volatile)
-#define _BP1_                   0x08 // Block protect bit 1 (non-volatile)
-#define _BP2_                   0x10 // Block protect bit 2 (non-volatile)
-#define _TB_                    0x20 // Top/Bottom write protect (non-volatile)
-#define _SEC_                   0x40 // Sector protect (non-volatile)
-#define _SRP0_                  0x80 // Status register protect bit 0 (non-volatile)
+// #define _BUSY_                  0x01 // Erase or write in progress
+// #define _WEL_                   0x02 // Write enable Latch
+// #define _BP0_                   0x04 // Block protect bit 0 (non-volatile)
+// #define _BP1_                   0x08 // Block protect bit 1 (non-volatile)
+// #define _BP2_                   0x10 // Block protect bit 2 (non-volatile)
+// #define _TB_                    0x20 // Top/Bottom write protect (non-volatile)
+// #define _SEC_                   0x40 // Sector protect (non-volatile)
+// #define _SRP0_                  0x80 // Status register protect bit 0 (non-volatile)
 
-#define _SRP1_                  0x01 // Status register protect bit 1 (non-volatile)
-#define _SREQ_                  0x02 // Quad enable
+// #define _SRP1_                  0x01 // Status register protect bit 1 (non-volatile)
+// #define _SREQ_                  0x02 // Quad enable
 
 typedef struct
 {
@@ -519,27 +519,6 @@ bool SaveWavetable(WAVETABLE wt, uint8_t table) {
     return true;
 }
 
-inline void Read66Mhz(uint8_t * buf, uint32_t size, uint32_t address, uint8_t pin) {
-
-    memset(buf, 0, size);
-
-    LOW(pin);
-
-    uint8_t send_buf[5];
-    send_buf[0] = READ_66MHZ;
-    send_buf[1] = ((address >> 16) & 0xFF);
-    send_buf[2] = ((address >> 8) & 0xFF);
-    send_buf[3] = ((address) & 0xFF);
-    send_buf[4] = 0x00;
-
-    Write(send_buf, 5);
-
-    ReadFast(buf, size);
-
-    HIGH(pin);
-}
-
-
 bool InitMemory() {
     WriteStatusRegister(0, EEPROM_FACTORY_SS);
     for(uint8_t table = 0; table < 1; table++) {
@@ -898,6 +877,65 @@ void Read25Mhz(uint8_t * buf, uint32_t size, uint32_t address, uint8_t pin) {
     HIGH(pin);
 }
 
+void Read66Mhz(uint8_t * buf, uint32_t size, uint32_t address, uint8_t pin) {
+
+    LOW(pin);
+
+    uint8_t send_buf[5];
+    send_buf[0] = READ_66MHZ;
+    send_buf[1] = ((address >> 16) & 0xFF);
+    send_buf[2] = ((address >> 8) & 0xFF);
+    send_buf[3] = ((address) & 0xFF);
+    send_buf[4] = 0x00;
+
+    Write(send_buf, 5);
+
+    ReadFast(buf, size);
+
+    HIGH(pin);
+}
+
+void Read66MhzDMA(uint32_t size, uint32_t address) {
+
+    LOW(EEPROM_FACTORY_SS);
+
+    uint8_t send_buf[5];
+    send_buf[0] = READ_66MHZ;
+    send_buf[1] = ((address >> 16) & 0xFF);
+    send_buf[2] = ((address >> 8) & 0xFF);
+    send_buf[3] = ((address) & 0xFF);
+    send_buf[4] = 0x00;
+
+    Write(send_buf, 5);
+
+    SPI_I2S_SendData(SPI1, 0);
+    while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
+    SPI_I2S_ReceiveData(SPI1);
+    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
+
+    StartDMARead(size);
+}
+
+void Read25MhzDMA(uint32_t size, uint32_t address) {
+
+    LOW(EEPROM_FACTORY_SS);
+
+    uint8_t send_buf[4];
+    send_buf[0] = READ_25MHZ;
+    send_buf[1] = ((address >> 16) & 0xFF);
+    send_buf[2] = ((address >> 8) & 0xFF);
+    send_buf[3] = ((address) & 0xFF);
+
+    Write(send_buf, 4);
+
+    SPI_I2S_SendData(SPI1, 0);
+    while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
+    SPI_I2S_ReceiveData(SPI1);
+    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
+
+    StartDMARead(size);
+}
+
 bool Program(uint8_t byte, uint32_t address, uint8_t pin) {
     // wren
     CMD(WRITE_ENABLE, pin);
@@ -999,19 +1037,23 @@ void W25qxx_Init (void)
 
     w25qxx.Lock = ReadStatusRegister(EEPROM_FACTORY_SS);
 
-    SectorErase4K(0, EEPROM_FACTORY_SS);
     // Program(0xef, 0, EEPROM_FACTORY_SS);
     // Program(0xaa, 1, EEPROM_FACTORY_SS);
 
-    // dataBuffer[0] = 12;
-    AAI_Word_Program((uint8_t *)&ROM[0], 4096, 0, EEPROM_FACTORY_SS);
+    // for(int i = 0; i < 16; i++) {
+    //     SectorErase4K(4096*i, EEPROM_FACTORY_SS);
+    //     AAI_Word_Program((uint8_t *)&ROM[2048*i], 4096, 4096*i, EEPROM_FACTORY_SS);
+    // }
+    // SectorErase4K(0, EEPROM_FACTORY_SS);
+    // AAI_Word_Program((uint8_t *)&ROM[0], 4096, 0, EEPROM_FACTORY_SS);
 
-
-    // dataBuffer[0] = 13;
-    int16_t buf;
-    Read25Mhz((uint8_t*)&buf, 2, 4, EEPROM_FACTORY_SS);
-
-    dataBuffer[0] = buf;
+    if(!GetFlag(&_EREG_, _BUSY_)) {
+        Read66MhzDMA(4096, 0);
+    }
+    // uint32_t buf;
+    // Read25Mhz((uint8_t*)&buf, 4, 2, EEPROM_FACTORY_SS);
+    // int16_t * test = (int16_t*)&buf;
+    // dataBuffer[0] = test[1];
     // memset(dataBuffer, 0, 4);
     // memcpy(dataBuffer, &buf, 2);
   // W25Qxx_TransferSPI(WRITE_ENABLE, -1, 0, DIR_NEUTRAL, 0);

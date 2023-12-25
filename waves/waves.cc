@@ -225,10 +225,19 @@ void TIM1_UP_TIM10_IRQHandler(void) {
   status += 0;
   // snprintf(value, 80, "c=%d, m=%lu, s=%08lx, %08lx\n", counter, system_clock.milliseconds(), sample1, __REV(dataBuffer[0]));
   // _write(0, (char*)value, 80);
+// union fourbyte {
+//   uint32_t dword;
+//   uint16_t word[2];
+//   uint8_t  byte[4];
+// };
 
-  // int16_t result = 0;
+// union fourbyte val;
+
+// val.dword = __REV(dataBuffer[0]);
+  // int16_t * result = (int16_t *)dataBuffer;
   // memcpy(&result, dataBuffer, 2);
-  snprintf(value, 80, "%lu\n", dataBuffer[0]);
+  snprintf(value, 80, "%d\n", dataBuffer[2]);
+  // snprintf(value, 80, "%08lx\n", dataBuffer[0]);
   // snprintf(value, 80, "buf=%04x, db=%08lx\n, %08lx", buffer[0], dataBuffer[0], flash.w25qxx.ID);
   // snprintf(value, 40, "f=%d\n", static_cast<int>(phase*100.0f));
   // sample += 1;

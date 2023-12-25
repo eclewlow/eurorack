@@ -21,7 +21,7 @@ EEPROM_PIN eeprom[6] = {
 	{ GPIOA, GPIO_Pin_6 },
 };
 
-uint32_t dataBuffer[1024];
+int16_t dataBuffer[2048];
 
 
 
