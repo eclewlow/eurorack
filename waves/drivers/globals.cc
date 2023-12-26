@@ -22,8 +22,12 @@ EEPROM_PIN eeprom[6] = {
 };
 
 int16_t dataBuffer[2048];
-
-
+int16_t double_waveframe_buffer_1[4096];
+int16_t double_waveframe_buffer_2[4096];
+int16_t pump_buffer[4096];
+int16_t * front_buffer = double_waveframe_buffer_1;
+int16_t * back_buffer = double_waveframe_buffer_2;
+uint8_t volatile loading = 0;
 
 uint32_t _EREG_ = 0;
 

@@ -40,6 +40,7 @@
 #include "waves/drivers/audio_dac.h"
 #include "waves/drivers/flash.h"
 #include "waves/drivers/4x_downsampler.h"
+#include "waves/drivers/ParameterInterpolator.h"
 // #include "waves/drivers/uart_logger.h"
 // #include "waves/ramp/ramp_extractor.h"
 // #include "waves/random/random_generator.h"
@@ -120,6 +121,8 @@ int _write(int file, char *ptr, int len) {
     return len;
 }
 
+uint8_t current_frame_ = 0;
+uint8_t target_frame_ = 0;
 
 extern "C" {
 
@@ -145,6 +148,20 @@ void SysTick_Handler() {
   //     debug_port.Write(response);
   //   }
   // }
+  adc.Convert();
+
+  float morph_target = adc.float_value(0);
+  float clamped_morph = CLAMP<float>(morph_target, 0.0, 0.9999);
+
+  if(!GetFlag(&_EREG_, _BUSY_) && !GetFlag(&_EREG_, _RXNE_)) {
+    float frame = clamped_morph * 15.0f;
+
+    uint16_t frame_integral = floor(frame);
+    if(frame_integral != current_frame_) {
+      target_frame_ = frame_integral;
+      flash.StartFrameDMARead((uint32_t*)back_buffer, 8192, target_frame_ * 4096);
+    }
+  }
 }
 
 int counter = 0;
@@ -172,9 +189,9 @@ void TIM1_UP_TIM10_IRQHandler(void) {
   // int16_t sample = flash.LoadWaveSample(counter % (2048 * 16 * 1), counter % (2048 * 16), counter % (2048));
   // int16_t sample = flash.LoadWaveSample(0, 0, 0);
   // ITM_SendChar('h');
-  // adc.Convert();
 
   char value[80];
+
 
 
     // if(counter == 9) {
@@ -235,13 +252,32 @@ void TIM1_UP_TIM10_IRQHandler(void) {
 
 // val.dword = __REV(dataBuffer[0]);
   // int16_t * result = (int16_t *)dataBuffer;
+  // if(DMA_GetFlagStatus(DMA2_Stream0, DMA_FLAG_TCIF0)) {
+  //   loading++;
+  //   DMA_ClearFlag(DMA2_Stream0, DMA_FLAG_TCIF0 | DMA_FLAG_HTIF0);
+  // }
+  // if(DMA_GetFlagStatus(DMA2_Stream3, DMA_FLAG_TCIF3)) {
+  //   loading++;
+  //   DMA_ClearFlag(DMA2_Stream3, DMA_FLAG_TCIF3 | DMA_FLAG_HTIF3);
+  // }
+
+
+
+// if(!GetFlag(&_EREG_, _BUSY_) && !GetFlag(&_EREG_, _RXNE_)) {
+
+  // float morph_target = adc.float_value(0);
+  // float clamped_morph = CLAMP<float>(morph_target, 0.0, 0.9999);
+  // float frame = clamped_morph * 15.0f;
+  // uint16_t frame_integral = floor(frame);
+
   // memcpy(&result, dataBuffer, 2);
-  snprintf(value, 80, "%d\n", dataBuffer[2]);
+  // snprintf(value, 80, "c=%d, s=%d, frame=%d, %d\n", counter, loading, frame_integral, front_buffer[(2048 - 20) + counter%20]);
+  snprintf(value, 80, "l=%d, busy=%d, rxne=%d, %d\n", loading, GetFlag(&_EREG_, _BUSY_), GetFlag(&_EREG_, _RXNE_), front_buffer[(2048 - 20) + counter%20]);
   // snprintf(value, 80, "%08lx\n", dataBuffer[0]);
   // snprintf(value, 80, "buf=%04x, db=%08lx\n, %08lx", buffer[0], dataBuffer[0], flash.w25qxx.ID);
   // snprintf(value, 40, "f=%d\n", static_cast<int>(phase*100.0f));
   // sample += 1;
-  _write(0, (char*)value, 80);
+  // _write(0, (char*)value, 80);
 
 
       // GPIO_ResetBits(GPIOA, kPinFactorySS);
@@ -317,6 +353,11 @@ int16_t GetSample(int16_t wavetable, int16_t frame, float phase) {
 
 float carrier_fir_;
 
+float morph_;
+
+float swap_counter = 0.0f;
+float swap_increment = 1.0f / 10000.0f;
+
 void FillBuffer(AudioDac::Frame* output, size_t size) {
 // #ifdef PROFILE_INTERRUPT
 //   TIC
@@ -325,7 +366,7 @@ void FillBuffer(AudioDac::Frame* output, size_t size) {
 //   IWDG_ReloadCounter();
   
 //   ui.Poll();
-  float phase_increment = 440.0f / 47992.0f;
+  float phase_increment = (110.0f / 4.0f) / 47992.0f;
 //   if (test_adc_noise) {
 //     static float note_lp = 0.0f;
 //     float note = modulations.note;
@@ -347,6 +388,19 @@ void FillBuffer(AudioDac::Frame* output, size_t size) {
 
     */
 
+    float morphTarget = adc.float_value(0);
+
+    ParameterInterpolator morph_interpolator(&morph_, morphTarget, size);
+
+    bool swap = false;
+
+    if(GetFlag(&_EREG_, _RXNE_)) {
+      // swap buffers
+      // do transition this half
+      swap = true;
+    }
+    // swap = false;
+
     while (size--) {
 
       // if(1) {//counter < 20) {
@@ -355,7 +409,7 @@ void FillBuffer(AudioDac::Frame* output, size_t size) {
       //   ++output;
       //   return;
       // }
-      float sample = 0;//inf(2 * M_PI * phase);
+      // float sample = sinf(2 * M_PI * phase);
       // float test = 0;//sinf(2 * M_PI * phase);
 
       // sample += 0.0f;
@@ -383,13 +437,12 @@ void FillBuffer(AudioDac::Frame* output, size_t size) {
       // float frame_fractional = frame - frame_integral;      
       // uint16_t next_frame_integral = (frame_integral + 1) % 16;
 
-    float index = phase * 4096.0;
-    uint16_t integral = static_cast<uint16_t>(index) & ~0x1;
+    // float index = phase * 4096.0;
+    // uint16_t integral = static_cast<uint16_t>(index) & ~0x1;
     // float fractional = index - integral;
     
     // uint16_t nextIntegral = (integral + 1) % 2048;
     
-    int16_t sample1 = 0;
     // int16_t sample2 = 0;
     // int16_t samples[32];
 
@@ -398,9 +451,9 @@ void FillBuffer(AudioDac::Frame* output, size_t size) {
           write - 8*5*(4 + 4 + 1 + 1) = 400
           read - 2 * 8 * (2 + 1 + 4 + 4) = 176
     */
-    flash.Read66Mhz((uint8_t *)&sample1, 2, integral, EEPROM_FACTORY_SS);
+    // flash.Read66Mhz((uint8_t *)&sample1, 2, integral, EEPROM_FACTORY_SS);
     // sample1 = 0;
-    flash.Read66Mhz((uint8_t *)&sample1, 2, integral, EEPROM_FACTORY_SS);
+    // flash.Read66Mhz((uint8_t *)&sample1, 2, integral, EEPROM_FACTORY_SS);
     // flash.Read66Mhz((uint8_t *)&sample1, 2, integral, EEPROM_FACTORY_SS);
     // flash.Read66Mhz((uint8_t *)&sample1, 2, integral, EEPROM_FACTORY_SS);
     // flash.Read66Mhz((uint8_t *)samples, 64, 0, EEPROM_FACTORY_SS);
@@ -424,10 +477,110 @@ void FillBuffer(AudioDac::Frame* output, size_t size) {
     // sample1 += 0;
     // sample2 += 0;
 
-      // float index = phase * 2048.0;
-      // uint16_t integral = floor(index);
-      // float fractional = index - integral;
-      // uint16_t nextIntegral = (integral + 1) % 2048;
+      float interpolated_morph = morph_interpolator.Next();
+      interpolated_morph = CLAMP<float>(interpolated_morph, 0.0, 0.9999f);
+
+      float sample = 0;
+      for (size_t j = 0; j < kOversampling; ++j) {
+          
+          float frame = interpolated_morph * 15.0f;
+          uint16_t frame_integral = floor(frame);
+          float frame_fractional = frame - frame_integral;
+          // frame_fractional = 0.0f;
+          // uint16_t next_frame_integral = (frame_integral + 1) % 16;
+
+          float index = phase * 2048.0;
+          uint16_t integral = floor(index);
+          float fractional = index - integral;
+          uint16_t nextIntegral = (integral + 1) % 2048;
+          // swap = false;
+
+          if(!swap) {
+            int16_t sample1 = 0;
+            int16_t sample2 = 0;
+
+            int16_t * buf = front_buffer;
+            sample1 = buf[integral] + (buf[nextIntegral] - buf[integral]) * fractional;
+            sample2 = buf[2048 + integral] + (buf[2048 + nextIntegral] - buf[2048 + integral]) * fractional;
+
+            if(frame_integral > current_frame_)
+              sample = sample2;
+            else if(frame_integral < current_frame_)
+              sample = sample1;
+            else
+              sample = sample1 * (1.0f - frame_fractional) + sample2 * frame_fractional;
+          }
+          else {
+            int16_t sample1 = 0;
+            int16_t sample2 = 0;
+
+            int16_t * buf = front_buffer;
+            sample1 = buf[integral] + (buf[nextIntegral] - buf[integral]) * fractional;
+            sample2 = buf[2048 + integral] + (buf[2048 + nextIntegral] - buf[2048 + integral]) * fractional;
+
+            /*
+
+            0 to 2.  0... morph ... 2.0 front buffer.. morph is from 0 to 1.0.
+            when morph approaches 1.0, a new frame is loaded.
+
+            */
+            if(target_frame_ > current_frame_)
+              sample1 = sample2;
+            else if(current_frame_ > target_frame_)
+              sample1 = sample1;
+            else
+              sample1 = sample1 * (1.0f - frame_fractional) + sample2 * frame_fractional;
+
+            int16_t sample3 = 0;
+            int16_t sample4 = 0;
+
+            buf = back_buffer;
+            sample3 = buf[integral] + (buf[nextIntegral] - buf[integral]) * fractional;
+            sample4 = buf[2048 + integral] + (buf[2048 + nextIntegral] - buf[2048 + integral]) * fractional;
+
+            // if(frame_integral > target_frame_)
+            //   sample3 = sample4;
+            // else if(frame_integral < target_frame_)
+            //   sample3 = sample3;
+            // else
+              sample3 = sample3 * (1.0f - frame_fractional) + sample4 * frame_fractional;
+            // sample3 += 0;
+            // sample4 += 0;
+            sample = sample1 * (1.0f - swap_counter) + sample3 * swap_counter;
+            // sample = sample1;
+            // sample = sample1;
+          }
+
+          phase += phase_increment;
+          
+          if(phase >= 1.0f)
+              phase -= 1.0f;
+          
+          if(swap) {
+            swap_counter += swap_increment;
+            if(swap_counter >= 1.0f) {
+              swap = false;
+              if(front_buffer == double_waveframe_buffer_1) {
+                front_buffer = double_waveframe_buffer_2;
+                back_buffer = double_waveframe_buffer_1;
+              } else {
+                front_buffer = double_waveframe_buffer_1;
+                back_buffer = double_waveframe_buffer_2;      
+              }
+              current_frame_ = target_frame_;
+              swap_counter = 0.0f;
+
+              SetFlag(&_EREG_, _RXNE_, FLAG_CLEAR);
+              SetFlag(&_EREG_, _BUSY_, FLAG_CLEAR);
+            }
+          }
+
+
+          carrier_downsampler.Accumulate(j, sample / 32768.0f);
+      }
+      
+      sample = carrier_downsampler.Read();
+      
 
       // int16_t sample1 = 0;
       // uint8_t sample2[2];
@@ -445,10 +598,10 @@ void FillBuffer(AudioDac::Frame* output, size_t size) {
       // flash.Read66Mhz((uint8_t *)&sample2, 2, nextIntegral * 2, EEPROM_FACTORY_SS);
 
       // sample1 = sample1 + (sample2 - sample1) * fractional;
-      for(uint32_t i = 0; i < 128; i++) {
-      flash.HIGH(GPIOA, GPIO_Pin_11);
-      flash.LOW(GPIOA, GPIO_Pin_11);
-      }
+      // for(uint32_t i = 0; i < 128; i++) {
+      // flash.HIGH(GPIOA, GPIO_Pin_11);
+      // flash.LOW(GPIOA, GPIO_Pin_11);
+      // }
 
       // uint32_t address = integral * 2;
       // flash.LOW(EEPROM_FACTORY_SS);
@@ -508,8 +661,8 @@ void FillBuffer(AudioDac::Frame* output, size_t size) {
       // output->l = static_cast<int32_t>(20000.0f * sample);
       // output->l = static_cast<int16_t>(interpolated16 * 26000.0f);
       output->l = static_cast<int32_t>(26000.0f * sample);
-      output->l = sample1;
-      // output->l = static_cast<int16_t>(sample2 / 1.5f);
+      // output->l = sample1;
+      // output->l = static_cast<int16_t>(sample / 1.5f);
       // output->l = static_cast<int16_t>(sample1 / 1.5f);
       // output->l = ~test_ramp >> 16;
       // output->l = 0;
@@ -524,10 +677,9 @@ void FillBuffer(AudioDac::Frame* output, size_t size) {
 
       //*/
       ++output;
-
-      phase += phase_increment;
-      if(phase >= 1.0f)
-        phase -= 1.0f;
+      // phase += phase_increment;
+      // if(phase >= 1.0f)
+      //   phase -= 1.0f;
 
     }
 }
@@ -884,15 +1036,15 @@ void Init() {
   // for (size_t i = 0; i < kNumGateOutputs; ++i) {
   //   self_patching_detector[i].Init(i);
   // }
-  // adc.Init(false);
+  adc.Init(false);
   flash.Init();
   // flash.InitMemory();
 
   
   sys.StartTimers();
 
-  // audio_dac.Init(48000, kBlockSize);
-  // audio_dac.Start(&FillBuffer);
+  audio_dac.Init(48000, kBlockSize);
+  audio_dac.Start(&FillBuffer);
 
 
   // logger.Init(9600);

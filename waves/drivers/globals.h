@@ -78,6 +78,7 @@ typedef enum
 #define _RXTC_  0 // Rx transfer complete
 #define _TXTC_  1 // Tx transfer complete
 #define _BUSY_  2 // Busy processing
+#define _RXNE_  3 // Receive Buffer is full
 
 extern uint32_t _EREG_;
 FlagStateTypeDef GetFlag(uint32_t*, uint8_t);
@@ -86,5 +87,18 @@ void SetFlag(uint32_t*, uint8_t, FlagStateTypeDef);
 extern EEPROM_PIN eeprom[6];
 
 extern int16_t dataBuffer[2048];
+extern int16_t double_waveframe_buffer_1[4096];
+extern int16_t double_waveframe_buffer_2[4096];
+extern int16_t * front_buffer;
+extern int16_t * back_buffer;
+extern int16_t pump_buffer[4096];
+extern volatile uint8_t loading;
+
+template <typename T> T CLAMP(T value, T low, T high)
+{
+    return (value < low) ? low : ((value > high) ? high : value);
+}
+
+
 
 #endif

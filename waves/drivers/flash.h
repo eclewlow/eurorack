@@ -731,7 +731,10 @@ inline void Write(uint8_t * buf, uint32_t size) {
         SPI_I2S_SendData(SPI1, buf[i]);
         while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
         SPI_I2S_ReceiveData(SPI1);
-        while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
+        // while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
+          while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE)) {
+            SPI_I2S_ReceiveData(SPI1);    
+          }
     }
 }
 
@@ -970,7 +973,6 @@ bool AAI_Word_Program(uint8_t * buffer, uint32_t size, uint32_t address, uint8_t
     if(size % 2 != 0) return false;
 
     // TODO: USE HARDWARE BSY FOR FASTER WRITE
-
     // wren
     CMD(WRITE_ENABLE, pin);
 
@@ -980,13 +982,15 @@ bool AAI_Word_Program(uint8_t * buffer, uint32_t size, uint32_t address, uint8_t
 
     LOW(pin);
 
+    uint32_t i = 0;
+
     uint8_t send_buf[6];
     send_buf[0] = AAI_WORD_PROGRAM;
     send_buf[1] = ((address >> 16) & 0xFF);
     send_buf[2] = ((address >> 8) & 0xFF);
     send_buf[3] = ((address) & 0xFF);
-    send_buf[4] = buffer[0];
-    send_buf[5] = buffer[1];
+    send_buf[4] = buffer[i++];
+    send_buf[5] = buffer[i++];
 
     Write(send_buf, 6);
 
@@ -995,21 +999,19 @@ bool AAI_Word_Program(uint8_t * buffer, uint32_t size, uint32_t address, uint8_t
     HIGH(pin);
 
     // while(ReadStatusRegister(pin) & 0x01);  // BUSY
-    system_clock.Delay(1);
-
-    uint32_t i = 2;
+    system_clock.Delay(10);
 
     while(i < size) {
 
         LOW(pin);
 
-        uint8_t send_buf[3] = {
+        uint8_t send_buf2[3] = {
             AAI_WORD_PROGRAM,
             buffer[i++],
             buffer[i++],
         };
 
-        Write(send_buf, 3);
+        Write(send_buf2, 3);
 
         while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_BSY));
 
@@ -1031,6 +1033,8 @@ bool AAI_Word_Program(uint8_t * buffer, uint32_t size, uint32_t address, uint8_t
 // -------------------------------------------------------------  
 void W25qxx_Init (void)
 {
+    // system_clock.Delay(1000);
+
     w25qxx.ID = __REV(Jedec_ID_Read());
 
     WriteStatusRegister(0x00, EEPROM_FACTORY_SS);
@@ -1040,16 +1044,48 @@ void W25qxx_Init (void)
     // Program(0xef, 0, EEPROM_FACTORY_SS);
     // Program(0xaa, 1, EEPROM_FACTORY_SS);
 
-    // for(int i = 0; i < 16; i++) {
-    //     SectorErase4K(4096*i, EEPROM_FACTORY_SS);
-    //     AAI_Word_Program((uint8_t *)&ROM[2048*i], 4096, 4096*i, EEPROM_FACTORY_SS);
-    // }
-    // SectorErase4K(0, EEPROM_FACTORY_SS);
-    // AAI_Word_Program((uint8_t *)&ROM[0], 4096, 0, EEPROM_FACTORY_SS);
-
-    if(!GetFlag(&_EREG_, _BUSY_)) {
-        Read66MhzDMA(4096, 0);
+    while(GetFlag(&_EREG_, _BUSY_));
+    SetFlag(&_EREG_, _BUSY_, FLAG_SET);
+    for(int i = 0; i < 16; i++) {
+    loading++;
+        // system_clock.Delay(10);
+    // int i = 0;
+    // SectorErase4K(4096*i, EEPROM_FACTORY_SS);
+    // system_clock.Delay(i == 0 ? 25 : 25);
+    // AAI_Word_Program((uint8_t *)&ROM[2048*i], 4096, 4096*i, EEPROM_FACTORY_SS);
     }
+
+
+    SetFlag(&_EREG_, _BUSY_, FLAG_CLEAR);
+    // Program(0x1, 0, EEPROM_FACTORY_SS);
+    // system_clock.Delay(100);
+    // Program(0x1, 1, EEPROM_FACTORY_SS);
+    // system_clock.Delay(100);
+    // SectorErase4K(0, EEPROM_FACTORY_SS);
+    // system_clock.Delay(100);
+    // AAI_Word_Program((uint8_t *)ROM, 4096, 0, EEPROM_FACTORY_SS);
+
+
+    // system_clock.Delay(100);
+    // SectorErase4K(4096, EEPROM_FACTORY_SS);
+    // system_clock.Delay(100);
+    // AAI_Word_Program((uint8_t *)&ROM[2048], 4096, 4096, EEPROM_FACTORY_SS);
+    // system_clock.Delay(100);
+
+    // if(!GetFlag(&_EREG_, _BUSY_)) {
+        // Read66MhzDMA(4096, 0);
+    // }
+    // front_buffer = double_waveframe_buffer_1;
+    // back_buffer = double_waveframe_buffer_2;
+
+    // SetFlag(&_EREG_, _RXNE_, FLAG_CLEAR);
+    // StartFrameDMARead((uint32_t*)front_buffer, 8192, 0);
+
+    // SetFlag(&_EREG_, _BUSY_, FLAG_CLEAR);
+    // SetFlag(&_EREG_, _RXNE_, FLAG_CLEAR);
+    // if(!GetFlag(&_EREG_, _BUSY_)) {
+        // StartFrameDMARead((uint32_t*)double_waveframe_buffer_1, 8192, 4096 * 0);
+    // }
     // uint32_t buf;
     // Read25Mhz((uint8_t*)&buf, 4, 2, EEPROM_FACTORY_SS);
     // int16_t * test = (int16_t*)&buf;
@@ -1111,6 +1147,7 @@ void W25qxx_Init (void)
   // SetFlag(&_EREG_, _DBLF_, FLAG_CLEAR);
 }
     w25qxx_t    w25qxx;
+void StartFrameDMARead(uint32_t * buffer, uint32_t size, uint32_t address);
 void StartDMARead(uint16_t __bytes);
 void StartDMAWrite(uint16_t __bytes);
 void StopDMA();

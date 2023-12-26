@@ -126,10 +126,10 @@ void Flash::Init() {
   DMA_Init(DMA2_Stream0, &dma_init);
   
   // Enable the interrupts: half transfer and transfer complete.
-  // DMA_ITConfig(DMA2_Stream0, DMA_IT_TC, ENABLE);
+  DMA_ITConfig(DMA2_Stream0, DMA_IT_TC, ENABLE);
   
   // Enable the IRQ.
-  // NVIC_EnableIRQ(DMA2_Stream0_IRQn);
+  NVIC_EnableIRQ(DMA2_Stream0_IRQn);
   
   // SPI_I2S_DMACmd(SPI1, SPI_I2S_DMAReq_Rx, ENABLE);
 
@@ -226,6 +226,59 @@ void Flash::StartDMARead(uint16_t __bytes) {
   SetFlag(&_EREG_, _BUSY_, FLAG_SET);
 }
 
+void Flash::StartFrameDMARead(uint32_t * buffer, uint32_t __bytes, uint32_t address) {
+  SetFlag(&_EREG_, _RXTC_, FLAG_CLEAR);
+  SetFlag(&_EREG_, _TXTC_, FLAG_CLEAR);
+  if(GetFlag(&_EREG_, _BUSY_))
+    return;
+  SetFlag(&_EREG_, _BUSY_, FLAG_SET);
+
+  loading = 3;
+  LOW(EEPROM_FACTORY_SS);
+
+  uint8_t send_buf[5];
+  send_buf[0] = READ_66MHZ;
+  send_buf[1] = ((address >> 16) & 0xFF);
+  send_buf[2] = ((address >> 8) & 0xFF);
+  send_buf[3] = ((address) & 0xFF);
+  send_buf[4] = 0x00;
+
+  Write(send_buf, 5);
+
+  // system_clock.Delay(1);
+  // uint8_t pump = 0;
+
+  loading = 4;
+
+  SPI_I2S_SendData(SPI1, 0);
+  while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
+  SPI_I2S_ReceiveData(SPI1);
+  while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE)) {
+    SPI_I2S_ReceiveData(SPI1);    
+  }
+
+  loading = 5;
+
+  DMA_SetCurrDataCounter(DMA2_Stream3, __bytes);
+  DMA_SetCurrDataCounter(DMA2_Stream0, __bytes);
+  DMA2_Stream3->M0AR = (uint32_t)pump_buffer;
+  DMA2_Stream0->M0AR = (uint32_t)buffer;
+  DMA_Cmd(DMA2_Stream3, ENABLE);
+  DMA_Cmd(DMA2_Stream0, ENABLE);
+  SPI_I2S_DMACmd(SPI1, SPI_I2S_DMAReq_Tx, ENABLE);
+  SPI_I2S_DMACmd(SPI1, SPI_I2S_DMAReq_Rx, ENABLE);
+
+  loading = 6;
+
+  // loading++;
+
+  // while(!DMA_GetFlagStatus(DMA2_Stream0, DMA_FLAG_TCIF0))
+  //   DMA_ClearFlag(DMA2_Stream0, DMA_FLAG_TCIF0 | DMA_FLAG_HTIF0);
+  // while(!DMA_GetFlagStatus(DMA2_Stream3, DMA_FLAG_TCIF3))
+  //   DMA_ClearFlag(DMA2_Stream3, DMA_FLAG_TCIF3 | DMA_FLAG_HTIF3);
+  // loading++;
+}
+
 void Flash::StartDMAWrite(uint16_t __bytes) {
   DMA_SetCurrDataCounter(DMA2_Stream3, __bytes);
   DMA2_Stream3->M0AR = (int)dataBuffer;
@@ -238,8 +291,16 @@ void Flash::StartDMAWrite(uint16_t __bytes) {
 }
 
 void Flash::StopDMA() {
-  while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
-  while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
+  loading = 2;
+  DMA_ClearFlag(DMA2_Stream0, DMA_FLAG_TCIF0 | DMA_FLAG_HTIF0);
+  DMA_ClearFlag(DMA2_Stream3, DMA_FLAG_TCIF3 | DMA_FLAG_HTIF3);
+
+  // while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
+  // while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
+    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE)) {
+    SPI_I2S_ReceiveData(SPI1);    
+  }
+
   DMA_Cmd(DMA2_Stream3, DISABLE);
   DMA_Cmd(DMA2_Stream0, DISABLE);
   SPI_I2S_DMACmd(SPI1, SPI_I2S_DMAReq_Tx, DISABLE);
@@ -247,7 +308,7 @@ void Flash::StopDMA() {
 
   HIGH(EEPROM_FACTORY_SS);
 
-  SetFlag(&_EREG_, _BUSY_, FLAG_CLEAR);
+  SetFlag(&_EREG_, _RXNE_, FLAG_SET);
 }
 
 }  // namespace waves
@@ -257,27 +318,29 @@ extern "C" {
 
 // Rx Transfer complete
 void DMA2_Stream0_IRQHandler(void) {
+    loading = 1;
   if(DMA_GetFlagStatus(DMA2_Stream0, DMA_FLAG_TCIF0)) {
     DMA_ClearFlag(DMA2_Stream0, DMA_FLAG_TCIF0 | DMA_FLAG_HTIF0);
 
     SetFlag(&_EREG_, _RXTC_, FLAG_SET);
 
-    if(GetFlag(&_EREG_, _TXTC_)) {
+    // if(GetFlag(&_EREG_, _TXTC_)) {
       waves::Flash::GetInstance()->StopDMA();
-    }
+    // }
   }
 }
 
 // Tx Transfer complete
 void DMA2_Stream3_IRQHandler(void) {
+  // loading++;
   if(DMA_GetFlagStatus(DMA2_Stream3, DMA_FLAG_TCIF3)) {
     DMA_ClearFlag(DMA2_Stream3, DMA_FLAG_TCIF3 | DMA_FLAG_HTIF3);
 
     SetFlag(&_EREG_, _TXTC_, FLAG_SET);
 
-    if(GetFlag(&_EREG_, _RXTC_)) {
-      waves::Flash::GetInstance()->StopDMA();
-    }
+    // if(GetFlag(&_EREG_, _RXTC_)) {
+      // waves::Flash::GetInstance()->StopDMA();
+    // }
   }
 }
 

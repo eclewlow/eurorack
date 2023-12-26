@@ -81,8 +81,8 @@ void Adc::Init(bool single_channel) {
   dma_init.DMA_FIFOThreshold = DMA_FIFOThreshold_HalfFull;
   dma_init.DMA_MemoryBurst = DMA_MemoryBurst_Single;
   dma_init.DMA_PeripheralBurst = DMA_PeripheralBurst_Single;
-  DMA_Init(DMA2_Stream0, &dma_init);
-  DMA_Cmd(DMA2_Stream0, ENABLE);
+  DMA_Init(DMA2_Stream4, &dma_init);
+  DMA_Cmd(DMA2_Stream4, ENABLE);
   
   // dma_init.DMA_Channel = DMA_Channel_1;
   // dma_init.DMA_PeripheralBaseAddr = (uint32_t)&ADC2->DR;
@@ -140,7 +140,7 @@ void Adc::Init(bool single_channel) {
 }
 
 void Adc::DeInit() {
-  DMA_Cmd(DMA2_Stream0, DISABLE);
+  DMA_Cmd(DMA2_Stream4, DISABLE);
   // DMA_Cmd(DMA2_Stream2, DISABLE);
   ADC_DMARequestAfterLastTransferCmd(ADC1, DISABLE);
   // ADC_DMARequestAfterLastTransferCmd(ADC2, DISABLE);
