@@ -8,10 +8,10 @@
   ==============================================================================
 */
 
-#include "Display.h"
-#include "graphics.h"
-#include "Globals.h"
-#include "fft.h"
+#include "waves/Display.h"
+#include "waves/graphics.h"
+#include "waves/Globals.h"
+#include "waves/dsp/fft/fft.h"
 #include <cmath>
 
 WaveEditor::WaveEditor() {

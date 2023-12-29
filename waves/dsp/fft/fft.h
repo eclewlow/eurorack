@@ -10,8 +10,6 @@
 
 #pragma once
 
-#include <JuceHeader.h>
-
 class FFT {
 public:
     FFT() {}
@@ -30,5 +28,5 @@ public:
     static void fft(COMPLEX_NUMBER * input, int size, COMPLEX_NUMBER * output);
     static void ifft(COMPLEX_NUMBER * input, int size, COMPLEX_NUMBER * output);
 private:
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FFT);
+    DISALLOW_COPY_AND_ASSIGN (FFT);
 };

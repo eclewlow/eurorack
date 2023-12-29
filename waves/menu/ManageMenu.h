@@ -10,8 +10,7 @@
 
 #pragma once
 
-#include <JuceHeader.h>
-#include "State.h"
+#include "waves/State.h"
 
 class State;
 
@@ -95,5 +94,5 @@ private:
     uint32_t blink_timer_;
     bool absorb_keypress_;
     int8_t copy_state_;
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ManageMenu);
+    DISALLOW_COPY_AND_ASSIGN (ManageMenu);
 };

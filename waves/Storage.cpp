@@ -8,8 +8,8 @@
   ==============================================================================
 */
 
-#include "wavetables.h"
-#include "Globals.h"
+#include "waves/wavetables.h"
+#include "waves/Globals.h"
 
 void Storage::Init() {
 //    save_file_ = juce::File::getCurrentWorkingDirectory().getChildFile ("file.txt");

@@ -28,5 +28,5 @@ protected:
     float phase;
     float oscilloscopePhase;
 private:
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Effect);
+    DISALLOW_COPY_AND_ASSIGN (Effect);
 };

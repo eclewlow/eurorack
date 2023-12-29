@@ -10,8 +10,7 @@
 
 #pragma once
 
-#include <JuceHeader.h>
-#include "Globals.h"
+#include "waves/Globals.h"
 
 class Quantizer {
 public:
@@ -52,5 +51,5 @@ private:
     const float quantizer_scale_diatonic[15] = { -12.0,-10.0,-8.0,-7.0,-5.0,-3.0,-1.0,0.0,2.0,4.0,5.0,7.0,9.0,11.0,12.0 };
     
     int8_t scale_;
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Quantizer);
+    DISALLOW_COPY_AND_ASSIGN (Quantizer);
 };

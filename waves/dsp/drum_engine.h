@@ -10,8 +10,8 @@
 
 #pragma once
 
-#include "effect.h"
-#include "Engine.h"
+#include "waves/dsp/fx/effect.h"
+#include "waves/dsp/Engine.h"
 
 class Engine;
 
@@ -51,5 +51,5 @@ private:
     // shape -50 to 50
     float amp_decay_trigger_;
     float fm_decay_trigger_;
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DrumEngine);
+    DISALLOW_COPY_AND_ASSIGN (DrumEngine);
 };

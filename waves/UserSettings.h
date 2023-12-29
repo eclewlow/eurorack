@@ -10,8 +10,7 @@
 
 #pragma once
 
-#include <JuceHeader.h>
-#include "Storage.h"
+#include "waves/Storage.h"
 
 class Storage;
 
@@ -100,5 +99,5 @@ private:
     uint32_t app_start_time_;
     Storage::SNAPSHOT settings_;
        
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (UserSettings);
+    DISALLOW_COPY_AND_ASSIGN (UserSettings);
 };

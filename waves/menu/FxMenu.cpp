@@ -8,9 +8,9 @@
  ==============================================================================
  */
 
-#include "Display.h"
-#include "graphics.h"
-#include "Globals.h"
+#include "waves/Display.h"
+#include "waves/graphics.h"
+#include "waves/Globals.h"
 
 FxMenu::FxMenu() {
     setLeftState(FX_MENU_LEFT_FX);

@@ -8,8 +8,8 @@
  ==============================================================================
  */
 
-#include "Display.h"
-#include "Globals.h"
+#include "waves/Display.h"
+#include "waves/Globals.h"
 
 uint8_t Display::framebuffer[8][128];
 

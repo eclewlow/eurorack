@@ -41,5 +41,5 @@ private:
     float tail_;
     float* state_;
     
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Downsampler);
+    DISALLOW_COPY_AND_ASSIGN(Downsampler);
 };

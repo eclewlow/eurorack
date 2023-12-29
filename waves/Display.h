@@ -10,12 +10,11 @@
 
 #pragma once
 
-#include <JuceHeader.h>
-#include "fnt08x08.h"
-#include "fnt09x09.h"
-#include "fnt05x05.h"
-#include "fnt03x05.h"
-#include "graphics.h"
+#include "waves/fnt08x08.h"
+#include "waves/fnt09x09.h"
+#include "waves/fnt05x05.h"
+#include "waves/fnt03x05.h"
+#include "waves/graphics.h"
 //==============================================================================
 /*
  This component lives inside our window, and this is where you should put all
@@ -108,5 +107,5 @@ private:
     //==============================================================================
     // Your private member variables go here...
     
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Display)
+    DISALLOW_COPY_AND_ASSIGN (Display)
 };

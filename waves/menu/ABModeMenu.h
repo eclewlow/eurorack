@@ -10,9 +10,8 @@
 
 #pragma once
 
-#include <JuceHeader.h>
-#include "State.h"
-#include "Globals.h"
+#include "waves/State.h"
+#include "waves/Globals.h"
 
 class State;
 
@@ -71,5 +70,5 @@ private:
     uint8_t left_ticker_ = 0;
     uint8_t right_ticker_ = 0;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ABModeMenu);
+    DISALLOW_COPY_AND_ASSIGN (ABModeMenu);
 };

@@ -8,11 +8,11 @@
  ==============================================================================
  */
 
-#include "Engine.h"
-#include "wavetables.h"
-#include "ParameterInterpolator.h"
-#include "Globals.h"
-#include "4x_downsampler.h"
+#include "waves/dsp/Engine.h"
+#include "waves/wavetables.h"
+#include "waves/dsp/ParameterInterpolator.h"
+#include "waves/Globals.h"
+#include "waves/dsp/downsampler/4x_downsampler.h"
 
 Engine::Engine() {
     phase_ = 0.0f;

@@ -10,8 +10,7 @@
 
 #pragma once
 
-#include <JuceHeader.h>
-#include "State.h"
+#include "waves/State.h"
 
 class State;
 
@@ -46,5 +45,5 @@ private:
     bool message_displayed_;
     int16_t c1_value_;
     int16_t c5_value_;
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CalibrationMenu);
+    DISALLOW_COPY_AND_ASSIGN (CalibrationMenu);
 };

@@ -74,31 +74,31 @@
 
 #define BACK_BUTTON             KEYCODE_ESCAPE
 
-// #include "MainMenu.h"
-// #include "ModeMenu.h"
-// #include "FxMenu.h"
-// #include "Oscilloscope.h"
-// #include "ControlStatusMenu.h"
-// #include "DeviceConfigurationMenu.h"
-// #include "InfoMenu.h"
-// #include "DisplayConfigurationMenu.h"
-// #include "OscilloscopeConfigurationMenu.h"
-// #include "SubOscillatorMenu.h"
-// #include "EnterNameMenu.h"
-// #include "WavetableModeMenu.h"
-// #include "ABModeMenu.h"
-// #include "WaveEditor.h"
-// #include "LoadWaveMenu.h"
-// #include "SaveWaveMenu.h"
-// #include "Popup.h"
-// #include "MatrixMode.h"
-// #include "DrumMode.h"
-// #include "IOConfigurationMenu.h"
-// #include "CalibrationMenu.h"
-// #include "QuantizerMenu.h"
-// #include "ManageMenu.h"
-// #include "SnapshotMenu.h"
-// #include "MemoryClearMenu.h"
+// #include "waves/menu/MainMenu.h"
+// #include "waves/menu/ModeMenu.h"
+// #include "waves/menu/FxMenu.h"
+// #include "waves/menu/Oscilloscope.h"
+// #include "waves/menu/ControlStatusMenu.h"
+// #include "waves/menu/DeviceConfigurationMenu.h"
+// #include "waves/menu/InfoMenu.h"
+// #include "waves/menu/DisplayConfigurationMenu.h"
+// #include "waves/menu/OscilloscopeConfigurationMenu.h"
+// #include "waves/menu/SubOscillatorMenu.h"
+// #include "waves/menu/EnterNameMenu.h"
+// #include "waves/menu/WavetableModeMenu.h"
+// #include "waves/menu/ABModeMenu.h"
+// #include "waves/menu/WaveEditor.h"
+// #include "waves/menu/LoadWaveMenu.h"
+// #include "waves/menu/SaveWaveMenu.h"
+// #include "waves/menu/Popup.h"
+// #include "waves/menu/MatrixMode.h"
+// #include "waves/menu/DrumMode.h"
+// #include "waves/menu/IOConfigurationMenu.h"
+// #include "waves/menu/CalibrationMenu.h"
+// #include "waves/menu/QuantizerMenu.h"
+// #include "waves/menu/ManageMenu.h"
+// #include "waves/menu/SnapshotMenu.h"
+// #include "waves/menu/MemoryClearMenu.h"
 
 #include "waves/dsp/ab_engine.h"
 #include "waves/dsp/wavetable_engine.h"
@@ -118,12 +118,12 @@
 
 #include "waves/dsp/quantizer/quantizer.h"
 
-#include "Context.h"
-#include "UserSettings.h"
-#include "Storage.h"
+#include "waves/Context.h"
+#include "waves/UserSettings.h"
+#include "waves/Storage.h"
 
-#include "adc.h"
-#include "system_clock.h"
+// #include "adc.h"
+// #include "system_clock.h"
 
 extern Context context;
 extern UserSettings user_settings;
@@ -173,8 +173,8 @@ extern Bypass bypass;
 
 extern Quantizer quantizer;
 
-extern Adc adc;
-extern SystemClock system_clock;
+// extern Adc adc;
+// extern SystemClock system_clock;
 
 extern int16_t BUF1[2048];
 extern int16_t BUF2[2048];

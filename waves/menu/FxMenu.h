@@ -10,8 +10,7 @@
 
 #pragma once
 
-#include <JuceHeader.h>
-#include "State.h"
+#include "waves/State.h"
 
 class State;
 
@@ -47,5 +46,5 @@ private:
     FxMenuLeftState left_state_;
     FxMenuRightState right_state_;
     uint16_t wavedata_[59];
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FxMenu);
+    DISALLOW_COPY_AND_ASSIGN (FxMenu);
 };

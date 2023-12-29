@@ -10,7 +10,6 @@
 
 #pragma once
 
-#include <JuceHeader.h>
 
 class State {
 public:
@@ -26,5 +25,5 @@ public:
 
 protected:
     State* back_menu_;
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (State);
+    DISALLOW_COPY_AND_ASSIGN (State);
 };

@@ -8,7 +8,7 @@
   ==============================================================================
 */
 
-#include "Globals.h"
+#include "waves/Globals.h"
 #define ONE_OCTAVE_12BIT (12.0f * 4095.0f / 120.0f)
 
 Quantizer::Quantizer() {

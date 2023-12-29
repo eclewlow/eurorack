@@ -10,9 +10,8 @@
 
 #pragma once
 
-#include <JuceHeader.h>
-#include "wavetables.h"
-#include "Globals.h"
+#include "waves/wavetables.h"
+#include "waves/Globals.h"
 
 class Storage {
 public:
@@ -142,5 +141,5 @@ private:
     
     juce::File save_file_;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Storage);
+    DISALLOW_COPY_AND_ASSIGN (Storage);
 };

@@ -10,8 +10,8 @@
 
 #pragma once
 
-#include "effect.h"
-#include "Engine.h"
+#include "waves/dsp/fx/effect.h"
+#include "waves/dsp/Engine.h"
 
 class Engine;
 
@@ -50,5 +50,5 @@ public:
     int8_t GetWavelistOffset();
 
 private:
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MatrixEngine);
+    DISALLOW_COPY_AND_ASSIGN (MatrixEngine);
 };

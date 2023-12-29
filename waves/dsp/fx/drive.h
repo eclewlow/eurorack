@@ -26,5 +26,5 @@ public:
     float GetSample(float phase);
 protected:
 private:
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Drive);
+    DISALLOW_COPY_AND_ASSIGN (Drive);
 };

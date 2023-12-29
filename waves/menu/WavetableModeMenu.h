@@ -10,8 +10,7 @@
 
 #pragma once
 
-#include <JuceHeader.h>
-#include "State.h"
+#include "waves/State.h"
 
 class State;
 
@@ -30,5 +29,5 @@ private:
     int16_t wavetable_offset_;
     int16_t wavetable_;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WavetableModeMenu);
+    DISALLOW_COPY_AND_ASSIGN (WavetableModeMenu);
 };

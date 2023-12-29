@@ -8,9 +8,9 @@
   ==============================================================================
 */
 
-#include "Display.h"
-#include "graphics.h"
-#include "Globals.h"
+#include "waves/Display.h"
+#include "waves/graphics.h"
+#include "waves/Globals.h"
 
 Popup::Popup() {
     is_showing_ = false;

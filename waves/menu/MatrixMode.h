@@ -10,8 +10,7 @@
 
 #pragma once
 
-#include <JuceHeader.h>
-#include "State.h"
+#include "waves/State.h"
 
 class State;
 
@@ -36,5 +35,5 @@ public:
 private:
     uint8_t edit_state_;
     bool editing_offset_;
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MatrixMode);
+    DISALLOW_COPY_AND_ASSIGN (MatrixMode);
 };

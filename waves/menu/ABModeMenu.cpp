@@ -8,9 +8,9 @@
   ==============================================================================
 */
 
-#include "Display.h"
-#include "graphics.h"
-#include "Globals.h"
+#include "waves/Display.h"
+#include "waves/graphics.h"
+#include "waves/Globals.h"
 
 ABModeMenu::ABModeMenu() {
     left_state_ = AB_LOAD_HOVER;

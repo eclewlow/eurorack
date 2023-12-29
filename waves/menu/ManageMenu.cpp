@@ -8,9 +8,9 @@
   ==============================================================================
 */
 
-#include "Display.h"
-#include "graphics.h"
-#include "Globals.h"
+#include "waves/Display.h"
+#include "waves/graphics.h"
+#include "waves/Globals.h"
 
 ManageMenu::ManageMenu() {
     setState(MANAGE_MENU_SELECT_WAVETABLE);

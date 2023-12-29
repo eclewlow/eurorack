@@ -8,7 +8,7 @@
   ==============================================================================
 */
 
-#include "Globals.h"
+#include "waves/Globals.h"
 
 Context context;
 UserSettings user_settings;

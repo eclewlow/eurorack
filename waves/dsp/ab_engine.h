@@ -10,9 +10,9 @@
 
 #pragma once
 
-#include "effect.h"
-#include "Engine.h"
-#include "Globals.h"
+#include "waves/dsp/fx/effect.h"
+#include "waves/dsp/Engine.h"
+#include "waves/Globals.h"
 
 class Engine;
 
@@ -60,5 +60,5 @@ private:
 //    bool is_editing_left_;
 //    bool is_editing_right_;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ABEngine);
+    DISALLOW_COPY_AND_ASSIGN (ABEngine);
 };

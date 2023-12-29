@@ -9,9 +9,9 @@
 */
 
 
-#include "Display.h"
-#include "graphics.h"
-#include "Globals.h"
+#include "waves/Display.h"
+#include "waves/graphics.h"
+#include "waves/Globals.h"
 
 ControlStatusMenu::ControlStatusMenu() {
     setState(CONTROL_STATUS_STATE_NONE);

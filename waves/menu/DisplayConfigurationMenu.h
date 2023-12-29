@@ -10,8 +10,7 @@
 
 #pragma once
 
-#include <JuceHeader.h>
-#include "State.h"
+#include "waves/State.h"
 
 class State;
 
@@ -37,5 +36,5 @@ public:
 
 private:
     DisplayConfigurationMenuState state_;
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DisplayConfigurationMenu);
+    DISALLOW_COPY_AND_ASSIGN (DisplayConfigurationMenu);
 };

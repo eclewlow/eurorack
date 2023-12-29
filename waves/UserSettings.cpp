@@ -8,7 +8,7 @@
   ==============================================================================
 */
 
-#include "Globals.h"
+#include "waves/Globals.h"
 
 UserSettings::UserSettings() {
     app_start_time_ = system_clock.milliseconds();

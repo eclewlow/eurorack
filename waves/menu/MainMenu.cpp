@@ -8,9 +8,9 @@
  ==============================================================================
  */
 
-#include "Display.h"
-#include "graphics.h"
-#include "Globals.h"
+#include "waves/Display.h"
+#include "waves/graphics.h"
+#include "waves/Globals.h"
 
 MainMenu::MainMenu() {
     setState(MAIN_WAVE_DESIGN);

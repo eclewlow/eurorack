@@ -8,9 +8,9 @@
   ==============================================================================
 */
 
-#include "Display.h"
-#include "graphics.h"
-#include "Globals.h"
+#include "waves/Display.h"
+#include "waves/graphics.h"
+#include "waves/Globals.h"
 
 Oscilloscope::Oscilloscope() {
     setState(OSCILLOSCOPE_STATE_NONE);

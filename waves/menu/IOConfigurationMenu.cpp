@@ -8,9 +8,9 @@
   ==============================================================================
 */
 
-#include "Display.h"
-#include "graphics.h"
-#include "Globals.h"
+#include "waves/Display.h"
+#include "waves/graphics.h"
+#include "waves/Globals.h"
 
 IOConfigurationMenu::IOConfigurationMenu() {
     setState(IO_CONFIG_MENU_INPUT);

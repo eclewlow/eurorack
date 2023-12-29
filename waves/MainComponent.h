@@ -1,7 +1,6 @@
 #pragma once
 
-#include <JuceHeader.h>
-#include "Context.h"
+#include "waves/Context.h"
 //==============================================================================
 /*
     This component lives inside our window, and this is where you should put all
@@ -33,5 +32,5 @@ private:
     // Your private member variables go here...
     float phase = 0.0f;
     bool key_map[128];
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
+    DISALLOW_COPY_AND_ASSIGN (MainComponent)
 };

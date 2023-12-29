@@ -10,10 +10,9 @@
 
 #pragma once
 
-#include <JuceHeader.h>
-#include "State.h"
-#include "effect.h"
-#include "Engine.h"
+#include "waves/State.h"
+#include "waves/dsp/fx/effect.h"
+#include "waves/dsp/Engine.h"
 
 class Context {
 public:
@@ -43,5 +42,5 @@ public:
 private:
     State* _state;
     int8_t last_engine_;
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Context);
+    DISALLOW_COPY_AND_ASSIGN (Context);
 };

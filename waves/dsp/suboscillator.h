@@ -10,8 +10,8 @@
 
 #pragma once
 
-#include "effect.h"
-#include "Engine.h"
+#include "waves/dsp/fx/effect.h"
+#include "waves/dsp/Engine.h"
 
 class Suboscillator;
 
@@ -30,5 +30,5 @@ public:
     void FillWaveform(int16_t * waveform, uint16_t tune, uint16_t fx_amount, uint16_t fx, uint16_t morph, bool withFx);
     void triggerUpdate();
 private:
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Suboscillator);
+    DISALLOW_COPY_AND_ASSIGN (Suboscillator);
 };

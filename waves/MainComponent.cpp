@@ -1,7 +1,6 @@
-#include <JuceHeader.h>
-#include "MainComponent.h"
-#include "Display.h"
-#include "Globals.h"
+#include "waves/MainComponent.h"
+#include "waves/Display.h"
+#include "waves/Globals.h"
 
 //==============================================================================
 MainComponent::MainComponent()

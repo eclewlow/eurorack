@@ -8,8 +8,8 @@
   ==============================================================================
 */
 
-#include "Context.h"
-#include "Globals.h"
+#include "waves/Context.h"
+#include "waves/Globals.h"
 
 Context::Context() {_state = NULL;}
 Context::~Context() {}

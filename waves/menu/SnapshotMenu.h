@@ -10,8 +10,7 @@
 
 #pragma once
 
-#include <JuceHeader.h>
-#include "State.h"
+#include "waves/State.h"
 
 class State;
 
@@ -96,5 +95,5 @@ private:
     char confirm_lines_[3][20];
 
     
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SnapshotMenu);
+    DISALLOW_COPY_AND_ASSIGN (SnapshotMenu);
 };

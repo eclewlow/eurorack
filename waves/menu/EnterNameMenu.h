@@ -10,8 +10,7 @@
 
 #pragma once
 
-#include <JuceHeader.h>
-#include "State.h"
+#include "waves/State.h"
 
 class State;
 
@@ -42,5 +41,5 @@ private:
     bool ok_selected = false;
     void (*exec_func)(char* param);
     EnterNameMenuState currentState;
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EnterNameMenu);
+    DISALLOW_COPY_AND_ASSIGN (EnterNameMenu);
 };

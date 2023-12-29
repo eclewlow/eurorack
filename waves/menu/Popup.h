@@ -10,7 +10,6 @@
 
 #pragma once
 
-#include <JuceHeader.h>
 
 
 class Popup
@@ -30,5 +29,5 @@ private:
     int32_t timer_length_;
     char lines_[3][20];
     bool is_showing_;
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Popup);
+    DISALLOW_COPY_AND_ASSIGN (Popup);
 };

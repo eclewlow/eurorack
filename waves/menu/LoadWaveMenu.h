@@ -10,8 +10,7 @@
 
 #pragma once
 
-#include <JuceHeader.h>
-#include "State.h"
+#include "waves/State.h"
 
 class State;
 
@@ -50,5 +49,5 @@ private:
     uint32_t ticker_timer_ = 0;
     uint8_t ticker_ = 0;
     
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LoadWaveMenu);
+    DISALLOW_COPY_AND_ASSIGN (LoadWaveMenu);
 };

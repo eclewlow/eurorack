@@ -10,8 +10,7 @@
 
 #pragma once
 
-#include <JuceHeader.h>
-#include "State.h"
+#include "waves/State.h"
 
 class State;
 
@@ -42,5 +41,5 @@ private:
     uint32_t timer_;
     bool is_editing_;
     int8_t edit_state_;
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DrumMode);
+    DISALLOW_COPY_AND_ASSIGN (DrumMode);
 };

@@ -10,8 +10,7 @@
 
 #pragma once
 
-#include <JuceHeader.h>
-#include "State.h"
+#include "waves/State.h"
 
 class State;
 
@@ -38,5 +37,5 @@ private:
     uint16_t fx_amount_wavedata_[20];
     uint16_t fx_wavedata_[20];
     uint16_t morph_wavedata_[20];
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ControlStatusMenu);
+    DISALLOW_COPY_AND_ASSIGN (ControlStatusMenu);
 };

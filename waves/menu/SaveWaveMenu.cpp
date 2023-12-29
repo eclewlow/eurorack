@@ -8,9 +8,9 @@
   ==============================================================================
 */
 
-#include "Display.h"
-#include "graphics.h"
-#include "Globals.h"
+#include "waves/Display.h"
+#include "waves/graphics.h"
+#include "waves/Globals.h"
 
 SaveWaveMenu::SaveWaveMenu() {
     setState(SAVE_WAVE_MENU_SELECT_WAVETABLE);

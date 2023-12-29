@@ -82,5 +82,5 @@ protected:
 //    int8_t control_type_;
 //    Effect* effect_;
 private:
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EffectManager);
+    DISALLOW_COPY_AND_ASSIGN (EffectManager);
 };

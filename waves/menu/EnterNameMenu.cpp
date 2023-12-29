@@ -10,9 +10,9 @@
 
 #include "EnterNameMenu.h"
 
-#include "Display.h"
-#include "graphics.h"
-#include "Globals.h"
+#include "waves/Display.h"
+#include "waves/graphics.h"
+#include "waves/Globals.h"
 
 EnterNameMenu::EnterNameMenu() {
     char_index = 0;

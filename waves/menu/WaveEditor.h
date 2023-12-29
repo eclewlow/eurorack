@@ -10,9 +10,8 @@
 
 #pragma once
 
-#include <JuceHeader.h>
-#include "State.h"
-#include "fft.h"
+#include "waves/State.h"
+#include "waves/dsp/fft/fft.h"
 
 class State;
 
@@ -90,5 +89,5 @@ private:
     bool pen_drawing_;
     int16_t wavetable_;
     int16_t frame_;
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WaveEditor);
+    DISALLOW_COPY_AND_ASSIGN (WaveEditor);
 };

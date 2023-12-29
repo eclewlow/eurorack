@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "effect.h"
+#include "waves/dsp/fx/effect.h"
 
 class Engine
 {
@@ -43,5 +43,5 @@ protected:
     float carrier_fir_;
     bool started_ = false;
     
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Engine);
+    DISALLOW_COPY_AND_ASSIGN (Engine);
 };
