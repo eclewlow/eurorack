@@ -35,6 +35,11 @@
 #define EEPROM_CLOCK 			3
 #define EEPROM_MOSI 			4
 #define EEPROM_MISO 			5
+#define LCD_SS					6
+#define	LCD_CMD					7
+#define LCD_CLOCK				8
+#define LCD_MOSI				9
+#define LCD_RESET				10
 
 typedef struct {
     GPIO_TypeDef* gpio;
@@ -84,7 +89,7 @@ extern uint32_t _EREG_;
 FlagStateTypeDef GetFlag(uint32_t*, uint8_t);
 void SetFlag(uint32_t*, uint8_t, FlagStateTypeDef);
 
-extern EEPROM_PIN eeprom[6];
+extern EEPROM_PIN eeprom[11];
 
 extern int16_t dataBuffer[2048];
 extern int16_t double_waveframe_buffer_1[4096];
@@ -92,7 +97,8 @@ extern int16_t double_waveframe_buffer_2[4096];
 extern int16_t * front_buffer;
 extern int16_t * back_buffer;
 extern int16_t pump_buffer[4096];
-extern volatile uint8_t loading;
+extern uint8_t loading;
+extern uint8_t lcd_buffer[8][128];
 
 template <typename T> T CLAMP(T value, T low, T high)
 {

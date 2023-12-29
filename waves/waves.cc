@@ -28,34 +28,17 @@
 // #include <stdio.h>
 // #include <cstdlib>
 #include "math.h"
-// #include "waves/drivers/clock_inputs.h"
-// #include "waves/drivers/dac.h"
-// #include "waves/drivers/debug_pin.h"
-// #include "waves/drivers/debug_port.h"
-// #include "waves/drivers/gate_outputs.h"
-// #include "waves/drivers/rng.h"
+
+#include "stmlib/system/system_clock.h"
+
 #include "waves/drivers/system.h"
 #include "waves/drivers/adc.h"
-#include "stmlib/system/system_clock.h"
 #include "waves/drivers/audio_dac.h"
 #include "waves/drivers/flash.h"
+#include "waves/drivers/lcd.h"
 #include "waves/drivers/4x_downsampler.h"
 #include "waves/drivers/ParameterInterpolator.h"
-// #include "waves/drivers/uart_logger.h"
-// #include "waves/ramp/ramp_extractor.h"
-// #include "waves/random/random_generator.h"
-// #include "waves/random/random_stream.h"
-// #include "waves/random/t_generator.h"
-// #include "waves/random/x_y_generator.h"
-
-// #include "waves/clock_self_patching_detector.h"
-// #include "waves/cv_reader.h"
-// #include "waves/io_buffer.h"
-// #include "waves/note_filter.h"
-// #include "waves/resources.h"
-// #include "waves/scale_recorder.h"
-// #include "waves/settings.h"
-// #include "waves/ui.h"
+#include "waves/Globals.h"
 
 // #include "stmlib/dsp/dsp.h"
 // #include "stmlib/dsp/hysteresis_quantizer.h"
@@ -95,7 +78,7 @@ Adc adc;
 // Ui ui;
 // UartLogger logger;
 Flash flash;
-
+LCD lcd;
 // RandomGenerator random_generator;
 // RandomStream random_stream;
 // TGenerator t_generator;
@@ -277,7 +260,7 @@ void TIM1_UP_TIM10_IRQHandler(void) {
   // snprintf(value, 80, "buf=%04x, db=%08lx\n, %08lx", buffer[0], dataBuffer[0], flash.w25qxx.ID);
   // snprintf(value, 40, "f=%d\n", static_cast<int>(phase*100.0f));
   // sample += 1;
-  // _write(0, (char*)value, 80);
+  _write(0, (char*)value, 80);
 
 
       // GPIO_ResetBits(GPIOA, kPinFactorySS);
@@ -1038,6 +1021,7 @@ void Init() {
   // }
   adc.Init(false);
   flash.Init();
+  lcd.Init();
   // flash.InitMemory();
 
   
@@ -1046,7 +1030,10 @@ void Init() {
   audio_dac.Init(48000, kBlockSize);
   audio_dac.Start(&FillBuffer);
 
-
+  // lcd.Initial();
+  // lcd.Draw();
+  // lcd.DisplayOff();
+  // lcd.Draw();
   // logger.Init(9600);
   // dac.Start(&FillBuffer);
 }
@@ -1058,7 +1045,18 @@ int main(void) {
     if(fresh_start) {
       fresh_start = false;
       flash.W25qxx_Init();
+      lcd.Initial();
+      // lcd.DisplayOn();
     }
+    // lcd.HIGH(LCD_SS);
+    // lcd.HIGH(LCD_CMD);
+    system_clock.Delay(1000);
+    // lcd.Initial();
+    // lcd.Draw();
+    // lcd.LOW(LCD_SS);
+    // lcd.LOW(LCD_CMD);
+    system_clock.Delay(1000);
+
     // ui.DoEvents();
     // io_buffer.Process(ui.output_test_mode() ? &ProcessTest : &Process);
   }

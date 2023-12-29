@@ -12,13 +12,18 @@
 // GPIO_TypeDef* eeprom_ss_gpio = GPIOA;
 // uint16_t eeprom_ss_pin = GPIO_Pin_4;
 
-EEPROM_PIN eeprom[6] = {
+EEPROM_PIN eeprom[11] = {
 	{ GPIOA, GPIO_Pin_4 },
 	{ GPIOA, GPIO_Pin_3 },
 	{ GPIOA, GPIO_Pin_2 },
 	{ GPIOA, GPIO_Pin_5 },
 	{ GPIOA, GPIO_Pin_7 },
 	{ GPIOA, GPIO_Pin_6 },
+	{ GPIOA, GPIO_Pin_15 },
+   	{ GPIOB, GPIO_Pin_4 },
+	{ GPIOC, GPIO_Pin_10 },
+   	{ GPIOC, GPIO_Pin_12 },
+   	{ GPIOC, GPIO_Pin_11 },
 };
 
 int16_t dataBuffer[2048];
@@ -27,7 +32,9 @@ int16_t double_waveframe_buffer_2[4096];
 int16_t pump_buffer[4096];
 int16_t * front_buffer = double_waveframe_buffer_1;
 int16_t * back_buffer = double_waveframe_buffer_2;
-uint8_t volatile loading = 0;
+uint8_t loading = 0;
+
+uint8_t lcd_buffer[8][128];
 
 uint32_t _EREG_ = 0;
 

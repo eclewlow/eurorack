@@ -110,7 +110,7 @@ void Flash::Init() {
   // SPI RX
   dma_init.DMA_Channel = DMA_Channel_3;
   dma_init.DMA_PeripheralBaseAddr = (uint32_t)&(SPI1->DR);
-  dma_init.DMA_Memory0BaseAddr = (uint32_t)(&dataBuffer);
+  dma_init.DMA_Memory0BaseAddr = (uint32_t)(dataBuffer);
   dma_init.DMA_DIR = DMA_DIR_PeripheralToMemory;
   dma_init.DMA_BufferSize = 0;
   dma_init.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
@@ -136,7 +136,7 @@ void Flash::Init() {
   // SPI TX
   dma_init.DMA_Channel = DMA_Channel_3;
   dma_init.DMA_PeripheralBaseAddr = (uint32_t)&(SPI1->DR);
-  dma_init.DMA_Memory0BaseAddr = (uint32_t)(&dataBuffer);
+  dma_init.DMA_Memory0BaseAddr = (uint32_t)(dataBuffer);
   dma_init.DMA_DIR = DMA_DIR_MemoryToPeripheral;
   dma_init.DMA_BufferSize = 0;
   dma_init.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
@@ -157,56 +157,6 @@ void Flash::Init() {
 
   // Enable the IRQ.
   // NVIC_EnableIRQ(DMA2_Stream3_IRQn);
-
-  /*
-  // Initialize MOSI and SCK pins.
-  gpio_init.GPIO_Mode = GPIO_Mode_AF;
-  gpio_init.GPIO_OType = GPIO_OType_PP;
-  gpio_init.GPIO_Speed = GPIO_Speed_2MHz;
-  gpio_init.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  gpio_init.GPIO_Pin = GPIO_Pin_5;  
-  GPIO_Init(GPIOA, &gpio_init);
-
-  gpio_init.GPIO_Pin = GPIO_Pin_5;
-  GPIO_Init(GPIOB, &gpio_init);
-
-  gpio_init.GPIO_Pin = GPIO_Pin_4;
-  GPIO_Init(GPIOB, &gpio_init);
-
-  // GPIO_PinAFConfig(GPIOA, GPIO_PinSource4, GPIO_AF_SPI1);
-  GPIO_PinAFConfig(GPIOA, GPIO_PinSource5, GPIO_AF_SPI1);
-  GPIO_PinAFConfig(GPIOB, GPIO_PinSource4, GPIO_AF_SPI1);
-  GPIO_PinAFConfig(GPIOB, GPIO_PinSource5, GPIO_AF_SPI1);
-  
-  // Initialize SPI.
-  SPI_InitTypeDef spi_init;
-  spi_init.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
-  spi_init.SPI_Mode = SPI_Mode_Master;
-  spi_init.SPI_DataSize = SPI_DataSize_8b;
-  // spi_init.SPI_CPOL = SPI_CPOL_Low;
-  spi_init.SPI_CPOL = SPI_CPOL_High;
-  spi_init.SPI_CPHA = SPI_CPHA_1Edge;
-  // spi_init.SPI_CPHA = SPI_CPHA_2Edge;
-  spi_init.SPI_NSS = SPI_NSS_Soft;
-  spi_init.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_16;
-  spi_init.SPI_FirstBit = SPI_FirstBit_MSB;
-  spi_init.SPI_CRCPolynomial = 7;
-  SPI_Init(SPI1, &spi_init);
-
-  GPIOA->BSRRL = GPIO_Pin_4;
-
-  SPI_Cmd(SPI1, ENABLE);
-
-//*/
-  
-  // GPIO_SetBits(GPIOA, kPinUserSS);
-  // GPIO_SetBits(GPIOA, kPinPersistentSS);
-
-  // GPIOA->BSRR = GPIO_Pin_15;
-  // GPIOA->BRR = GPIO_Pin_15;
-  // SPI3->DR = 0x090a;
-  // Wait<64>();
-  // SPI3->DR = 0x0000;
 }
 
 void Flash::StartDMARead(uint16_t __bytes) {

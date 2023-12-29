@@ -10586,12 +10586,12 @@ Source: &lt;a href="https://www.ckswitches.com/media/1341/d6.pdf"&gt; Datasheet 
 <instance part="+3V7" gate="G$1" x="289.56" y="213.36" smashed="yes" rot="R270">
 <attribute name="VALUE" x="289.56" y="213.36" size="1.778" layer="96"/>
 </instance>
-<instance part="C17" gate="G$1" x="302.26" y="203.2" smashed="yes">
-<attribute name="NAME" x="303.784" y="206.121" size="1.778" layer="95" font="vector"/>
-<attribute name="VALUE" x="303.784" y="201.041" size="1.778" layer="96" font="vector"/>
+<instance part="C17" gate="G$1" x="302.26" y="200.66" smashed="yes">
+<attribute name="NAME" x="303.784" y="203.581" size="1.778" layer="95" font="vector"/>
+<attribute name="VALUE" x="303.784" y="198.501" size="1.778" layer="96" font="vector"/>
 </instance>
-<instance part="GND25" gate="1" x="302.26" y="195.58" smashed="yes">
-<attribute name="VALUE" x="302.26" y="195.326" size="1.778" layer="96" align="top-center"/>
+<instance part="GND25" gate="1" x="302.26" y="193.04" smashed="yes">
+<attribute name="VALUE" x="302.26" y="192.786" size="1.778" layer="96" align="top-center"/>
 </instance>
 <instance part="C16" gate="G$1" x="289.56" y="187.96" smashed="yes">
 <attribute name="NAME" x="291.084" y="190.881" size="1.778" layer="95" font="vector"/>
@@ -10993,7 +10993,7 @@ Source: &lt;a href="https://www.ckswitches.com/media/1341/d6.pdf"&gt; Datasheet 
 <segment>
 <pinref part="C17" gate="G$1" pin="2"/>
 <pinref part="GND25" gate="1" pin="GND"/>
-<wire x1="302.26" y1="198.12" x2="302.26" y2="200.66" width="0.1524" layer="91"/>
+<wire x1="302.26" y1="195.58" x2="302.26" y2="198.12" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <pinref part="R3" gate="G$1" pin="A"/>
@@ -11570,14 +11570,6 @@ Source: &lt;a href="https://www.ckswitches.com/media/1341/d6.pdf"&gt; Datasheet 
 <label x="284.48" y="149.86" size="1.778" layer="95"/>
 </segment>
 </net>
-<net name="N$3" class="0">
-<segment>
-<pinref part="J8" gate="G$1" pin="4"/>
-<wire x1="281.94" y1="210.82" x2="302.26" y2="210.82" width="0.1524" layer="91"/>
-<wire x1="302.26" y1="210.82" x2="302.26" y2="208.28" width="0.1524" layer="91"/>
-<pinref part="C17" gate="G$1" pin="1"/>
-</segment>
-</net>
 <net name="N$12" class="0">
 <segment>
 <pinref part="J8" gate="G$1" pin="13"/>
@@ -11920,6 +11912,14 @@ Source: &lt;a href="https://www.ckswitches.com/media/1341/d6.pdf"&gt; Datasheet 
 <pinref part="IC2" gate="G$$1" pin="PC7/I2S3_MCK"/>
 <wire x1="208.28" y1="170.18" x2="210.82" y2="170.18" width="0.1524" layer="91"/>
 <label x="210.82" y="170.18" size="1.778" layer="95"/>
+</segment>
+</net>
+<net name="N$3" class="0">
+<segment>
+<pinref part="J8" gate="G$1" pin="5"/>
+<wire x1="281.94" y1="208.28" x2="302.26" y2="208.28" width="0.1524" layer="91"/>
+<pinref part="C17" gate="G$1" pin="1"/>
+<wire x1="302.26" y1="208.28" x2="302.26" y2="205.74" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>

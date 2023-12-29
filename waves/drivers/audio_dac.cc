@@ -57,10 +57,10 @@ void AudioDac::InitializeGPIO() {
   gpio_init.GPIO_Pin = GPIO_Pin_12 | GPIO_Pin_15;
   GPIO_Init(GPIOB, &gpio_init);
 
-  gpio_init.GPIO_Pin = GPIO_Pin_13;
   gpio_init.GPIO_OType = GPIO_OType_PP;
   gpio_init.GPIO_Speed = GPIO_Speed_2MHz;
   gpio_init.GPIO_PuPd = GPIO_PuPd_NOPULL;
+  gpio_init.GPIO_Pin = GPIO_Pin_13;
   GPIO_Init(GPIOB, &gpio_init);
 
   GPIO_PinAFConfig(GPIOB, GPIO_PinSource12, GPIO_AF_SPI2);
