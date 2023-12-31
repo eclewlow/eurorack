@@ -39,10 +39,17 @@ UPLOAD_COMMAND  = upload_combo_jtag_erase_first
 # Packages to build
 TARGET         = waves
 PACKAGES       = waves \
+		waves/dsp \
+		waves/dsp/fx \
+		waves/dsp/fft \
+		waves/dsp/downsampler \
+		waves/dsp/quantizer \
 		waves/drivers \
 		stmlib/dsp \
 		stmlib/utils \
 		stmlib/system
+#		waves/menu
+
 RESOURCES      = waves/resources
 
 TOOLCHAIN_PATH ?= /usr/local/arm-4.8.3/

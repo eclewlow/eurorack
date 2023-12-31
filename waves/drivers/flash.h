@@ -31,7 +31,7 @@
 #define WAVES_DRIVERS_FLASH_H_
 
 #include "stmlib/stmlib.h"
-#include "waves/drivers/globals.h"
+#include "waves/Globals.h"
 #include "waves/drivers/wavetables.h"
 #include "stmlib/system/system_clock.h"
 

@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include "stdint.h"
+
 class Effect {
 public:
     Effect() {
@@ -28,5 +30,7 @@ protected:
     float phase;
     float oscilloscopePhase;
 private:
-    DISALLOW_COPY_AND_ASSIGN (Effect);
+    // Effect(const Effect&);
+    // Effect& operator=(Effect const&);
+    // DISALLOW_COPY_AND_ASSIGN (Effect);
 };

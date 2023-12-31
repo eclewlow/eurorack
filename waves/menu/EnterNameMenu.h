@@ -28,7 +28,7 @@ public:
     void triggerUpdate(bool back_pressed);
     inline void setState(EnterNameMenuState newState) { currentState = newState; }
     inline void setExecFunc(void (* func)(char* param)) { exec_func = func; }
-    inline void setNameChars(const char* name) { strncpy(name_chars, name, 9); name_index = std::clamp<int>(strlen(name), 0, 8-1); }
+    inline void setNameChars(const char* name) { strncpy(name_chars, name, 9); name_index = CLAMP<int>(strlen(name), 0, 8-1); }
     
 private:
     int num_of_chars = 41;

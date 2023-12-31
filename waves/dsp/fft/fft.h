@@ -28,5 +28,8 @@ public:
     static void fft(COMPLEX_NUMBER * input, int size, COMPLEX_NUMBER * output);
     static void ifft(COMPLEX_NUMBER * input, int size, COMPLEX_NUMBER * output);
 private:
-    DISALLOW_COPY_AND_ASSIGN (FFT);
+    FFT(const FFT&);
+    FFT& operator=(FFT const&);
+
+    // DISALLOW_COPY_AND_ASSIGN (FFT);
 };

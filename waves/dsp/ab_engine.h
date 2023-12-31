@@ -28,7 +28,6 @@ public:
     float GetSample(int16_t wavetable, int16_t frame, float phase, bool isLeft);
     float GetSampleBetweenFrames(float phase, float morph);
 //    void SetX(float newX);
-    bool handleKeyPress(const juce::KeyPress &key);
     void FillWaveform(int16_t * waveform, uint16_t tune, uint16_t fx_amount, uint16_t fx, uint16_t morph, bool withFx);
     void FillWaveform(int16_t * waveform, int16_t wavetable, int16_t frame);
     float GetSample(float phase);

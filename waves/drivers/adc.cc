@@ -31,11 +31,15 @@
 #include <stm32f4xx_conf.h>
 
 namespace waves {
-  
+
+/* extern */
+Adc adc;
+
 void Adc::Init(bool single_channel) {
   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA2, ENABLE);
   // RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
   // RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
+  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE);
   // RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC2, ENABLE);
@@ -53,10 +57,10 @@ void Adc::Init(bool single_channel) {
   // GPIO_Init(GPIOA, &gpio_init);
 
   // Initialize B0..B1 (ADC8..ADC9)
-  // gpio_init.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1;
-  // gpio_init.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  // gpio_init.GPIO_Mode = GPIO_Mode_AN;
-  // GPIO_Init(GPIOB, &gpio_init);
+  gpio_init.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1;
+  gpio_init.GPIO_PuPd = GPIO_PuPd_NOPULL;
+  gpio_init.GPIO_Mode = GPIO_Mode_AN;
+  GPIO_Init(GPIOB, &gpio_init);
 
   // Initialize C0..C5 (ADC10..ADC11)
   gpio_init.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3;
@@ -70,7 +74,7 @@ void Adc::Init(bool single_channel) {
   dma_init.DMA_PeripheralBaseAddr = (uint32_t)&ADC1->DR;
   dma_init.DMA_Memory0BaseAddr = (uint32_t)&values_[0];
   dma_init.DMA_DIR = DMA_DIR_PeripheralToMemory;
-  dma_init.DMA_BufferSize = 6;
+  dma_init.DMA_BufferSize = 8;
   dma_init.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
   dma_init.DMA_MemoryInc = DMA_MemoryInc_Enable; 
   dma_init.DMA_PeripheralDataSize = DMA_PeripheralDataSize_HalfWord;
@@ -102,17 +106,19 @@ void Adc::Init(bool single_channel) {
   adc_init.ADC_ExternalTrigConv = ADC_ExternalTrigConv_T1_CC1;
   adc_init.ADC_ExternalTrigConvEdge = ADC_ExternalTrigConvEdge_None;
   adc_init.ADC_DataAlign = ADC_DataAlign_Left;
-  adc_init.ADC_NbrOfConversion = 6;
+  adc_init.ADC_NbrOfConversion = 8;
   ADC_Init(ADC1, &adc_init);
   // ADC_Init(ADC2, &adc_init);
   
   // 168M / 2 / 8 / (8 x (144 + 20)) = 8.001kHz.
-    ADC_RegularChannelConfig(ADC1, ADC_Channel_10, 1, ADC_SampleTime_144Cycles);
-    ADC_RegularChannelConfig(ADC1, ADC_Channel_11, 2, ADC_SampleTime_144Cycles); 
-    ADC_RegularChannelConfig(ADC1, ADC_Channel_12, 3, ADC_SampleTime_144Cycles); 
-    ADC_RegularChannelConfig(ADC1, ADC_Channel_13, 4, ADC_SampleTime_144Cycles); 
-    ADC_RegularChannelConfig(ADC1, ADC_Channel_14, 5, ADC_SampleTime_144Cycles); 
-    ADC_RegularChannelConfig(ADC1, ADC_Channel_15, 6, ADC_SampleTime_144Cycles); 
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_8,  1, ADC_SampleTime_144Cycles);
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_9,  2, ADC_SampleTime_144Cycles);
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_10, 3, ADC_SampleTime_144Cycles);
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_11, 4, ADC_SampleTime_144Cycles); 
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_12, 5, ADC_SampleTime_144Cycles); 
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_13, 6, ADC_SampleTime_144Cycles); 
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_14, 7, ADC_SampleTime_144Cycles); 
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_15, 8, ADC_SampleTime_144Cycles); 
   //   ADC_RegularChannelConfig(ADC1, ADC_Channel_11, 7, ADC_SampleTime_144Cycles);
   //   ADC_RegularChannelConfig(ADC1, ADC_Channel_8, 8, ADC_SampleTime_144Cycles); 
   // }

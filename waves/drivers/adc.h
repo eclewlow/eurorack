@@ -34,7 +34,7 @@
 
 namespace waves {
 
-const uint8_t kNumAdcChannels = 6;
+const uint8_t kNumAdcChannels = 8;
 const uint8_t kHistoryLength = 64;
 const uint16_t kThreshold = 70;
 
@@ -43,6 +43,17 @@ class Adc {
   Adc() { }
   ~Adc() { }
   
+  enum Adc_Channel {
+      ADC_CHANNEL_PITCH_POT        = 0,
+      ADC_CHANNEL_FX_AMOUNT_POT    = 1,
+      ADC_CHANNEL_FX_POT           = 2,
+      ADC_CHANNEL_MORPH_POT        = 3,
+      ADC_CHANNEL_PITCH_CV         = 4,
+      ADC_CHANNEL_FX_AMOUNT_CV     = 5,
+      ADC_CHANNEL_FX_CV            = 6,
+      ADC_CHANNEL_MORPH_CV         = 7,
+  };
+
   void Init(bool single_channel);
   void DeInit();
   void Convert();
@@ -50,6 +61,37 @@ class Adc {
   inline float float_value(int channel) {
     return static_cast<float>(value(channel)) / 65536.0f;
   }
+
+  inline uint16_t getChannel(int channel) {
+
+    // apply hysteresis
+    if (abs(static_cast<int>(values_[channel]) - static_cast<int>(pre_hysteresis[channel])) < kThreshold) {
+      history[channel][history_index[channel]] = pre_hysteresis[channel];
+    } else {
+      history[channel][history_index[channel]] = values_[channel];
+      pre_hysteresis[channel] = values_[channel];
+    }
+
+    // history[channel][history_index[channel]] = values_[channel];
+
+    history_index[channel] = (history_index[channel] + 1) % kHistoryLength;
+    uint32_t sum = 0;
+    for (uint8_t i = 0; i < kHistoryLength; i++) {
+      sum += history[channel][i];
+    }
+    uint16_t average = sum / kHistoryLength;
+
+    // apply hysteresis
+    if (abs(static_cast<int>(average) - static_cast<int>(post_hysteresis[channel])) < kThreshold) {
+      average = post_hysteresis[channel];
+    } else {
+      post_hysteresis[channel] = average;
+    }
+
+    return average;
+    // return values_[channel];
+  }
+
   inline uint16_t value(int channel) {
 
     // apply hysteresis
@@ -93,6 +135,9 @@ class Adc {
   
   DISALLOW_COPY_AND_ASSIGN(Adc);
 };
+
+extern Adc adc;
+
 
 }  // namespace waves
 

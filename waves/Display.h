@@ -15,6 +15,7 @@
 #include "waves/fnt05x05.h"
 #include "waves/fnt03x05.h"
 #include "waves/graphics.h"
+#include "stdint.h"
 //==============================================================================
 /*
  This component lives inside our window, and this is where you should put all
@@ -23,42 +24,12 @@
 class Display
 {
 public:
-    static uint8_t framebuffer[8][128];
-
     //==============================================================================
-    Display();
-////        menu = Menu();
-//        clear_screen();
-////        Put_Pixel(10,10,1);
-////        Put_Pixel(20,20,1);
-////        Put_Pixel(30,30,1);
-////        Put_Pixel(40,40,1);
-////        LCD_Line(128/3, 60, 128, 64, 1);
-//        if(false) {
-//            put_string_5x5(0 + 1 + 1,
-//                           0 + 1 + 1,
-//                           16,
-//                           "ABCDEFGHIJKLMNOP");
-//            put_string_5x5(0 + 1 + 1,
-//                           27 + 1 + 1,
-//                           16,
-//                           "QRSTUVWXYZ012345", true);
-//            put_string_5x5(0 + 1 + 1,
-//                           34 + 1 + 1,
-//                           9,
-//                           "6789_-/.:");
-//        }
-//        put_image_22x23(10, 10, Graphic_main_menu_ab);
-//        put_string_5x5(0 + 1 + 1,
-//                       40 + 1 + 1,
-//                       16,
-//                       "ABCDEFGHIJKLMNOP");
-//        invert_rectangle(10, 10, 40, 40);
-//    }
-        ~Display();
+    Display() {};
+    ~Display() {};
     
     //==============================================================================
-    static void paint(juce::Graphics& g);
+    // static void paint(juce::Graphics& g);
     static void clear_screen();
     static void Put_Pixel(uint8_t x, uint8_t y, uint8_t set, bool toggle=false);
     static void Draw_Wave(uint8_t x, uint8_t y, uint8_t width, uint8_t height, int16_t* waveform_data, bool shade=false);
@@ -70,15 +41,7 @@ public:
                          uint8_t set, bool toggle=false);
     static void LCD_DottedLine(uint8_t x0, uint8_t y0,
                   uint8_t x1, uint8_t y1, int16_t dash_width, int16_t gap_width,
-                         uint8_t set);
-    typedef union
-      {
-      uint8_t
-        as_bytes[2];
-      uint16_t
-        as_word;
-      }WORD_UNION;
-    
+                         uint8_t set);    
     static void put_string(uint8_t x, uint8_t y, uint8_t Field_Width, const char *input);
     static void put_string_3x5(uint8_t x, int8_t y, uint8_t Field_Width, const char *input, bool inverted=false);
     static void put_string_5x5(uint8_t x, int8_t y, uint8_t Field_Width, const char *input, bool inverted=false);
@@ -95,6 +58,14 @@ public:
     typedef union
       {
       uint8_t
+        as_bytes[2];
+      uint16_t
+        as_word;
+      }WORD_UNION;
+
+    typedef union
+      {
+      uint8_t
         as_bytes[4];
       uint32_t
         as_word;
@@ -104,8 +75,9 @@ public:
     static void put_image_22x23(uint8_t x, uint8_t y, const uint8_t image[3][23]);
 
 private:
-    //==============================================================================
-    // Your private member variables go here...
-    
-    DISALLOW_COPY_AND_ASSIGN (Display)
+    static uint8_t framebuffer[8][128];
+
+    Display(const Display&);
+    Display& operator=(Display const&);
+    // DISALLOW_COPY_AND_ASSIGN (Display);
 };

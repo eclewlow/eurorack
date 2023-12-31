@@ -13,6 +13,7 @@
 #include "waves/State.h"
 #include "waves/dsp/fx/effect.h"
 #include "waves/dsp/Engine.h"
+#include "stdint.h"
 
 class Context {
 public:
@@ -37,10 +38,13 @@ public:
     bool handleKeyPress(int key);
     bool handleKeyLongPress(int key);
     bool handleKeyRelease(int key);
-    void paint(juce::Graphics& g);
+    void paint();
 
 private:
     State* _state;
     int8_t last_engine_;
-    DISALLOW_COPY_AND_ASSIGN (Context);
+
+    Context(const Context&);
+    Context& operator=(Context const&);
+    // DISALLOW_COPY_AND_ASSIGN (Context);
 };

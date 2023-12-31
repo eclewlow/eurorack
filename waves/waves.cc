@@ -38,6 +38,7 @@
 #include "waves/drivers/lcd.h"
 #include "waves/drivers/4x_downsampler.h"
 #include "waves/drivers/ParameterInterpolator.h"
+#include "waves/defines.h"
 #include "waves/Globals.h"
 
 // #include "stmlib/dsp/dsp.h"
@@ -60,8 +61,6 @@ const size_t kMaxBlockSize = 24;
 const size_t kBlockSize = 12;
 
 AudioDac audio_dac;
-
-Adc adc;
 
 // ClockInputs clock_inputs;
 // ClockSelfPatchingDetector self_patching_detector[kNumGateOutputs];
@@ -342,329 +341,114 @@ float swap_counter = 0.0f;
 float swap_increment = 1.0f / 10000.0f;
 
 void FillBuffer(AudioDac::Frame* output, size_t size) {
-// #ifdef PROFILE_INTERRUPT
-//   TIC
-// #endif  // PROFILE_INTERRUPT
 
-//   IWDG_ReloadCounter();
-  
-//   ui.Poll();
   float phase_increment = (110.0f / 4.0f) / 47992.0f;
-//   if (test_adc_noise) {
-//     static float note_lp = 0.0f;
-//     float note = modulations.note;
-//     ONE_POLE(note_lp, note, 0.0001f);
-//     float cents = (note - note_lp) * 100.0f;
-//     CONSTRAIN(cents, -8.0f, +8.0f);
-//     while (size--) {
-//       output->r = output->l = static_cast<int16_t>(cents * 4040.0f);
-//       ++output;
-//     }
-//   } else if (ui.test_mode()) {
-//     // 100 Hz ascending and descending ramps.
-    Downsampler carrier_downsampler(&carrier_fir_);
 
-    /*
-  168 mhz
-    48000
-    3500 instructions per frame
+  Downsampler carrier_downsampler(&carrier_fir_);
 
-    */
+  float morphTarget = adc.float_value(0);
 
-    float morphTarget = adc.float_value(0);
+  ParameterInterpolator morph_interpolator(&morph_, morphTarget, size);
 
-    ParameterInterpolator morph_interpolator(&morph_, morphTarget, size);
+  bool swap = false;
 
-    bool swap = false;
+  if(GetFlag(&_EREG_, _RXNE_)) {
+    // swap buffers
+    // do transition this half
+    swap = true;
+  }
 
-    if(GetFlag(&_EREG_, _RXNE_)) {
-      // swap buffers
-      // do transition this half
-      swap = true;
-    }
-    // swap = false;
+  while (size--) {
+    float interpolated_morph = morph_interpolator.Next();
+    interpolated_morph = CLAMP<float>(interpolated_morph, 0.0, 0.9999f);
 
-    while (size--) {
+    float frame = interpolated_morph * 15.0f;
+    uint16_t frame_integral = floor(frame);
+    float frame_fractional = frame - frame_integral;
 
-      // if(1) {//counter < 20) {
-      //   output->l = 0;
-      //   output->r = 0;
-      //   ++output;
-      //   return;
-      // }
-      // float sample = sinf(2 * M_PI * phase);
-      // float test = 0;//sinf(2 * M_PI * phase);
+    float sample = 0;
+    for (size_t j = 0; j < kOversampling; ++j) {
 
-      // sample += 0.0f;
-      // int16_t shortsample = static_cast<int16_t>(32767.0f * sample);
-      // shortsample = 0xffff;
-      // if(phase < 0.5)
-        // shortsample = 0x0000;
+        float index = phase * 2048.0;
+        uint16_t integral = floor(index);
+        float fractional = index - integral;
+        uint16_t nextIntegral = (integral + 1) % 2048;
 
-      // output->l = shortsample;
-      // output->r = shortsample;
-      // ++output;
+        if(!swap) {
+          int16_t sample1 = 0;
+          int16_t sample2 = 0;
 
-      // +/- 2.74V, 2.69, 2.79, 2.84 , 2.54 fluctuates
+          int16_t * buf = front_buffer;
+          sample1 = buf[integral] + (buf[nextIntegral] - buf[integral]) * fractional;
+          sample2 = buf[2048 + integral] + (buf[2048 + nextIntegral] - buf[2048 + integral]) * fractional;
 
-      // takes 480 to increment once.
-      // if rate is 48000, it can output 100hz
+          if(frame_integral > current_frame_)
+            sample = sample2;
+          else if(frame_integral < current_frame_)
+            sample = sample1;
+          else
+            sample = sample1 * (1.0f - frame_fractional) + sample2 * frame_fractional;
+        }
+        else {
+          int16_t sample1 = 0;
+          int16_t sample2 = 0;
 
-      // float morph = 0;//adc.float_value(0);
-      // float interpolated16 = flash.LoadWaveSample(0, morph, phase);
+          int16_t * buf = front_buffer;
+          sample1 = buf[integral] + (buf[nextIntegral] - buf[integral]) * fractional;
+          sample2 = buf[2048 + integral] + (buf[2048 + nextIntegral] - buf[2048 + integral]) * fractional;
 
-      // frame = 0 to 15, morph between two frames
+          if(target_frame_ > current_frame_)
+            sample1 = sample2;
+          else if(current_frame_ > target_frame_)
+            sample1 = sample1;
+          else
+            sample1 = sample1 * (1.0f - frame_fractional) + sample2 * frame_fractional;
 
-      // float frame = 0;//adc.float_value(0) * 15.0f;
-      // uint16_t frame_integral = floor(frame);
-      // float frame_fractional = frame - frame_integral;      
-      // uint16_t next_frame_integral = (frame_integral + 1) % 16;
+          int16_t sample3 = 0;
+          int16_t sample4 = 0;
 
-    // float index = phase * 4096.0;
-    // uint16_t integral = static_cast<uint16_t>(index) & ~0x1;
-    // float fractional = index - integral;
-    
-    // uint16_t nextIntegral = (integral + 1) % 2048;
-    
-    // int16_t sample2 = 0;
-    // int16_t samples[32];
+          buf = back_buffer;
+          sample3 = buf[integral] + (buf[nextIntegral] - buf[integral]) * fractional;
+          sample4 = buf[2048 + integral] + (buf[2048 + nextIntegral] - buf[2048 + integral]) * fractional;
 
-    /*
-      one read is:
-          write - 8*5*(4 + 4 + 1 + 1) = 400
-          read - 2 * 8 * (2 + 1 + 4 + 4) = 176
-    */
-    // flash.Read66Mhz((uint8_t *)&sample1, 2, integral, EEPROM_FACTORY_SS);
-    // sample1 = 0;
-    // flash.Read66Mhz((uint8_t *)&sample1, 2, integral, EEPROM_FACTORY_SS);
-    // flash.Read66Mhz((uint8_t *)&sample1, 2, integral, EEPROM_FACTORY_SS);
-    // flash.Read66Mhz((uint8_t *)&sample1, 2, integral, EEPROM_FACTORY_SS);
-    // flash.Read66Mhz((uint8_t *)samples, 64, 0, EEPROM_FACTORY_SS);
+          sample3 = sample3 * (1.0f - frame_fractional) + sample4 * frame_fractional;
 
-    // flash.Read66Mhz((uint8_t *)&sample1, 2, index, EEPROM_FACTORY_SS);
-    // flash.Read66Mhz((uint8_t *)&sample1, 2, index, EEPROM_FACTORY_SS);
+          sample = sample1 * (1.0f - swap_counter) + sample3 * swap_counter;
+        }
 
-    // flash.Read66Mhz((uint8_t *)&sample1, 2, 4096 * frame_integral + integral * 2, EEPROM_FACTORY_SS);
-    // flash.Read66Mhz((uint8_t *)&sample1, 2, 4096 * frame + nextIntegral * 2, EEPROM_FACTORY_SS);
-
-    // flash.Read66Mhz((uint8_t *)&sample2, 2, 4096 * next_frame_integral + integral * 2, EEPROM_FACTORY_SS);
-    // flash.Read66Mhz((uint8_t *)&sample2, 2, 4096 * frame + nextIntegral * 2, EEPROM_FACTORY_SS);
-
-      // sample1 = sample1 * (1.0f - frame_fractional) + sample2 * frame_fractional;
-      // sample = sample1;
-
-    // index += 0;
-    // integral += 0;
-    // nextIntegral += 0;
-    // fractional += 0;
-    // sample1 += 0;
-    // sample2 += 0;
-
-      float interpolated_morph = morph_interpolator.Next();
-      interpolated_morph = CLAMP<float>(interpolated_morph, 0.0, 0.9999f);
-
-      float sample = 0;
-      for (size_t j = 0; j < kOversampling; ++j) {
-          
-          float frame = interpolated_morph * 15.0f;
-          uint16_t frame_integral = floor(frame);
-          float frame_fractional = frame - frame_integral;
-          // frame_fractional = 0.0f;
-          // uint16_t next_frame_integral = (frame_integral + 1) % 16;
-
-          float index = phase * 2048.0;
-          uint16_t integral = floor(index);
-          float fractional = index - integral;
-          uint16_t nextIntegral = (integral + 1) % 2048;
-          // swap = false;
-
-          if(!swap) {
-            int16_t sample1 = 0;
-            int16_t sample2 = 0;
-
-            int16_t * buf = front_buffer;
-            sample1 = buf[integral] + (buf[nextIntegral] - buf[integral]) * fractional;
-            sample2 = buf[2048 + integral] + (buf[2048 + nextIntegral] - buf[2048 + integral]) * fractional;
-
-            if(frame_integral > current_frame_)
-              sample = sample2;
-            else if(frame_integral < current_frame_)
-              sample = sample1;
-            else
-              sample = sample1 * (1.0f - frame_fractional) + sample2 * frame_fractional;
-          }
-          else {
-            int16_t sample1 = 0;
-            int16_t sample2 = 0;
-
-            int16_t * buf = front_buffer;
-            sample1 = buf[integral] + (buf[nextIntegral] - buf[integral]) * fractional;
-            sample2 = buf[2048 + integral] + (buf[2048 + nextIntegral] - buf[2048 + integral]) * fractional;
-
-            /*
-
-            0 to 2.  0... morph ... 2.0 front buffer.. morph is from 0 to 1.0.
-            when morph approaches 1.0, a new frame is loaded.
-
-            */
-            if(target_frame_ > current_frame_)
-              sample1 = sample2;
-            else if(current_frame_ > target_frame_)
-              sample1 = sample1;
-            else
-              sample1 = sample1 * (1.0f - frame_fractional) + sample2 * frame_fractional;
-
-            int16_t sample3 = 0;
-            int16_t sample4 = 0;
-
-            buf = back_buffer;
-            sample3 = buf[integral] + (buf[nextIntegral] - buf[integral]) * fractional;
-            sample4 = buf[2048 + integral] + (buf[2048 + nextIntegral] - buf[2048 + integral]) * fractional;
-
-            // if(frame_integral > target_frame_)
-            //   sample3 = sample4;
-            // else if(frame_integral < target_frame_)
-            //   sample3 = sample3;
-            // else
-              sample3 = sample3 * (1.0f - frame_fractional) + sample4 * frame_fractional;
-            // sample3 += 0;
-            // sample4 += 0;
-            sample = sample1 * (1.0f - swap_counter) + sample3 * swap_counter;
-            // sample = sample1;
-            // sample = sample1;
-          }
-
-          phase += phase_increment;
-          
-          if(phase >= 1.0f)
-              phase -= 1.0f;
-          
-          if(swap) {
-            swap_counter += swap_increment;
-            if(swap_counter >= 1.0f) {
-              swap = false;
-              if(front_buffer == double_waveframe_buffer_1) {
-                front_buffer = double_waveframe_buffer_2;
-                back_buffer = double_waveframe_buffer_1;
-              } else {
-                front_buffer = double_waveframe_buffer_1;
-                back_buffer = double_waveframe_buffer_2;      
-              }
-              current_frame_ = target_frame_;
-              swap_counter = 0.0f;
-
-              SetFlag(&_EREG_, _RXNE_, FLAG_CLEAR);
-              SetFlag(&_EREG_, _BUSY_, FLAG_CLEAR);
+        phase += phase_increment;
+        
+        if(phase >= 1.0f)
+            phase -= 1.0f;
+        
+        if(swap) {
+          swap_counter += swap_increment;
+          if(swap_counter >= 1.0f) {
+            swap = false;
+            if(front_buffer == double_waveframe_buffer_1) {
+              front_buffer = double_waveframe_buffer_2;
+              back_buffer = double_waveframe_buffer_1;
+            } else {
+              front_buffer = double_waveframe_buffer_1;
+              back_buffer = double_waveframe_buffer_2;      
             }
+            current_frame_ = target_frame_;
+            swap_counter = 0.0f;
+
+            SetFlag(&_EREG_, _RXNE_, FLAG_CLEAR);
+            SetFlag(&_EREG_, _BUSY_, FLAG_CLEAR);
           }
+        }
 
 
-          carrier_downsampler.Accumulate(j, sample / 32768.0f);
-      }
-      
-      sample = carrier_downsampler.Read();
-      
-
-      // int16_t sample1 = 0;
-      // uint8_t sample2[2];
-      // int16_t sample2 = 0;
-      // int16_t sample3 = 0;
-      // interpolated16 = flash.LoadWaveSample(0, morph, phase);
-      // interpolated16 = flash.LoadWaveSample(0, morph, phase);
-      // interpolated16 = flash.LoadWaveSample(0, morph, phase);
-      // interpolated16 = flash.LoadWaveSample(0, morph, phase);
-      // interpolated16 = flash.LoadWaveSample(0, morph, phase);
-
-      // flash.ReadStatusRegister(EEPROM_FACTORY_SS);
-
-      // flash.Read66Mhz((uint8_t *)&sample1, 2, integral * 2, EEPROM_FACTORY_SS);
-      // flash.Read66Mhz((uint8_t *)&sample2, 2, nextIntegral * 2, EEPROM_FACTORY_SS);
-
-      // sample1 = sample1 + (sample2 - sample1) * fractional;
-      // for(uint32_t i = 0; i < 128; i++) {
-      // flash.HIGH(GPIOA, GPIO_Pin_11);
-      // flash.LOW(GPIOA, GPIO_Pin_11);
-      // }
-
-      // uint32_t address = integral * 2;
-      // flash.LOW(EEPROM_FACTORY_SS);
-      // flash.Wait<200>();
-      // uint8_t buf[5];
-      // buf[0] = READ_66MHZ;
-      // buf[1] = ((address >> 16) & 0xFF);
-      // buf[2] = ((address >> 8) & 0xFF);
-      // buf[3] = ((address) & 0xFF);
-      // buf[4] = 0x00;
-
-      // buf[4] += 0;
-      // flash.HIGH(EEPROM_FACTORY_SS);
-      // flash.LOW(EEPROM_MOSI);
-      // flash.HIGH(EEPROM_MOSI);
-
-      // for(uint32_t i = 0; i < 10; i++) {
-
-      //     uint8_t bsize = 8;
-
-      //     while(bsize) {
-      //         // bool set = (buf[i] >> (bsize - 1)) & 0x1;
-      //         // if(set)
-      //             // flash.HIGH(EEPROM_FACTORY_SS);
-      //         // else
-      //             // flash.LOW(EEPROM_MOSI);
-      //         // sample += 0.0f;
-      //         //clock high
-      //         flash.HIGH(EEPROM_CLOCK);
-
-      //         flash.Wait<1>();
-
-      //         test += 1.1233124124124f;
-      //         sample += 0.0f;
-      //         // clock low
-      //         // flash.LOW(EEPROM_CLOCK);
-
-      //         bsize--;
-      //     }
-      // }
-      // // flash.Write(send_buf, 5);
-
-      // flash.HIGH(EEPROM_FACTORY_SS);
-      // test += 0.0f;
-      // while(flash.ReadStatusRegister(EEPROM_FACTORY_SS) & 0x01);  // BUSY
-      // flash.Wait<200>();
-      // sample1 = 0;
-      // flash.Read66Mhz((uint8_t *)&sample1, 2, integral * 2, EEPROM_FACTORY_SS);
-      // flash.Read66Mhz((uint8_t *)&sample3, 2, integral * 2, EEPROM_FACTORY_SS);
-      // flash.Read66Mhz((uint8_t *)&sample3, 2, integral * 2, EEPROM_FACTORY_SS);
-      // flash.Read66Mhz((uint8_t *)&sample3, 2, integral * 2, EEPROM_FACTORY_SS);
-      // flash.Read66Mhz((uint8_t *)&sample3, 2, integral * 2, EEPROM_FACTORY_SS);
-      // flash.Read66Mhz((uint8_t *)&sample3, 2, integral * 2, EEPROM_FACTORY_SS);
-
-      // test_ramp = static_cast<uint32_t>(4294967296 * (sample + 1.0f) / 2.0f);
-      // output->l = static_cast<int32_t>(32767.0f * (sample + 1.0f) / 2.0f);
-      // output->l = static_cast<int32_t>(20000.0f * sample);
-      // output->l = static_cast<int16_t>(interpolated16 * 26000.0f);
-      output->l = static_cast<int32_t>(26000.0f * sample);
-      // output->l = sample1;
-      // output->l = static_cast<int16_t>(sample / 1.5f);
-      // output->l = static_cast<int16_t>(sample1 / 1.5f);
-      // output->l = ~test_ramp >> 16;
-      // output->l = 0;
-      output->r = 0;//test_ramp >> 16;
-      // test_ramp += 8947848;  // 480.. 48000
-      /*
-      480 cycles per one wavelength
-      12 hz.  12 * 480 cycles per second
-      5760 cycles per second
-
-
-
-      //*/
-      ++output;
-      // phase += phase_increment;
-      // if(phase >= 1.0f)
-      //   phase -= 1.0f;
-
+        carrier_downsampler.Accumulate(j, sample / 32768.0f);
     }
+    
+    sample = carrier_downsampler.Read();
+    output->l = static_cast<int32_t>(26000.0f * sample);
+    output->r = 0;//test_ramp >> 16;
+    ++output;
+  }
 }
 
 // IOBuffer::Slice FillBuffer(size_t size) {
@@ -1024,11 +808,22 @@ void Init() {
   lcd.Init();
   // flash.InitMemory();
 
+  // abEngine.Init();
+  // wavetableEngine.Init();
+  // matrixEngine.Init();
+  // drumEngine.Init();
+  abEngine.Init();
+  // context.setEngine(Context::ENGINE_TYPE_AB);
+
+  // effect_manager.Init();
+  // effect_manager.setEffect(EffectManager::EFFECT_TYPE_BYPASS);
+
   
   sys.StartTimers();
 
   audio_dac.Init(48000, kBlockSize);
   audio_dac.Start(&FillBuffer);
+
 
   // lcd.Initial();
   // lcd.Draw();
@@ -1051,6 +846,7 @@ int main(void) {
     // lcd.HIGH(LCD_SS);
     // lcd.HIGH(LCD_CMD);
     system_clock.Delay(1000);
+    lcd.Initial();
     // lcd.Initial();
     // lcd.Draw();
     // lcd.LOW(LCD_SS);

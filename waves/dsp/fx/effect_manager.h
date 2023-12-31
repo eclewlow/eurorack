@@ -82,5 +82,7 @@ protected:
 //    int8_t control_type_;
 //    Effect* effect_;
 private:
-    DISALLOW_COPY_AND_ASSIGN (EffectManager);
+    EffectManager(const EffectManager&);
+    EffectManager& operator=(EffectManager const&);
+    // DISALLOW_COPY_AND_ASSIGN (EffectManager);
 };

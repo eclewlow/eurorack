@@ -153,10 +153,11 @@ void Flash::Init() {
 
   // DMA_ITConfig(DMA2_Stream3, DMA_IT_TC, ENABLE);
 
-  // SPI_I2S_DMACmd(SPI1, SPI_I2S_DMAReq_Tx, ENABLE);
-
   // Enable the IRQ.
   // NVIC_EnableIRQ(DMA2_Stream3_IRQn);
+
+  // SPI_I2S_DMACmd(SPI1, SPI_I2S_DMAReq_Tx, ENABLE);
+
 }
 
 void Flash::StartDMARead(uint16_t __bytes) {
@@ -247,7 +248,7 @@ void Flash::StopDMA() {
 
   // while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
   // while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
-    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE)) {
+  while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE)) {
     SPI_I2S_ReceiveData(SPI1);    
   }
 
