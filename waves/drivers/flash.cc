@@ -27,7 +27,8 @@
 // Lightweight DAC driver used for the firmware update procedure.
 // Initializes the I2S port as SPI, and relies on a timer for clock generation.
 
-#include "waves/drivers/flash.h"
+// #include "waves/drivers/flash.h"
+#include "waves/Globals.h"
 
 namespace waves {
 
@@ -177,12 +178,15 @@ void Flash::StartDMARead(uint16_t __bytes) {
   SetFlag(&_EREG_, _BUSY_, FLAG_SET);
 }
 
-void Flash::StartFrameDMARead(uint32_t * buffer, uint32_t __bytes, uint32_t address) {
+void Flash::StartFrameDMARead(uint32_t * buffer, uint32_t __bytes, uint32_t address, void (* func)()) {
+  // if(GetFlag(&_EREG_, _BUSY_))
+  StopDMA(true);
   SetFlag(&_EREG_, _RXTC_, FLAG_CLEAR);
   SetFlag(&_EREG_, _TXTC_, FLAG_CLEAR);
-  if(GetFlag(&_EREG_, _BUSY_))
-    return;
+  SetFlag(&_EREG_, _RXNE_, FLAG_CLEAR);
   SetFlag(&_EREG_, _BUSY_, FLAG_SET);
+
+  set_on_dma_read_finished_func(func);
 
   loading = 3;
   LOW(EEPROM_FACTORY_SS);
@@ -241,7 +245,7 @@ void Flash::StartDMAWrite(uint16_t __bytes) {
   SetFlag(&_EREG_, _BUSY_, FLAG_SET);
 }
 
-void Flash::StopDMA() {
+void Flash::StopDMA(bool bypass) {
   loading = 2;
   DMA_ClearFlag(DMA2_Stream0, DMA_FLAG_TCIF0 | DMA_FLAG_HTIF0);
   DMA_ClearFlag(DMA2_Stream3, DMA_FLAG_TCIF3 | DMA_FLAG_HTIF3);
@@ -259,7 +263,11 @@ void Flash::StopDMA() {
 
   HIGH(EEPROM_FACTORY_SS);
 
-  SetFlag(&_EREG_, _RXNE_, FLAG_SET);
+  if(!bypass)
+    SetFlag(&_EREG_, _RXNE_, FLAG_SET);
+
+  if(on_dma_read_finished_func && !bypass)
+    (*on_dma_read_finished_func)();
 }
 
 }  // namespace waves

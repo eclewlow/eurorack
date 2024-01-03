@@ -44,8 +44,13 @@ float ABEngine::GetSample(int16_t wavetable, int16_t frame, float phase, bool is
         sample = BUF4[integral];
         next_sample = BUF4[nextIntegral];
     } else {
-        sample = storage.LoadWaveSample(wavetable, frame, integral);
-        next_sample = storage.LoadWaveSample(wavetable, frame, nextIntegral);
+        if(isLeft) {
+            sample = front_buffer_1[integral];
+            next_sample = front_buffer_1[nextIntegral];
+        } else {
+            sample = front_buffer_1[2048 + integral];
+            next_sample = front_buffer_1[2048 + nextIntegral];
+        }
     }
     
     float interpolated16 = sample + (next_sample - sample) * fractional;
@@ -95,8 +100,12 @@ void ABEngine::FillWaveform(int16_t * waveform, uint16_t tune, uint16_t fx_amoun
     }
 }
 
-void ABEngine::FillWaveform(int16_t * waveform, int16_t wavetable, int16_t frame) {
-    storage.LoadWaveSample(waveform, wavetable, frame);
+void ABEngine::FillWaveform(int16_t * waveform, bool is_left) {
+    // storage.LoadWaveSample(waveform, wavetable, frame);
+    if(is_left)
+        memcpy(waveform, front_buffer_1, 4096);
+    else
+        memcpy(waveform, front_buffer_2, 4096);
 }
 
 float ABEngine::GetSampleNoFX(float phase, float fx, float morph) {
@@ -104,31 +113,35 @@ float ABEngine::GetSampleNoFX(float phase, float fx, float morph) {
     return sample;
 }
 
+void ABEngine::on_load_both_ab_left_finished() {
+    SetFlag(&_EREG_, _RXNE_, FLAG_CLEAR);
+    flash.StartFrameDMARead((uint32_t*)&back_buffer_1[2048], 4096, abEngine.GetRightFrame() * 4096, ABEngine::on_load_both_ab_right_finished);
+}
+void ABEngine::on_load_both_ab_right_finished() {
+    int16_t * temp_buffer = front_buffer_1;
+    front_buffer_1 = back_buffer_1;
+    back_buffer_1 = temp_buffer;
+    SetFlag(&_EREG_, _RXNE_, FLAG_CLEAR);
+    SetFlag(&_EREG_, _BUSY_, FLAG_CLEAR);
+}
+void ABEngine::on_load_one_ab_left_finished() {
+    // TODO: maybe always load both.  loading only one makes it difficult, unless we copy already loaded front buffer to back buffer
+}
+void ABEngine::on_load_one_ab_right_finished() {
+    // TODO: maybe always load both.  loading only one makes it difficult, unless we copy already loaded front buffer to back buffer
+}
+
 void ABEngine::triggerUpdate() {
     phase_ = 0.0f;
     // TODO: Load current left frame into left side of buffer, and right frame into right side of buffer
-    if(GetFlag(&_EREG_, _BUSY_)) {
-        flash.StopDMA();
-    }
-    loading_state_ = LOADING_AB_LEFT;
-    flash.StartFrameDMARead((uint32_t*)back_buffer_1, 4096, GetLeftFrame() * 4096);
+    flash.StopDMA(true);
+    flash.StartFrameDMARead((uint32_t*)back_buffer_1, 4096, GetLeftFrame() * 4096, ABEngine::on_load_both_ab_left_finished);
  }
 
-void ABEngine::Render(float* out, float* aux, uint32_t size, uint16_t tune, uint16_t fx_amount, uint16_t fx, uint16_t morph)
+void ABEngine::Render(AudioDac::Frame* output, uint32_t size, uint16_t tune, uint16_t fx_amount, uint16_t fx, uint16_t morph)
 {
-    if(GetFlag(&_EREG_, _RXNE_) && loading_state_ == LOADING_AB_LEFT) {
-
-        loading_state_ = LOADING_AB_RIGHT;
-
-        flash.StartFrameDMARead((uint32_t*)&back_buffer_1[2048], 4096, GetRightFrame() * 4096);
+    if(GetFlag(&_EREG_, _BUSY_)) {
         return;
-    }
-    else if(GetFlag(&_EREG_, _RXNE_) && loading_state_ == LOADING_AB_RIGHT) {
-        loading_state_ = LOADING_DONE;
-
-        int16_t * temp_buffer = front_buffer_1;
-        front_buffer_1 = back_buffer_1;
-        back_buffer_1 = temp_buffer;
     }
 
     // convert 12 bit uint 0-4095 to 0...15 float
@@ -143,31 +156,38 @@ void ABEngine::Render(float* out, float* aux, uint32_t size, uint16_t tune, uint
     }
 
     ParameterInterpolator morph_interpolator(&morph_, morphTarget, size);
-    ParameterInterpolator tune_interpolator(&tune_, tuneTarget, size);
+    // ParameterInterpolator tune_interpolator(&tune_, tuneTarget, size);
     Downsampler carrier_downsampler(&carrier_fir_);
+
+
+    // TODO:  interpolate phase_increment instead of tune.  pass in phase increment to effects-functions instead of frequency.
+    // float note = (120.0f * tune_interpolator.Next()) / 4095.0;
+    float note = tuneTarget * user_settings.getCalibrationX() + user_settings.getCalibrationY();
+    note = CLAMP<float>(note, 0.0f, 120.0f);
+
+    note = quantizer.Quantize(note);
+
+    note = note - 24.0f;
+    float a = 440; //frequency of A (coomon value is 440Hz)
+    float frequency = (a / 32) * pow(2, ((note - 9) / 12.0));
+    float phaseIncrement = frequency / 48000.0f;
+
+    ParameterInterpolator phase_increment_interpolator(&phase_increment_, phaseIncrement, size);
     
     while (size--) {
-//        float note = (120.0f * tune_interpolator.Next()) / 4095.0;
-        float note = tune_interpolator.Next() * user_settings.getCalibrationX() + user_settings.getCalibrationY();
-        note = CLAMP<float>(note, 0.0f, 120.0f);
-        
-        note = quantizer.Quantize(note);
-
-        note = note - 24.0f;
-        float a = 440; //frequency of A (coomon value is 440Hz)
-        float frequency = (a / 32) * pow(2, ((note - 9) / 12.0));
-        float phaseIncrement = frequency / 48000.0f;
         
         float interpolated_morph = morph_interpolator.Next();
         interpolated_morph = CLAMP<float>(interpolated_morph, 0.0, 1.0);
 //        printf("%f\n", interpolated_morph);
+
+        float phase_increment = phase_increment_interpolator.Next();
         
         for (size_t j = 0; j < kOversampling; ++j) {
-            float sample = GetSampleBetweenFrames(effect_manager.RenderPhaseEffect(phase_, frequency, fx_amount, fx, false, true), interpolated_morph);
+            float sample = GetSampleBetweenFrames(effect_manager.RenderPhaseEffect(phase_, 1  / phase_increment, fx_amount, fx, false, true), interpolated_morph);
             
-            sample = effect_manager.RenderSampleEffect(sample, phase_, frequency, fx_amount, fx, false, true);
+            sample = effect_manager.RenderSampleEffect(sample, phase_, 1  / phase_increment, fx_amount, fx, false, true);
             
-            phase_ += phaseIncrement;
+            phase_ += phase_increment;
             
             if(phase_ >= 1.0f)
                 phase_ -= 1.0f;
@@ -177,8 +197,8 @@ void ABEngine::Render(float* out, float* aux, uint32_t size, uint16_t tune, uint
         
         float sample = carrier_downsampler.Read();
         
-        *out++ = sample;
-        *aux++ = sample;
+        output->l = sample;
+        ++output;
     }
 }
 

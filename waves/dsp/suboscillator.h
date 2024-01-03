@@ -20,7 +20,7 @@ class Suboscillator: public Engine
 public:
     Suboscillator();
     ~Suboscillator();
-    virtual void Render(float* out, float* aux, uint32_t size, uint16_t tune, uint16_t fx_amount, uint16_t fx, uint16_t morph);
+    virtual void Render(AudioDac::Frame* output, uint32_t size, uint16_t tune, uint16_t fx_amount, uint16_t fx, uint16_t morph);
     float Render();
     void Init();
     float GetSample(int16_t wavetable, int16_t frame, float phase);

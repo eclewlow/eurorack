@@ -56,7 +56,7 @@ void DrumEngine::FillWaveform(int16_t * waveform, uint16_t tune, uint16_t fx_amo
 
     for(int i = 0; i < 2048; i++) {
         float thisX = morph_;
-        thisX = clamp(thisX, 0.0, 1.0);
+        thisX = CLAMP<float>(thisX, 0.0, 1.0);
         
         float calculated_phase = temp_phase;
         if(withFx)
@@ -135,7 +135,7 @@ float DrumEngine::GetY(float x) {
     return y;
 }
 
-void DrumEngine::Render(float* out, float* aux, uint32_t size, uint16_t tune, uint16_t fx_amount, uint16_t fx, uint16_t morph)
+void DrumEngine::Render(AudioDac::Frame* output, uint32_t size, uint16_t tune, uint16_t fx_amount, uint16_t fx, uint16_t morph)
 {
     //    float target = morph;
     // convert 12 bit uint 0-4095 to 0...15 float
@@ -167,12 +167,12 @@ void DrumEngine::Render(float* out, float* aux, uint32_t size, uint16_t tune, ui
         float fm_decay_trigger_increment = (1.0f / (6.0f * (GetFMDecay() + 0.001f))) / 48000.0f;
 
         float note = tune_interpolator.Next() * user_settings.getCalibrationX() + user_settings.getCalibrationY();
-        note = clamp(note, 0.0f, 120.0f);
+        note = CLAMP<float>(note, 0.0f, 120.0f);
 
         note = quantizer.Quantize(note);
 
         note += 12 * GetY(GetFMDecayTrigger()) * (GetFMDepth() * 2.0f - 1.0f);
-        note = clamp(note, 0.0f, 120.0f);
+        note = CLAMP<float>(note, 0.0f, 120.0f);
 
 
         note = note - 24.0f;
@@ -183,7 +183,7 @@ void DrumEngine::Render(float* out, float* aux, uint32_t size, uint16_t tune, ui
         
 
         float interpolated_morph = morph_interpolator.Next();
-        interpolated_morph = clamp(interpolated_morph, 0.0, 1.0);
+        interpolated_morph = CLAMP<float>(interpolated_morph, 0.0, 1.0);
         
         for (size_t j = 0; j < kOversampling; ++j) {
             float sample = GetSampleBetweenFrames(effect_manager.RenderPhaseEffect(phase_, frequency, fx_amount, fx, false, true), interpolated_morph);
@@ -212,29 +212,29 @@ void DrumEngine::Render(float* out, float* aux, uint32_t size, uint16_t tune, ui
         
         float sample = carrier_downsampler.Read();
         
-        *out++ = sample;
-        *aux++ = sample;
+        output->l = sample;
+        ++output;
     }
 }
 
 void DrumEngine::SetWavetable(int wavetable)
 {
-    user_settings.settings_ptr()->drum_engine_wavetable = CLAMP(wavetable, 0, USER_WAVETABLE_COUNT + FACTORY_WAVETABLE_COUNT - 1);
+    user_settings.settings_ptr()->drum_engine_wavetable = CLAMP<int>(wavetable, 0, USER_WAVETABLE_COUNT + FACTORY_WAVETABLE_COUNT - 1);
 }
 int DrumEngine::GetWavetable() { return user_settings.settings_ptr()->drum_engine_wavetable; }
 void DrumEngine::SetAmpDecay(float value) {
-    user_settings.settings_ptr()->drum_engine_amp_decay = CLAMP(value, 0.0f, 1.0f);
+    user_settings.settings_ptr()->drum_engine_amp_decay = CLAMP<float>(value, 0.0f, 1.0f);
 }
 float DrumEngine::GetAmpDecay() { return user_settings.settings_ptr()->drum_engine_amp_decay; }
 void DrumEngine::SetFMDecay(float value) {
-    user_settings.settings_ptr()->drum_engine_fm_decay = CLAMP(value, 0.0f, 1.0f);
+    user_settings.settings_ptr()->drum_engine_fm_decay = CLAMP<float>(value, 0.0f, 1.0f);
 }
 float DrumEngine::GetFMDecay() { return user_settings.settings_ptr()->drum_engine_fm_decay; }
 void DrumEngine::SetFMShape(float value) {
-    user_settings.settings_ptr()->drum_engine_fm_shape = CLAMP(value, 0.0f, 1.0f);
+    user_settings.settings_ptr()->drum_engine_fm_shape = CLAMP<float>(value, 0.0f, 1.0f);
 }
 float DrumEngine::GetFMShape() { return user_settings.settings_ptr()->drum_engine_fm_shape; }
 void DrumEngine::SetFMDepth(float value) {
-    user_settings.settings_ptr()->drum_engine_fm_depth = CLAMP(value, 0.0f, 1.0f);
+    user_settings.settings_ptr()->drum_engine_fm_depth = CLAMP<float>(value, 0.0f, 1.0f);
 }
 float DrumEngine::GetFMDepth() { return user_settings.settings_ptr()->drum_engine_fm_depth; }

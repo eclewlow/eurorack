@@ -34,7 +34,7 @@
 #include "waves/drivers/system.h"
 #include "waves/drivers/adc.h"
 #include "waves/drivers/audio_dac.h"
-#include "waves/drivers/flash.h"
+// #include "waves/drivers/flash.h"
 #include "waves/drivers/lcd.h"
 #include "waves/drivers/4x_downsampler.h"
 #include "waves/drivers/ParameterInterpolator.h"
@@ -76,7 +76,7 @@ AudioDac audio_dac;
 // Settings settings;
 // Ui ui;
 // UartLogger logger;
-Flash flash;
+// Flash flash;
 LCD lcd;
 // RandomGenerator random_generator;
 // RandomStream random_stream;
@@ -342,7 +342,7 @@ float swap_increment = 1.0f / 10000.0f;
 
 void FillBuffer(AudioDac::Frame* output, size_t size) {
 
-  float phase_increment = (110.0f / 4.0f) / 47992.0f;
+  // float phase_increment = (110.0f / 4.0f) / 47992.0f;
 
   Downsampler carrier_downsampler(&carrier_fir_);
 
@@ -350,105 +350,127 @@ void FillBuffer(AudioDac::Frame* output, size_t size) {
 
   ParameterInterpolator morph_interpolator(&morph_, morphTarget, size);
 
-  bool swap = false;
+  // bool swap = false;
 
-  if(GetFlag(&_EREG_, _RXNE_)) {
-    // swap buffers
-    // do transition this half
-    swap = true;
-  }
+  // if(GetFlag(&_EREG_, _RXNE_)) {
+  //   // swap buffers
+  //   // do transition this half
+  //   swap = true;
+  // }
 
-  while (size--) {
-    float interpolated_morph = morph_interpolator.Next();
-    interpolated_morph = CLAMP<float>(interpolated_morph, 0.0, 0.9999f);
+  // while (size--) {
+  //   float interpolated_morph = morph_interpolator.Next();
+  //   interpolated_morph = CLAMP<float>(interpolated_morph, 0.0, 0.9999f);
 
-    float frame = interpolated_morph * 15.0f;
-    uint16_t frame_integral = floor(frame);
-    float frame_fractional = frame - frame_integral;
+  //   float frame = interpolated_morph * 15.0f;
+  //   uint16_t frame_integral = floor(frame);
+  //   float frame_fractional = frame - frame_integral;
 
-    float sample = 0;
-    for (size_t j = 0; j < kOversampling; ++j) {
+  //   float sample = 0;
+  //   for (size_t j = 0; j < kOversampling; ++j) {
 
-        float index = phase * 2048.0;
-        uint16_t integral = floor(index);
-        float fractional = index - integral;
-        uint16_t nextIntegral = (integral + 1) % 2048;
+  //       float index = phase * 2048.0;
+  //       uint16_t integral = floor(index);
+  //       float fractional = index - integral;
+  //       uint16_t nextIntegral = (integral + 1) % 2048;
 
-        if(!swap) {
-          int16_t sample1 = 0;
-          int16_t sample2 = 0;
+  //       if(!swap) {
+  //         int16_t sample1 = 0;
+  //         int16_t sample2 = 0;
 
-          int16_t * buf = front_buffer;
-          sample1 = buf[integral] + (buf[nextIntegral] - buf[integral]) * fractional;
-          sample2 = buf[2048 + integral] + (buf[2048 + nextIntegral] - buf[2048 + integral]) * fractional;
+  //         int16_t * buf = front_buffer;
+  //         sample1 = buf[integral] + (buf[nextIntegral] - buf[integral]) * fractional;
+  //         sample2 = buf[2048 + integral] + (buf[2048 + nextIntegral] - buf[2048 + integral]) * fractional;
 
-          if(frame_integral > current_frame_)
-            sample = sample2;
-          else if(frame_integral < current_frame_)
-            sample = sample1;
-          else
-            sample = sample1 * (1.0f - frame_fractional) + sample2 * frame_fractional;
-        }
-        else {
-          int16_t sample1 = 0;
-          int16_t sample2 = 0;
+  //         if(frame_integral > current_frame_)
+  //           sample = sample2;
+  //         else if(frame_integral < current_frame_)
+  //           sample = sample1;
+  //         else
+  //           sample = sample1 * (1.0f - frame_fractional) + sample2 * frame_fractional;
+  //       }
+  //       else {
+  //         int16_t sample1 = 0;
+  //         int16_t sample2 = 0;
 
-          int16_t * buf = front_buffer;
-          sample1 = buf[integral] + (buf[nextIntegral] - buf[integral]) * fractional;
-          sample2 = buf[2048 + integral] + (buf[2048 + nextIntegral] - buf[2048 + integral]) * fractional;
+  //         int16_t * buf = front_buffer;
+  //         sample1 = buf[integral] + (buf[nextIntegral] - buf[integral]) * fractional;
+  //         sample2 = buf[2048 + integral] + (buf[2048 + nextIntegral] - buf[2048 + integral]) * fractional;
 
-          if(target_frame_ > current_frame_)
-            sample1 = sample2;
-          else if(current_frame_ > target_frame_)
-            sample1 = sample1;
-          else
-            sample1 = sample1 * (1.0f - frame_fractional) + sample2 * frame_fractional;
+  //         if(target_frame_ > current_frame_)
+  //           sample1 = sample2;
+  //         else if(current_frame_ > target_frame_)
+  //           sample1 = sample1;
+  //         else
+  //           sample1 = sample1 * (1.0f - frame_fractional) + sample2 * frame_fractional;
 
-          int16_t sample3 = 0;
-          int16_t sample4 = 0;
+  //         int16_t sample3 = 0;
+  //         int16_t sample4 = 0;
 
-          buf = back_buffer;
-          sample3 = buf[integral] + (buf[nextIntegral] - buf[integral]) * fractional;
-          sample4 = buf[2048 + integral] + (buf[2048 + nextIntegral] - buf[2048 + integral]) * fractional;
+  //         buf = back_buffer;
+  //         sample3 = buf[integral] + (buf[nextIntegral] - buf[integral]) * fractional;
+  //         sample4 = buf[2048 + integral] + (buf[2048 + nextIntegral] - buf[2048 + integral]) * fractional;
 
-          sample3 = sample3 * (1.0f - frame_fractional) + sample4 * frame_fractional;
+  //         sample3 = sample3 * (1.0f - frame_fractional) + sample4 * frame_fractional;
 
-          sample = sample1 * (1.0f - swap_counter) + sample3 * swap_counter;
-        }
+  //         sample = sample1 * (1.0f - swap_counter) + sample3 * swap_counter;
+  //       }
 
-        phase += phase_increment;
+  //       phase += phase_increment;
         
-        if(phase >= 1.0f)
-            phase -= 1.0f;
+  //       if(phase >= 1.0f)
+  //           phase -= 1.0f;
         
-        if(swap) {
-          swap_counter += swap_increment;
-          if(swap_counter >= 1.0f) {
-            swap = false;
-            if(front_buffer == double_waveframe_buffer_1) {
-              front_buffer = double_waveframe_buffer_2;
-              back_buffer = double_waveframe_buffer_1;
-            } else {
-              front_buffer = double_waveframe_buffer_1;
-              back_buffer = double_waveframe_buffer_2;      
-            }
-            current_frame_ = target_frame_;
-            swap_counter = 0.0f;
+  //       if(swap) {
+  //         swap_counter += swap_increment;
+  //         if(swap_counter >= 1.0f) {
+  //           swap = false;
+  //           if(front_buffer == double_waveframe_buffer_1) {
+  //             front_buffer = double_waveframe_buffer_2;
+  //             back_buffer = double_waveframe_buffer_1;
+  //           } else {
+  //             front_buffer = double_waveframe_buffer_1;
+  //             back_buffer = double_waveframe_buffer_2;      
+  //           }
+  //           current_frame_ = target_frame_;
+  //           swap_counter = 0.0f;
 
-            SetFlag(&_EREG_, _RXNE_, FLAG_CLEAR);
-            SetFlag(&_EREG_, _BUSY_, FLAG_CLEAR);
-          }
-        }
+  //           SetFlag(&_EREG_, _RXNE_, FLAG_CLEAR);
+  //           SetFlag(&_EREG_, _BUSY_, FLAG_CLEAR);
+  //         }
+  //       }
 
 
-        carrier_downsampler.Accumulate(j, sample / 32768.0f);
-    }
+  //       carrier_downsampler.Accumulate(j, sample / 32768.0f);
+  //   }
     
-    sample = carrier_downsampler.Read();
-    output->l = static_cast<int32_t>(26000.0f * sample);
-    output->r = 0;//test_ramp >> 16;
-    ++output;
-  }
+  //   sample = carrier_downsampler.Read();
+  //   output->l = static_cast<int32_t>(26000.0f * sample);
+  //   output->r = 0;//test_ramp >> 16;
+
+// AudioDac::Frame
+// voice.Render(patch, modulations, (AudioDac::Frame*)(output), size);
+  uint16_t tune = adc.getChannel(0);
+  uint16_t fx_amount = adc.getChannel(1);
+  uint16_t fx = adc.getChannel(2);
+  uint16_t morph = adc.getChannel(3);
+
+  context.getEngine()->Render((AudioDac::Frame*)(output), size, tune, fx_amount, fx, morph);
+    // if(context.getLastEngine()) {
+    //     float last_engine_out[size];
+    //     context.getLastEngine()->Render(last_engine_out, last_engine_out, size, tune, fx_amount, fx, morph);
+        
+    //     for(int i = 0; i < size; i++) {
+    //         float fraction = (float) i / (float) size;
+    //         out[i] = fraction * out[i] + (1.0f - fraction) * last_engine_out[i];
+    //     }
+        
+    //     context.setLastEngine(-1);
+    // }
+  suboscillator.Render((AudioDac::Frame*)(output), size, tune, fx_amount, fx, morph);
+    
+
+  // ++output;
 }
 
 // IOBuffer::Slice FillBuffer(size_t size) {
@@ -813,10 +835,7 @@ void Init() {
   // matrixEngine.Init();
   // drumEngine.Init();
   abEngine.Init();
-  // context.setEngine(Context::ENGINE_TYPE_AB);
-
-  // effect_manager.Init();
-  // effect_manager.setEffect(EffectManager::EFFECT_TYPE_BYPASS);
+  effect_manager.Init();
 
   
   sys.StartTimers();
@@ -841,6 +860,8 @@ int main(void) {
       fresh_start = false;
       flash.W25qxx_Init();
       lcd.Initial();
+      context.setEngine(Context::ENGINE_TYPE_AB);
+      effect_manager.setEffect(EffectManager::EFFECT_TYPE_BYPASS);
       // lcd.DisplayOn();
     }
     // lcd.HIGH(LCD_SS);

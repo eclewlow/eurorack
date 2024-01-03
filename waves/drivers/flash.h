@@ -31,9 +31,8 @@
 #define WAVES_DRIVERS_FLASH_H_
 
 #include "stmlib/stmlib.h"
-#include "waves/Globals.h"
-#include "waves/drivers/wavetables.h"
-#include "stmlib/system/system_clock.h"
+// #include "waves/drivers/wavetables.h"
+// #include "stmlib/system/system_clock.h"
 
 #include <stm32f4xx_conf.h>
 #include <cstring>
@@ -1092,71 +1091,21 @@ void W25qxx_Init (void)
     // dataBuffer[0] = test[1];
     // memset(dataBuffer, 0, 4);
     // memcpy(dataBuffer, &buf, 2);
-  // W25Qxx_TransferSPI(WRITE_ENABLE, -1, 0, DIR_NEUTRAL, 0);
+}   
 
-  // W25Qxx_TransferSPI(ENABLE_WRITE_STATUS_REGISTER, -1, 0, DIR_NEUTRAL, 0);
-
-  // W25Qxx_TransferSPI(WRITE_STATUS_REGISTER, -1, 0, DIR_NEUTRAL, 0);
-
-  // W25Qxx_TransferSPI(WRITE_DISABLE, -1, 0, DIR_NEUTRAL, 0);
-
-  // W25Qxx_TransferSPI(READ_STATUS_REGISTER, -1, 4, DIR_READ, 0);
-  // w25qxx.Capacity = __REV(dataBuffer[0]);
-
-    // w25qxx.ID = ReadStatusRegister(EEPROM_FACTORY_SS);
-
-    // while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_BSY));
-
-    // ReadWaveframe(0, EEPROM_FACTORY_SS);
-
-  // W25Qxx_TransferSPI(0xab, -1, 4, DIR_READ, 0);
-  // w25qxx.ID = __REV(dataBuffer[0]);
-
-  // W25Qxx_TransferSPI(Read_JedecID, -1, 4, DIR_READ, 0);
-  // w25qxx.ID = __REV(dataBuffer[0]);
-
-  // W25Qxx_TransferSPI(WRITE_ENABLE, -1, 0, DIR_NEUTRAL, 0);
-
-  // W25Qxx_TransferSPI(ENABLE_WRITE_STATUS_REGISTER, -1, 0, DIR_NEUTRAL, 0);
-
-  // W25Qxx_TransferSPI(WRITE_STATUS_REGISTER, -1, 0, DIR_NEUTRAL, 0);
-
-  // W25Qxx_TransferSPI(WRITE_DISABLE, -1, 0, DIR_NEUTRAL, 0);
-
-  // W25Qxx_TransferSPI(READ_STATUS_REGISTER, -1, 4, DIR_READ, 0);
-  // w25qxx.ID = __REV(dataBuffer[0]);
-
-  // W25Qxx_TransferSPI(Read_JedecID, -1, 0, DIR_WRITE, 0);
-  // w25qxx.ID = __REV(dataBuffer[0]);
-
-
-  // W25Qxx_TransferSPI(Read_JedecID, -1, 4, DIR_READ, 0);
-  // w25qxx.ID = __REV(dataBuffer[0]);
-  // W25Qxx_TransferSPI(Read_JedecID, -1, 4, DIR_READ, 0);
-  // w25qxx.ID = __REV(dataBuffer[0]);
-
-  
-  // W25Qxx_TransferSPI(Read_UniqueID, -1, 12, DIR_READ, 0);
-  // w25qxx.UniqID[0] = __REV(dataBuffer[1]);
-  // w25qxx.UniqID[1] = __REV(dataBuffer[2]);
-
-  // W25Qxx_TransferSPI(Read_DeviceID, -1, 4, DIR_READ, 0);
-  // w25qxx.BlockCount = w25q[(__REV(dataBuffer[0]) & 0x0f)];  
-  // w25qxx.Capacity = w25qxx.BlockCount * BlockSize;
-  
-  // SetFlag(&_EREG_, _DBLF_, FLAG_CLEAR);
-}
     w25qxx_t    w25qxx;
-void StartFrameDMARead(uint32_t * buffer, uint32_t size, uint32_t address);
-void StartDMARead(uint16_t __bytes);
-void StartDMAWrite(uint16_t __bytes);
-void StopDMA();
+    void StartFrameDMARead(uint32_t * buffer, uint32_t size, uint32_t address, void (* func)() = NULL);
+    void StartDMARead(uint16_t __bytes);
+    void StartDMAWrite(uint16_t __bytes);
+    void StopDMA(bool bypass = false);
 
-static Flash* GetInstance() { return instance_; }
+    static Flash* GetInstance() { return instance_; }
+
+    inline void set_on_dma_read_finished_func(void (* func)()) { on_dma_read_finished_func = func; }
 
  private:
-
-  static Flash* instance_;
+    void (*on_dma_read_finished_func)();
+    static Flash* instance_;
   // NextSampleFn next_sample_fn_;
   // static FirmwareUpdateDac* instance_;
   
@@ -1164,6 +1113,6 @@ static Flash* GetInstance() { return instance_; }
 };
 template<> inline void Flash::Wait<0>() { }
 
-}  // namespace stages
+}  // namespace waves
 
 #endif  // WAVES_DRIVERS_FLASH_H_

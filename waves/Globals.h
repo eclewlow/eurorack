@@ -30,6 +30,10 @@ extern int16_t double_waveframe_buffer_3[4096];
 extern int16_t double_waveframe_buffer_4[4096];
 extern int16_t * front_buffer;
 extern int16_t * back_buffer;
+extern int16_t * front_buffer_1;
+extern int16_t * front_buffer_2;
+extern int16_t * back_buffer_1;
+extern int16_t * back_buffer_2;
 extern int16_t pump_buffer[4096];
 extern uint8_t loading;
 extern uint8_t lcd_buffer[8][128];
@@ -60,6 +64,14 @@ extern uint8_t lcd_buffer[8][128];
 // #include "waves/menu/SnapshotMenu.h"
 // #include "waves/menu/MemoryClearMenu.h"
 
+// #include "adc.h"
+#include "stmlib/system/system_clock.h"
+#include "waves/drivers/adc.h"
+#include "waves/drivers/audio_dac.h"
+#include "waves/drivers/flash.h"
+
+#include "waves/dsp/Engine.h"
+
 #include "waves/dsp/ab_engine.h"
 #include "waves/dsp/wavetable_engine.h"
 #include "waves/dsp/matrix_engine.h"
@@ -82,9 +94,8 @@ extern uint8_t lcd_buffer[8][128];
 #include "waves/UserSettings.h"
 // #include "waves/Storage.h"
 
-// #include "adc.h"
-#include "waves/drivers/adc.h"
-// #include "system_clock.h"
+
+using namespace waves;
 
 extern Context context;
 extern UserSettings user_settings;
@@ -136,6 +147,8 @@ extern Quantizer quantizer;
 
 // extern Adc adc;
 // extern SystemClock system_clock;
+extern Flash flash;
+
 
 extern int16_t BUF1[2048];
 extern int16_t BUF2[2048];

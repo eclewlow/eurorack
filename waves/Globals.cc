@@ -10,6 +10,8 @@
 
 #include "waves/Globals.h"
 
+using namespace waves;
+
 Context context;
 UserSettings user_settings;
 // Storage storage;
@@ -60,6 +62,7 @@ Quantizer quantizer;
 
 // Adc adc;
 // SystemClock system_clock;
+Flash flash;
 
 int16_t BUF1[2048];
 int16_t BUF2[2048];

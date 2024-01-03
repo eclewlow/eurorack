@@ -121,6 +121,10 @@ class Adc {
     return average;
     // return values_[channel];
   }
+
+  inline uint16_t getChannelProcessed(int channel) {
+    return value(channel);
+  }
   // inline const uint16_t* values() const {
     // return &values_[0];
   // }

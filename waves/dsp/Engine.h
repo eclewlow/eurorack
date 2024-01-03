@@ -11,18 +11,22 @@
 #pragma once
 
 #include "waves/dsp/fx/effect.h"
+#include "waves/dsp/fx/effect_manager.h"
 #include "waves/defines.h"
+#include "waves/drivers/audio_dac.h"
+
+using namespace waves;
 
 class Engine
 {
 public:
     Engine();
     virtual ~Engine() {};
-    virtual void Render(float* out, float* aux, uint32_t size, uint16_t tune, uint16_t fx_amount, uint16_t fx, uint16_t morph) = 0;
+    virtual void Render(AudioDac::Frame* output, uint32_t size, uint16_t tune, uint16_t fx_amount, uint16_t fx, uint16_t morph) = 0;
     virtual void FillWaveform(int16_t * waveform, uint16_t tune, uint16_t fx_amount, uint16_t fx, uint16_t morph, bool withFx = true) = 0;
     virtual float GetSampleNoFX(float phase, float fx, float morph) = 0;
     virtual void triggerUpdate() = 0;
-    float GetSample(int16_t wavetable, int16_t frame, float phase);
+    // float GetSample(int16_t wavetable, int16_t frame, float phase);
     float GetSine(float phase);
     float GetRamp(float phase, float phase_increment);
     float GetSawtooth(float phase, float phase_increment);
@@ -41,6 +45,7 @@ protected:
     float fx_amount_;
     float fx_;
     float tune_;
+    float phase_increment_;
     float carrier_fir_;
     bool started_;
     LoadingState loading_state_;

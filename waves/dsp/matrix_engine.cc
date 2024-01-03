@@ -68,8 +68,8 @@ void MatrixEngine::FillWaveform(int16_t * waveform, uint16_t tune, uint16_t fx_a
     for(int i = 0; i < 2048; i++) {
         float morph_y = morph_;
         float morph_x = fx_;
-        morph_x = clamp(morph_x, 0.0, 1.0);
-        morph_y = clamp(morph_y, 0.0, 1.0);
+        morph_x = CLAMP<float>(morph_x, 0.0, 1.0);
+        morph_y = CLAMP<float>(morph_y, 0.0, 1.0);
 
         float sample = GetSampleBetweenFrames(temp_phase, morph_x, morph_y);
         
@@ -91,7 +91,7 @@ void MatrixEngine::triggerUpdate() {
     phase_ = 0.0f;
 }
 
-void MatrixEngine::Render(float* out, float* aux, uint32_t size, uint16_t tune, uint16_t fx_amount, uint16_t fx, uint16_t morph)
+void MatrixEngine::Render(AudioDac::Frame* output, uint32_t size, uint16_t tune, uint16_t fx_amount, uint16_t fx, uint16_t morph)
 {
     float morphTarget;
     float fxTarget;
@@ -116,7 +116,7 @@ void MatrixEngine::Render(float* out, float* aux, uint32_t size, uint16_t tune, 
     while (size--) {
 //        float note = (120.0f * tune_interpolator.Next()) / 4095.0;
         float note = tune_interpolator.Next() * user_settings.getCalibrationX() + user_settings.getCalibrationY();
-        note = clamp(note, 0.0f, 120.0f);
+        note = CLAMP<float>(note, 0.0f, 120.0f);
 
         note = quantizer.Quantize(note);
 
@@ -126,10 +126,10 @@ void MatrixEngine::Render(float* out, float* aux, uint32_t size, uint16_t tune, 
         float phaseIncrement = frequency / 48000.0f;
         
         float interpolated_morph = morph_interpolator.Next();
-        interpolated_morph = clamp(interpolated_morph, 0.0, 1.0);
+        interpolated_morph = CLAMP<float>(interpolated_morph, 0.0, 1.0);
 
         float interpolated_fx = fx_interpolator.Next();
-        interpolated_fx = clamp(interpolated_fx, 0.0, 1.0);
+        interpolated_fx = CLAMP<float>(interpolated_fx, 0.0, 1.0);
 
         for (size_t j = 0; j < kOversampling; ++j) {
             float sample = GetSampleBetweenFrames(phase_, interpolated_fx, interpolated_morph);
@@ -144,8 +144,8 @@ void MatrixEngine::Render(float* out, float* aux, uint32_t size, uint16_t tune, 
         
         float sample = carrier_downsampler.Read();
         
-        *out++ = sample;
-        *aux++ = sample;
+        output->l = sample;
+        ++output;
     }
 }
 

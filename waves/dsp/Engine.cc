@@ -9,20 +9,22 @@
  */
 
 #include "waves/dsp/Engine.h"
-#include "waves/wavetables.h"
-#include "waves/dsp/ParameterInterpolator.h"
+// #include "waves/wavetables.h"
+// #include "waves/dsp/ParameterInterpolator.h"
 #include "waves/Globals.h"
-#include "waves/dsp/downsampler/4x_downsampler.h"
+// #include "waves/dsp/downsampler/4x_downsampler.h"
 #include "math.h"
 
 Engine::Engine() {
     phase_ = 0.0f;
     started_ = false;
+    phase_increment_ = 1.0;
 }
 
 float Engine::GetSine(float phase) {
-    float sample = sin(2 * M_PI * phase);
+    float sample = sinf(2 * M_PI * phase);
     return sample;
+    // return 0;
 }
 
 // This function calculates the PolyBLEPs
@@ -128,19 +130,19 @@ float Engine::GetOscillatorSample(float phase, float phase_increment) {
     else return 0.0f;
 }
 
-float Engine::GetSample(int16_t wavetable, int16_t frame, float phase) {
-    float index = phase * 2048.0;
-    uint16_t integral = floor(index);
-    float fractional = index - integral;
+// float Engine::GetSample(float phase) {
+//     float index = phase * 2048.0;
+//     uint16_t integral = floor(index);
+//     float fractional = index - integral;
     
-    uint16_t nextIntegral = (integral + 1) % 2048;
+//     uint16_t nextIntegral = (integral + 1) % 2048;
     
-    float sample = storage.LoadWaveSample(wavetable, frame, integral);
-    float next_sample = storage.LoadWaveSample(wavetable, frame, nextIntegral);
-    float interpolated16 = sample + (next_sample - sample) * fractional;
+//     float sample = storage.LoadWaveSample(wavetable, frame, integral);
+//     float next_sample = storage.LoadWaveSample(wavetable, frame, nextIntegral);
+//     float interpolated16 = sample + (next_sample - sample) * fractional;
     
-    float interpolatedFloat = interpolated16 / 32768.0f;
+//     float interpolatedFloat = interpolated16 / 32768.0f;
     
-    return interpolatedFloat;
-}
+//     return interpolatedFloat;
+// }
 
