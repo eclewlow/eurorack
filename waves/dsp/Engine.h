@@ -14,8 +14,13 @@
 #include "waves/dsp/fx/effect_manager.h"
 #include "waves/defines.h"
 #include "waves/drivers/audio_dac.h"
+#include "stmlib/dsp/units.h"
+
 
 using namespace waves;
+
+static const float kCorrectedSampleRate = 47872.34f;
+const float a0 = (440.0f / 8.0f) / kCorrectedSampleRate;
 
 class Engine
 {
@@ -39,6 +44,12 @@ public:
     inline float NextBlepSample(float t) { t = 1.0f - t; return -0.5f * t * t; }
     inline void reset_phase() { phase_ = 0; }
     
+    inline float NoteToFrequency(float midi_note) {
+      midi_note -= 9.0f;
+      CONSTRAIN(midi_note, -128.0f, 127.0f);
+      return a0 * 0.25f * stmlib::SemitonesToRatio(midi_note);
+    }
+
 protected:
     float phase_;
     float morph_;

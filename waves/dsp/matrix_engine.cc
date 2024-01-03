@@ -93,6 +93,8 @@ void MatrixEngine::triggerUpdate() {
 
 void MatrixEngine::Render(AudioDac::Frame* output, uint32_t size, uint16_t tune, uint16_t fx_amount, uint16_t fx, uint16_t morph)
 {
+        loading = 57;
+
     float morphTarget;
     float fxTarget;
 
@@ -144,7 +146,7 @@ void MatrixEngine::Render(AudioDac::Frame* output, uint32_t size, uint16_t tune,
         
         float sample = carrier_downsampler.Read();
         
-        output->l = sample;
+        output->l = static_cast<int32_t>(26000.0f * sample);
         ++output;
     }
 }

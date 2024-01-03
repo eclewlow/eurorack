@@ -100,7 +100,7 @@ int16_t * back_buffer_1 = double_waveframe_buffer_3;
 int16_t * back_buffer_2 = double_waveframe_buffer_4;
 
 
-uint8_t loading = 0;
+float loading = 0;
 
 uint8_t lcd_buffer[8][128];
 

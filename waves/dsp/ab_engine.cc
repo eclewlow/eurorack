@@ -15,6 +15,8 @@
 #include "waves/dsp/downsampler/4x_downsampler.h"
 #include "math.h"
 
+namespace waves {
+
 ABEngine::ABEngine() {
     phase_ = 0.0f;
 }
@@ -28,36 +30,50 @@ void ABEngine::Init() {
 }
 
 float ABEngine::GetSample(int16_t wavetable, int16_t frame, float phase, bool isLeft) {
+    float sample = 0;
+    float next_sample = 0;
+    float interpolated16 = 0;
+    // float interpolatedFloat = 0;
+
     float index = phase * 2048.0;
     uint16_t integral = floor(index);
     float fractional = index - integral;
     
     uint16_t nextIntegral = (integral + 1) % 2048;
     
-    float sample;
-    float next_sample;
-    
-    if(IsEditingLeft() && isLeft) {
-        sample = BUF3[integral];
-        next_sample = BUF3[nextIntegral];
-    } else if (IsEditingRight() && !isLeft) {
-        sample = BUF4[integral];
-        next_sample = BUF4[nextIntegral];
-    } else {
+    // if(IsEditingLeft() && isLeft) {
+    //     sample = BUF3[integral];
+    //     next_sample = BUF3[nextIntegral];
+    // } else if (IsEditingRight() && !isLeft) {
+    //     sample = BUF4[integral];
+    //     next_sample = BUF4[nextIntegral];
+    // } else {
         if(isLeft) {
+            // sample += 0;
+            // next_sample += 0;
+            // nextIntegral += 0;
             sample = front_buffer_1[integral];
             next_sample = front_buffer_1[nextIntegral];
         } else {
+            // sample += 0;
+            // next_sample += 0;
+            // nextIntegral += 0;
             sample = front_buffer_1[2048 + integral];
             next_sample = front_buffer_1[2048 + nextIntegral];
         }
-    }
+    // }
     
-    float interpolated16 = sample + (next_sample - sample) * fractional;
+    interpolated16 = sample + (next_sample - sample) * fractional;
+    // interpolatedFloat = interpolated16 / 32768.0f;
     
-    float interpolatedFloat = interpolated16 / 32768.0f;
-    
-    return interpolatedFloat;
+
+    // interpolated16 = sample;
+    // interpolatedFloat = interpolated16 / 32768.0f;
+    // interpolatedFloat += 0;
+    // sample += 0;
+    // interpolatedFloat = sample;
+    // return interpolatedFloat;
+    return interpolated16;
 }
 
 float ABEngine::GetSampleBetweenFrames(float phase, float morph) {
@@ -140,12 +156,11 @@ void ABEngine::triggerUpdate() {
 
 void ABEngine::Render(AudioDac::Frame* output, uint32_t size, uint16_t tune, uint16_t fx_amount, uint16_t fx, uint16_t morph)
 {
-    if(GetFlag(&_EREG_, _BUSY_)) {
-        return;
-    }
-
+    // if(GetFlag(&_EREG_, _BUSY_)) {
+    //     return;
+    // }
     // convert 12 bit uint 0-4095 to 0...15 float
-    float morphTarget = morph * 1.0 / 4095.0;
+    float morphTarget = morph * 1.0 / 65535.0f;
     //    float interpolatedFloat = interpolated16 / 32768.0f;
     float tuneTarget = static_cast<float>(tune);
     
@@ -161,42 +176,54 @@ void ABEngine::Render(AudioDac::Frame* output, uint32_t size, uint16_t tune, uin
 
 
     // TODO:  interpolate phase_increment instead of tune.  pass in phase increment to effects-functions instead of frequency.
-    // float note = (120.0f * tune_interpolator.Next()) / 4095.0;
-    float note = tuneTarget * user_settings.getCalibrationX() + user_settings.getCalibrationY();
+    float note = (120.0f * tuneTarget) / 65535.0;
+    // float note = 48;//tuneTarget * user_settings.getCalibrationX() + user_settings.getCalibrationY();
     note = CLAMP<float>(note, 0.0f, 120.0f);
 
     note = quantizer.Quantize(note);
 
-    note = note - 24.0f;
-    float a = 440; //frequency of A (coomon value is 440Hz)
-    float frequency = (a / 32) * pow(2, ((note - 9) / 12.0));
-    float phaseIncrement = frequency / 48000.0f;
+    // note = note - 24.0f;
 
-    ParameterInterpolator phase_increment_interpolator(&phase_increment_, phaseIncrement, size);
-    
+    ParameterInterpolator phase_increment_interpolator(&phase_increment_, NoteToFrequency(note), size);
+
     while (size--) {
         
         float interpolated_morph = morph_interpolator.Next();
-        interpolated_morph = CLAMP<float>(interpolated_morph, 0.0, 1.0);
-//        printf("%f\n", interpolated_morph);
+        interpolated_morph = CLAMP<float>(interpolated_morph, 0.0, 0.9999);
+// //        printf("%f\n", interpolated_morph);
 
         float phase_increment = phase_increment_interpolator.Next();
-        
-        for (size_t j = 0; j < kOversampling; ++j) {
-            float sample = GetSampleBetweenFrames(effect_manager.RenderPhaseEffect(phase_, 1  / phase_increment, fx_amount, fx, false, true), interpolated_morph);
+        // phase_increment = CLAMP<float>(phase_increment, 0.0f, 1.0f);
+        // phase_increment += 0;
+        // for (size_t j = 0; j < kOversampling; ++j) {
+
+            // float phase = effect_manager.RenderPhaseEffect(phase_, 1  / phase_increment, fx_amount, fx, false, true);
+
+            // int16_t sample = GetSampleBetweenFrames(phase, interpolated_morph);
+
+            // sample = effect_manager.RenderSampleEffect(sample, phase_, 1  / phase_increment, fx_amount, fx, false, true);
             
-            sample = effect_manager.RenderSampleEffect(sample, phase_, 1  / phase_increment, fx_amount, fx, false, true);
+
+            float index = phase_ * 2048.0;
+            uint16_t integral = floor(index);
+            // float fractional = index - integral;
             
+            // uint16_t nextIntegral = (integral + 1) % 2048;
+            
+            int16_t sample = front_buffer_1[integral];
+            // int16_t next_sample = front_buffer_1[nextIntegral];
+
             phase_ += phase_increment;
             
             if(phase_ >= 1.0f)
                 phase_ -= 1.0f;
             
-            carrier_downsampler.Accumulate(j, sample);
-        }
+            // carrier_downsampler.Accumulate(j, sample);
+        // }
         
-        float sample = carrier_downsampler.Read();
-        
+        // float sample = carrier_downsampler.Read();
+
+            loading = front_buffer_1[3];
         output->l = sample;
         ++output;
     }
@@ -234,3 +261,5 @@ bool ABEngine::IsEditingLeft() { return user_settings.settings_ptr()->ab_engine_
 bool ABEngine::IsEditingRight() { return user_settings.settings_ptr()->ab_engine_is_editing_right; }
 void ABEngine::SetIsEditingLeft(bool is_editing_left) { user_settings.settings_ptr()->ab_engine_is_editing_left = is_editing_left; }
 void ABEngine::SetIsEditingRight(bool is_editing_right) { user_settings.settings_ptr()->ab_engine_is_editing_right = is_editing_right; }
+
+}

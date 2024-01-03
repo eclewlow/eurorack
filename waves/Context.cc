@@ -42,16 +42,31 @@ void Context::paint() {
 }
 
 void Context::setEngine(int8_t engine) { 
+    // loading=41;
     if(engine == user_settings.settings_ptr()->engine)
         return;
     
     last_engine_ = user_settings.settings_ptr()->engine;
+    // loading=42;
 
     user_settings.settings_ptr()->engine = engine;
 
-    if(getEngine())
-        getEngine()->triggerUpdate();
+    switch(user_settings.settings_ptr()->engine) {
+        case Context::ENGINE_TYPE_AB:
+            abEngine.triggerUpdate();
+            break;
+        case Context::ENGINE_TYPE_WAVETABLE:
+            wavetableEngine.triggerUpdate();
+            break;
+        case Context::ENGINE_TYPE_MATRIX:
+            matrixEngine.triggerUpdate();
+            break;
+        case Context::ENGINE_TYPE_DRUM:
+            drumEngine.triggerUpdate();
+            break;
+    }
 }
+
 Engine* Context::getEngine() {
     Engine * engine = NULL;
     switch(user_settings.settings_ptr()->engine) {

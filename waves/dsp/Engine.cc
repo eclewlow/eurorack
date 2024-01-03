@@ -18,7 +18,6 @@
 Engine::Engine() {
     phase_ = 0.0f;
     started_ = false;
-    phase_increment_ = 1.0;
 }
 
 float Engine::GetSine(float phase) {

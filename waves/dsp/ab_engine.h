@@ -18,6 +18,8 @@
 
 using namespace waves;
 
+namespace waves {
+
 class ABEngine: public Engine
 {
 public:
@@ -67,3 +69,6 @@ private:
 
     DISALLOW_COPY_AND_ASSIGN (ABEngine);
 };
+
+
+}

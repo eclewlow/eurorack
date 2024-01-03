@@ -164,6 +164,7 @@ void Flash::Init() {
 void Flash::StartDMARead(uint16_t __bytes) {
   uint8_t pump = 0;
 
+  loading = 33;
   DMA_SetCurrDataCounter(DMA2_Stream3, __bytes);
   DMA_SetCurrDataCounter(DMA2_Stream0, __bytes);
   DMA2_Stream3->M0AR = (int)&pump;

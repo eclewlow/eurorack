@@ -126,7 +126,7 @@ void Suboscillator::Render(AudioDac::Frame* output, uint32_t size, uint16_t tune
         
         float sample = carrier_downsampler.Read();
         
-        output->r = sample;
+        output->r = static_cast<int32_t>(26000.0f * sample);
         ++output;
     }
 }

@@ -132,18 +132,18 @@ void SysTick_Handler() {
   // }
   adc.Convert();
 
-  float morph_target = adc.float_value(0);
-  float clamped_morph = CLAMP<float>(morph_target, 0.0, 0.9999);
+  // float morph_target = adc.float_value(0);
+  // float clamped_morph = CLAMP<float>(morph_target, 0.0, 0.9999);
 
-  if(!GetFlag(&_EREG_, _BUSY_) && !GetFlag(&_EREG_, _RXNE_)) {
-    float frame = clamped_morph * 15.0f;
+  // if(!GetFlag(&_EREG_, _BUSY_) && !GetFlag(&_EREG_, _RXNE_)) {
+  //   float frame = clamped_morph * 15.0f;
 
-    uint16_t frame_integral = floor(frame);
-    if(frame_integral != current_frame_) {
-      target_frame_ = frame_integral;
-      flash.StartFrameDMARead((uint32_t*)back_buffer, 8192, target_frame_ * 4096);
-    }
-  }
+  //   uint16_t frame_integral = floor(frame);
+  //   if(frame_integral != current_frame_) {
+  //     target_frame_ = frame_integral;
+  //     flash.StartFrameDMARead((uint32_t*)back_buffer, 8192, target_frame_ * 4096);
+  //   }
+  // }
 }
 
 int counter = 0;
@@ -251,10 +251,10 @@ void TIM1_UP_TIM10_IRQHandler(void) {
   // float clamped_morph = CLAMP<float>(morph_target, 0.0, 0.9999);
   // float frame = clamped_morph * 15.0f;
   // uint16_t frame_integral = floor(frame);
-
+  loading = adc.getChannel(0);
   // memcpy(&result, dataBuffer, 2);
   // snprintf(value, 80, "c=%d, s=%d, frame=%d, %d\n", counter, loading, frame_integral, front_buffer[(2048 - 20) + counter%20]);
-  snprintf(value, 80, "l=%d, busy=%d, rxne=%d, %d\n", loading, GetFlag(&_EREG_, _BUSY_), GetFlag(&_EREG_, _RXNE_), front_buffer[(2048 - 20) + counter%20]);
+  snprintf(value, 80, "l=%lu, busy=%d, rxne=%d, %d\n", (int32_t)loading, GetFlag(&_EREG_, _BUSY_), GetFlag(&_EREG_, _RXNE_), front_buffer[(2048 - 20) + counter%20]);
   // snprintf(value, 80, "%08lx\n", dataBuffer[0]);
   // snprintf(value, 80, "buf=%04x, db=%08lx\n, %08lx", buffer[0], dataBuffer[0], flash.w25qxx.ID);
   // snprintf(value, 40, "f=%d\n", static_cast<int>(phase*100.0f));
@@ -339,16 +339,16 @@ float morph_;
 
 float swap_counter = 0.0f;
 float swap_increment = 1.0f / 10000.0f;
+float phase_increment = (440.0f) / 47992.0f;
 
 void FillBuffer(AudioDac::Frame* output, size_t size) {
 
-  // float phase_increment = (110.0f / 4.0f) / 47992.0f;
 
-  Downsampler carrier_downsampler(&carrier_fir_);
+  // Downsampler carrier_downsampler(&carrier_fir_);
 
-  float morphTarget = adc.float_value(0);
+  // float morphTarget = adc.float_value(0);
 
-  ParameterInterpolator morph_interpolator(&morph_, morphTarget, size);
+  // ParameterInterpolator morph_interpolator(&morph_, morphTarget, size);
 
   // bool swap = false;
 
@@ -455,7 +455,8 @@ void FillBuffer(AudioDac::Frame* output, size_t size) {
   uint16_t fx = adc.getChannel(2);
   uint16_t morph = adc.getChannel(3);
 
-  context.getEngine()->Render((AudioDac::Frame*)(output), size, tune, fx_amount, fx, morph);
+  // loading = 23;
+  abEngine.Render((AudioDac::Frame*)(output), size, tune, fx_amount, fx, morph);
     // if(context.getLastEngine()) {
     //     float last_engine_out[size];
     //     context.getLastEngine()->Render(last_engine_out, last_engine_out, size, tune, fx_amount, fx, morph);
@@ -467,8 +468,19 @@ void FillBuffer(AudioDac::Frame* output, size_t size) {
         
     //     context.setLastEngine(-1);
     // }
-  suboscillator.Render((AudioDac::Frame*)(output), size, tune, fx_amount, fx, morph);
+  // suboscillator.Render((AudioDac::Frame*)(output), size, tune, fx_amount, fx, morph);
+  
+  // while (size--) {
+  //   output->l = static_cast<int32_t>(26000.0f * sinf(2*M_PI * phase));
+  //   output->r = 0;//test_ramp >> 16;
+
+  //   phase += phase_increment;
     
+  //   if(phase >= 1.0f)
+  //       phase -= 1.0f;
+
+  //   ++output;
+  // }
 
   // ++output;
 }
@@ -782,49 +794,6 @@ void Init() {
   System sys;
   sys.Init(true);
 
-  // printf("hi\n");
-
-  // Enable TRCENA
-  // DEMCR |= ( 1 << 24);
-  // Enable stimulus port 0
-  // ITM_TRACE_EN |= ( 1 << 0);
-
-  // settings.Init();
-  
-  // clock_inputs.Init();
-  // dac.Init(kSampleRate, 1);
-  // rng.Init();
-  // note_filter.Init();
-  // gate_outputs.Init();
-  // io_buffer.Init();
-    
-  // deja_vu_length_quantizer.Init(
-  //     sizeof(loop_length) / sizeof(int), 0.25f, false);
-  // cv_reader.Init(settings.mutable_calibration_data());
-  // scale_recorder.Init();
-  // ui.Init(&settings, &cv_reader, &scale_recorder, &clock_inputs);
-  
-  // if (settings.freshly_baked()) {
-  //   settings.ProgramOptionBytes();
-  //   if (PROFILE_INTERRUPT || PROFILE_RENDER) {
-  //     DebugPin::Init();
-  //   } else {
-  //     debug_port.Init();
-  //   }
-  // }
-  
-  // random_generator.Init(1);
-  // random_stream.Init(&random_generator);
-  // t_generator.Init(&random_stream, static_cast<float>(kSampleRate));
-  // xy_generator.Init(&random_stream, static_cast<float>(kSampleRate));
-
-  // for (size_t i = 0; i < kNumScales; ++i) {
-  //   xy_generator.LoadScale(i, settings.persistent_data().scale[i]);
-  // }
-  
-  // for (size_t i = 0; i < kNumGateOutputs; ++i) {
-  //   self_patching_detector[i].Init(i);
-  // }
   adc.Init(false);
   flash.Init();
   lcd.Init();
@@ -840,8 +809,6 @@ void Init() {
   
   sys.StartTimers();
 
-  audio_dac.Init(48000, kBlockSize);
-  audio_dac.Start(&FillBuffer);
 
 
   // lcd.Initial();
@@ -850,6 +817,20 @@ void Init() {
   // lcd.Draw();
   // logger.Init(9600);
   // dac.Start(&FillBuffer);
+
+  context.setEngine(Context::ENGINE_TYPE_AB);
+
+  abEngine.triggerUpdate();
+  // if(effect_manager != NULL)
+  // loading = 27;
+  // else
+  // loading = 28;
+  effect_manager.setEffect(EffectManager::EFFECT_TYPE_BYPASS);
+  // loading = 26;
+
+  audio_dac.Init(48000, kBlockSize);
+  audio_dac.Start(&FillBuffer);
+
 }
 
 int main(void) {
@@ -858,21 +839,22 @@ int main(void) {
   while (1) {
     if(fresh_start) {
       fresh_start = false;
-      flash.W25qxx_Init();
-      lcd.Initial();
-      context.setEngine(Context::ENGINE_TYPE_AB);
-      effect_manager.setEffect(EffectManager::EFFECT_TYPE_BYPASS);
+      // flash.W25qxx_Init();
+      // lcd.Initial();
+
+
+
       // lcd.DisplayOn();
     }
     // lcd.HIGH(LCD_SS);
     // lcd.HIGH(LCD_CMD);
-    system_clock.Delay(1000);
-    lcd.Initial();
+    // system_clock.Delay(1000);
+    // lcd.Initial();
     // lcd.Initial();
     // lcd.Draw();
     // lcd.LOW(LCD_SS);
     // lcd.LOW(LCD_CMD);
-    system_clock.Delay(1000);
+    // system_clock.Delay(1000);
 
     // ui.DoEvents();
     // io_buffer.Process(ui.output_test_mode() ? &ProcessTest : &Process);

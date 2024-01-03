@@ -12,9 +12,10 @@
 
 #include "stdint.h"
 #include "defines.h"
-// inline double clamp(double input, double low, double high) {
-//     return std::min(std::max(input, low), high);
-// }
+
+inline float clamp(float input, float low, float high) {
+    return (input < low) ? low : ((input > high) ? high : input);
+}
 
 
 extern uint32_t _EREG_;
@@ -35,7 +36,7 @@ extern int16_t * front_buffer_2;
 extern int16_t * back_buffer_1;
 extern int16_t * back_buffer_2;
 extern int16_t pump_buffer[4096];
-extern uint8_t loading;
+extern float loading;
 extern uint8_t lcd_buffer[8][128];
     
 // #include "waves/menu/MainMenu.h"

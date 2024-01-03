@@ -35,8 +35,12 @@ float FM::RenderPhaseEffect(float input_phase, float frequency, uint16_t fx_amou
     float adjusted_phase = 0.0f;
     float phaseIncrement = frequency / 48000.0f;
 
-    if(!effect_manager.getSync())
-        frequency = pow(2, ((15.0 * fx) / 4095.0) - 3.0f);
+    if(true)
+    return input_phase;
+
+    if(!effect_manager.getSync()){
+        // frequency = pow(2, ((15.0 * fx) / 4095.0) - 3.0f);
+    }
     else {
         if(fx >= 2048) {
             frequency *= int(1.0f + (fx - 2048.0f) * 15.0f / 2047.0f);

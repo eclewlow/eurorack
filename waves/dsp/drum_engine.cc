@@ -137,6 +137,8 @@ float DrumEngine::GetY(float x) {
 
 void DrumEngine::Render(AudioDac::Frame* output, uint32_t size, uint16_t tune, uint16_t fx_amount, uint16_t fx, uint16_t morph)
 {
+        loading = 56;
+
     //    float target = morph;
     // convert 12 bit uint 0-4095 to 0...15 float
     float morphTarget = morph * 1.0 / 4095.0;
@@ -212,7 +214,7 @@ void DrumEngine::Render(AudioDac::Frame* output, uint32_t size, uint16_t tune, u
         
         float sample = carrier_downsampler.Read();
         
-        output->l = sample;
+        output->l = static_cast<int32_t>(26000.0f * sample);
         ++output;
     }
 }
