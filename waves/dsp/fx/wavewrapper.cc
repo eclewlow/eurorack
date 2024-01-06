@@ -22,7 +22,7 @@ void Wavewrapper::Reset() {
     phase_ = 0.0f;
 }
 
-float Wavewrapper::RenderSampleEffect(float sample, float input_phase, float phase_increment, uint16_t fx_amount, uint16_t fx, bool isOscilloscope, bool downsampling) {
+float Wavewrapper::RenderSampleEffect(float sample, float input_phase, float phase_increment, uint16_t fx_amount, uint16_t fx, bool isOscilloscope) {
 
     float amount = settings_.fx_depth * ((float)fx_amount) / 65535.0f;
     
@@ -107,6 +107,6 @@ float Wavewrapper::RenderSampleEffect(float sample, float input_phase, float pha
     return sample;
 }
 
-float Wavewrapper::RenderPhaseEffect(float input_phase, float phase_increment, uint16_t fx_amount, uint16_t fx, bool isOscilloscope, bool downsampling) {
+float Wavewrapper::RenderPhaseEffect(float input_phase, float phase_increment, uint16_t fx_amount, uint16_t fx, bool isOscilloscope) {
     return input_phase;
 }

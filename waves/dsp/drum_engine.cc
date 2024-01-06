@@ -192,9 +192,9 @@ void DrumEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, uin
         interpolated_morph = CLAMP<float>(interpolated_morph, 0.0, 1.0);
         
         for (size_t j = 0; j < kOversampling; ++j) {
-            float sample = GetSampleBetweenFrames(effect_manager.RenderPhaseEffect(phase_, frequency, fx_amount, fx, false, true), interpolated_morph);
+            float sample = GetSampleBetweenFrames(effect_manager.RenderPhaseEffect(phase_, frequency, fx_amount, fx, false), interpolated_morph);
             
-            sample = effect_manager.RenderSampleEffect(sample, phase_, frequency, fx_amount, fx, false, true);
+            sample = effect_manager.RenderSampleEffect(sample, phase_, frequency, fx_amount, fx, false);
             
             sample = (1 - amp_decay_trigger_) * sample;
             

@@ -160,7 +160,7 @@ void ABEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, uint1
     //     return;
     // }
     // convert 12 bit uint 0-4095 to 0...15 float
-    float morphTarget = morph * 1.0 / 65535.0f;
+    float morphTarget = morph / 65535.0f;
     //    float interpolatedFloat = interpolated16 / 32768.0f;
     float tuneTarget = static_cast<float>(tune);
     
@@ -178,7 +178,7 @@ void ABEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, uint1
 
     // TODO:  interpolate phase_increment instead of tune.  pass in phase increment to effects-functions instead of frequency.
     float note = (120.0f * tuneTarget) / 65535.0;
-    // float note = 48;//tuneTarget * user_settings.getCalibrationX() + user_settings.getCalibrationY();
+    // float note = tuneTarget * user_settings.getCalibrationX() + user_settings.getCalibrationY();
     note = CLAMP<float>(note, 0.0f, 120.0f);
 
     note = quantizer.Quantize(note);
@@ -215,6 +215,11 @@ void ABEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, uint1
     ParameterInterpolator phase_increment_interpolator(&phase_increment_, NoteToFrequency(note), size);
     ParameterInterpolator sub_phase_increment_interpolator(&sub_phase_increment_, NoteToFrequency((note + settings_.subosc_detune / 100.0f + settings_.subosc_offset)), size);
 
+    float phase = 0;
+    float sample = 0;
+    float sub_sample = 0;
+    bool isOscilloscope = false;
+
     while (size--) {
         
         float interpolated_morph = morph_interpolator.Next();
@@ -232,77 +237,72 @@ void ABEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, uint1
             // float sample = GetSampleBetweenFrames(phase, interpolated_morph);
             // float sub_sample = GetSampleBetweenFrames(sub_phase_, interpolated_morph);
 
-            float phase = 0;
-            float sample = 0;
-            float sub_sample = 0;
-            bool isOscilloscope = false;
-            bool downsampling = true;
 
-            // sample = fm.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
+            // sample = fm.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope);
             switch(settings_.fx_effect) {
                 case EFFECT_TYPE_BYPASS:
-                    phase = bypass.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false, true);
+                    phase = bypass.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false);
 
                     sample = GetSampleBetweenFrames(phase, interpolated_morph);
                     sub_sample = GetSampleBetweenFrames(sub_phase_, interpolated_morph);
 
-                    sample = bypass.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
+                    sample = bypass.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope);
                     break;
                 case EFFECT_TYPE_FM:
-                    phase = fm.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false, true);
+                    phase = fm.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false);
 
                     sample = GetSampleBetweenFrames(phase, interpolated_morph);
                     sub_sample = GetSampleBetweenFrames(sub_phase_, interpolated_morph);
 
-                    sample = fm.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
+                    sample = fm.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope);
                     break;
                 case EFFECT_TYPE_RING_MODULATOR:
-                    phase = ring_modulator.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false, true);
+                    phase = ring_modulator.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false);
 
                     sample = GetSampleBetweenFrames(phase, interpolated_morph);
                     sub_sample = GetSampleBetweenFrames(sub_phase_, interpolated_morph);
 
-                    sample = ring_modulator.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
+                    sample = ring_modulator.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope);
                     break;
                 case EFFECT_TYPE_PHASE_DISTORTION:
-                    phase = phase_distortion.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false, true);
+                    phase = phase_distortion.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false);
 
                     sample = GetSampleBetweenFrames(phase, interpolated_morph);
                     sub_sample = GetSampleBetweenFrames(sub_phase_, interpolated_morph);
 
-                    sample = phase_distortion.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
+                    sample = phase_distortion.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope);
                     break;
                 case EFFECT_TYPE_WAVEFOLDER:
-                    phase = wavefolder.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false, true);
+                    phase = wavefolder.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false);
 
                     sample = GetSampleBetweenFrames(phase, interpolated_morph);
                     sub_sample = GetSampleBetweenFrames(sub_phase_, interpolated_morph);
 
-                    sample = wavefolder.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
+                    sample = wavefolder.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope);
                     break;
                 case EFFECT_TYPE_WAVEWRAPPER:
-                    phase = wavewrapper.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false, true);
+                    phase = wavewrapper.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false);
 
                     sample = GetSampleBetweenFrames(phase, interpolated_morph);
                     sub_sample = GetSampleBetweenFrames(sub_phase_, interpolated_morph);
 
-                    sample = wavewrapper.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
+                    sample = wavewrapper.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope);
                     break;
                 case EFFECT_TYPE_BITCRUSH:
-                    phase = bitcrush.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false, true);
+                    phase = bitcrush.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false);
 
                     sample = GetSampleBetweenFrames(phase, interpolated_morph);
                     sub_sample = GetSampleBetweenFrames(sub_phase_, interpolated_morph);
 
-                    sample = bitcrush.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
+                    sample = bitcrush.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope);
                     break;
                 case EFFECT_TYPE_DRIVE:
-                    phase = drive.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false, true);
+                    phase = drive.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false);
 
                     sample = GetSampleBetweenFrames(phase, interpolated_morph);
                     sub_sample = GetSampleBetweenFrames(sub_phase_, interpolated_morph);
 
-                    sample = drive.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
+                    sample = drive.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope);
                     break;
             }
 

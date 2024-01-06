@@ -259,7 +259,7 @@ void TIM1_UP_TIM10_IRQHandler(void) {
   // snprintf(value, 80, "buf=%04x, db=%08lx\n, %08lx", buffer[0], dataBuffer[0], flash.w25qxx.ID);
   // snprintf(value, 40, "f=%d\n", static_cast<int>(phase*100.0f));
   // sample += 1;
-  // _write(0, (char*)value, 80);
+  _write(0, (char*)value, 80);
 
 
       // GPIO_ResetBits(GPIOA, kPinFactorySS);
@@ -880,6 +880,9 @@ void Init() {
   // matrixEngine.Init();
   // drumEngine.Init();
   abEngine.Init();
+  wavetableEngine.Init();
+  matrixEngine.Init();
+  drumEngine.Init();
 
   effect_manager.Init();
 
@@ -892,10 +895,6 @@ void Init() {
   bitcrush.Init();
   drive.Init();
   
-  sys.StartTimers();
-
-
-
   // lcd.Initial();
   // lcd.Draw();
   // lcd.DisplayOff();
@@ -903,29 +902,32 @@ void Init() {
   // logger.Init(9600);
   // dac.Start(&FillBuffer);
   ResetSettings();
-    // EFFECT_TYPE_BYPASS          
+
+  // EFFECT_TYPE_BYPASS          
   // EFFECT_TYPE_FM
   // EFFECT_TYPE_RING_MODULATOR
   // EFFECT_TYPE_PHASE_DISTORTION
-    // EFFECT_TYPE_WAVEFOLDER        
-    // EFFECT_TYPE_WAVEWRAPPER       
-    // EFFECT_TYPE_BITCRUSH          
-    // EFFECT_TYPE_DRIVE             
+  // EFFECT_TYPE_WAVEFOLDER        
+  // EFFECT_TYPE_WAVEWRAPPER       
+  // EFFECT_TYPE_BITCRUSH          
+  // EFFECT_TYPE_DRIVE             
+  settings_.fx_effect = EFFECT_TYPE_FM;
 
-  settings_.fx_effect = EFFECT_TYPE_BYPASS;
-
-  context.setEngine(ENGINE_TYPE_AB);
-
-  abEngine.triggerUpdate();
-  // if(effect_manager != NULL)
-  // loading = 27;
-  // else
-  // loading = 28;
-  // effect_manager.setEffect(EFFECT_TYPE_FM);
-  // loading = 26;
+  // ENGINE_TYPE_AB
+  // ENGINE_TYPE_WAVETABLE
+  // ENGINE_TYPE_MATRIX
+  // ENGINE_TYPE_DRUM
+  // context.setEngine(ENGINE_TYPE_WAVETABLE);
+  // settings_.engine = ENGINE_TYPE_AB;
+  settings_.engine = ENGINE_TYPE_WAVETABLE;
+  
+  // abEngine.triggerUpdate();
+  wavetableEngine.triggerUpdate();
 
   audio_dac.Init(48000, kBlockSize);
   audio_dac.Start(&FillBuffer);
+
+  sys.StartTimers();
 
 }
 

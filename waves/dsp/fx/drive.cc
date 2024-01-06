@@ -22,7 +22,7 @@ void Drive::Reset() {
     phase_ = 0.0f;
 }
 
-float Drive::RenderSampleEffect(float sample, float input_phase, float phase_increment, uint16_t fx_amount, uint16_t fx, bool isOscilloscope, bool downsampling) {
+float Drive::RenderSampleEffect(float sample, float input_phase, float phase_increment, uint16_t fx_amount, uint16_t fx, bool isOscilloscope) {
 
     float amount = settings_.fx_depth * ((float)fx_amount) / 65535.0f;
 
@@ -125,6 +125,6 @@ float Drive::RenderSampleEffect(float sample, float input_phase, float phase_inc
     return sample;
 }
 
-float Drive::RenderPhaseEffect(float input_phase, float phase_increment, uint16_t fx_amount, uint16_t fx, bool isOscilloscope, bool downsampling) {
+float Drive::RenderPhaseEffect(float input_phase, float phase_increment, uint16_t fx_amount, uint16_t fx, bool isOscilloscope) {
     return input_phase;
 }

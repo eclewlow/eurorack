@@ -21,8 +21,8 @@ public:
     virtual ~Effect() {}
     virtual void Init() = 0;
     virtual void Reset() = 0;
-    virtual float RenderSampleEffect(float sample, float phase, float phase_increment, uint16_t fx_amount, uint16_t fx, bool isOscilloscope, bool downsampling) = 0;
-    virtual float RenderPhaseEffect(float phase, float phase_increment, uint16_t fx_amount, uint16_t fx, bool isOscilloscope, bool downsampling) = 0;
+    virtual float RenderSampleEffect(float sample, float phase, float phase_increment, uint16_t fx_amount, uint16_t fx, bool isOscilloscope) = 0;
+    virtual float RenderPhaseEffect(float phase, float phase_increment, uint16_t fx_amount, uint16_t fx, bool isOscilloscope) = 0;
     inline void Sync_phases() { oscilloscope_phase_ = phase_; }
     
     inline void triggerUpdate() { /*phase = 0.0f; oscilloscopePhase = 0.0f;*/ }

@@ -27,10 +27,10 @@ public:
     void setEffect(uint8_t effect_type);
     Effect* getEffect();
 
-    int16_t RenderSampleEffect(int16_t sample, float phase, float frequency, uint16_t fx_amount, uint16_t fx, bool isOscillcope=false, bool downsampling=false);
+    int16_t RenderSampleEffect(int16_t sample, float phase, float frequency, uint16_t fx_amount, uint16_t fx, bool isOscillcope=false);
 
-    float RenderSampleEffect(float sample, float phase, float frequency, uint16_t fx_amount, uint16_t fx, bool isOscillcope=false, bool downsampling=false);
-    float RenderPhaseEffect(float phase, float frequency, uint16_t fx_amount, uint16_t fx, bool isOscillcope=false, bool downsampling=false);
+    float RenderSampleEffect(float sample, float phase, float frequency, uint16_t fx_amount, uint16_t fx, bool isOscillcope=false);
+    float RenderPhaseEffect(float phase, float frequency, uint16_t fx_amount, uint16_t fx, bool isOscillcope=false);
     float GetSample(float phase);
     
     uint8_t getEffectType();

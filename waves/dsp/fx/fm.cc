@@ -21,11 +21,11 @@ void FM::Reset() {
     phase_ = 0.0f;
 }
 
-float FM::RenderSampleEffect(float sample, float input_phase, float frequency, uint16_t fx_amount, uint16_t fx, bool isOscilloscope, bool downsampling) {
+float FM::RenderSampleEffect(float sample, float input_phase, float frequency, uint16_t fx_amount, uint16_t fx, bool isOscilloscope) {
     return sample;
 }
 
-float FM::RenderPhaseEffect(float input_phase, float phase_increment, uint16_t fx_amount, uint16_t fx, bool isOscilloscope, bool downsampling) {
+float FM::RenderPhaseEffect(float input_phase, float phase_increment, uint16_t fx_amount, uint16_t fx, bool isOscilloscope) {
 
     float amount = settings_.fx_depth * ((float)fx_amount) / 65535.0f;
 

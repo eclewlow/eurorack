@@ -36,7 +36,7 @@ namespace waves {
 
 const uint8_t kNumAdcChannels = 8;
 const uint8_t kHistoryLength = 64;
-const uint16_t kThreshold = 70;
+const uint16_t kThreshold = 200;
 
 class Adc {
  public:
@@ -58,41 +58,11 @@ class Adc {
   void DeInit();
   void Convert();
   
-  float float_value(int channel) {
+  inline float float_value(int channel) {
     return static_cast<float>(value(channel)) / 65536.0f;
   }
 
-  uint16_t getChannel(int channel) {
-
-    // // apply hysteresis
-    // if (abs(static_cast<int>(values_[channel]) - static_cast<int>(pre_hysteresis[channel])) < kThreshold) {
-    //   history[channel][history_index[channel]] = pre_hysteresis[channel];
-    // } else {
-    //   history[channel][history_index[channel]] = values_[channel];
-    //   pre_hysteresis[channel] = values_[channel];
-    // }
-
-    // // history[channel][history_index[channel]] = values_[channel];
-
-    // history_index[channel] = (history_index[channel] + 1) % kHistoryLength;
-    // uint32_t sum = 0;
-    // for (uint8_t i = 0; i < kHistoryLength; i++) {
-    //   sum += history[channel][i];
-    // }
-    // uint16_t average = sum / kHistoryLength;
-
-    // // apply hysteresis
-    // if (abs(static_cast<int>(average) - static_cast<int>(post_hysteresis[channel])) < kThreshold) {
-    //   average = post_hysteresis[channel];
-    // } else {
-    //   post_hysteresis[channel] = average;
-    // }
-
-    // return average;
-    return values_[channel];
-  }
-
-  uint16_t value(int channel) {
+  inline uint16_t getChannel(int channel) {
 
     // apply hysteresis
     if (abs(static_cast<int>(values_[channel]) - static_cast<int>(pre_hysteresis[channel])) < kThreshold) {
@@ -122,7 +92,37 @@ class Adc {
     // return values_[channel];
   }
 
-  uint16_t getChannelProcessed(int channel) {
+  inline uint16_t value(int channel) {
+
+    // apply hysteresis
+    if (abs(static_cast<int>(values_[channel]) - static_cast<int>(pre_hysteresis[channel])) < kThreshold) {
+      history[channel][history_index[channel]] = pre_hysteresis[channel];
+    } else {
+      history[channel][history_index[channel]] = values_[channel];
+      pre_hysteresis[channel] = values_[channel];
+    }
+
+    // history[channel][history_index[channel]] = values_[channel];
+
+    history_index[channel] = (history_index[channel] + 1) % kHistoryLength;
+    uint32_t sum = 0;
+    for (uint8_t i = 0; i < kHistoryLength; i++) {
+      sum += history[channel][i];
+    }
+    uint16_t average = sum / kHistoryLength;
+
+    // apply hysteresis
+    if (abs(static_cast<int>(average) - static_cast<int>(post_hysteresis[channel])) < kThreshold) {
+      average = post_hysteresis[channel];
+    } else {
+      post_hysteresis[channel] = average;
+    }
+
+    return average;
+    // return values_[channel];
+  }
+
+  inline uint16_t getChannelProcessed(int channel) {
     return value(channel);
   }
   // inline const uint16_t* values() const {
