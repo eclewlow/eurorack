@@ -26,6 +26,9 @@ void MatrixEngine::Init() {
     phase_ = 0.0f;
 }
 
+float MatrixEngine::GetSample(int16_t wavetable, int16_t frame, float phase) {
+    return 0.0f;
+}
 
 float MatrixEngine::GetSampleBetweenFrames(float phase, float morph_x, float morph_y) {
     // if x1 = 8 and x2 = 12. and morph_x = 0.5, then x1 + morph_x * (x2 - x1)

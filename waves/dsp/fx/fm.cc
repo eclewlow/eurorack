@@ -11,20 +11,14 @@
 #include "waves/dsp/fx/effect.h"
 #include "waves/Globals.h"
 #include "math.h"
+#include "waves/dsp/dsp.h"
 
 void FM::Init() {
     phase_ = 0.0f;
-        phase_test_ = 0.0f;
 }
 
 void FM::Reset() {
     phase_ = 0.0f;
-        phase_test_ = 0.0f;
-}
-
-float FM::GetSample(float phase) {
-    float sample = sin(2 * M_PI * phase);
-    return sample;
 }
 
 float FM::RenderSampleEffect(float sample, float input_phase, float frequency, uint16_t fx_amount, uint16_t fx, bool isOscilloscope, bool downsampling) {
@@ -33,7 +27,7 @@ float FM::RenderSampleEffect(float sample, float input_phase, float frequency, u
 
 float FM::RenderPhaseEffect(float input_phase, float phase_increment, uint16_t fx_amount, uint16_t fx, bool isOscilloscope, bool downsampling) {
 
-    float amount = ((float)fx_amount) / 65535.0f;
+    float amount = settings_.fx_depth * ((float)fx_amount) / 65535.0f;
 
     float adjusted_phase = 0.0f;
 
@@ -65,17 +59,11 @@ float FM::RenderPhaseEffect(float input_phase, float phase_increment, uint16_t f
         {
             float sample = 0.0f;
 
-            float index = *target_phase * kSineLUTSize;
-            MAKE_INTEGRAL_FRACTIONAL(index)
-            float a = lut_sine[index_integral];
-            float b = lut_sine[index_integral + 1];
-
-            sample = a + (b - a) * index_fractional;//stmlib::InterpolateWrap(lut_sine, 0.0f, kSineLUTSize);
-
-            phase_ = phase_ + phase_increment;
-            if(phase_ >= 1.0f) {
-                phase_ -= 1.0f;
-            }
+            sample = GetOscillatorSample(*target_phase, phase_increment);
+            
+            *target_phase += phase_increment;
+            if(*target_phase >= 1.0)
+                *target_phase -= 1.0;
 
             adjusted_phase = input_phase + amount * sample;
             

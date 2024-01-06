@@ -11,6 +11,7 @@
 #include "waves/dsp/fx/effect.h"
 #include "waves/Globals.h"
 #include "math.h"
+#include "waves/dsp/dsp.h"
 
 
 void Wavefolder::Init() {
@@ -21,32 +22,32 @@ void Wavefolder::Reset() {
     phase_ = 0.0f;
 }
 
-float Wavefolder::GetSample(float phase) {
-    float sample = sin(2 * M_PI * phase);
-    return sample;
-}
-
 float Wavefolder::RenderSampleEffect(float sample, float input_phase, float phase_increment, uint16_t fx_amount, uint16_t fx, bool isOscilloscope, bool downsampling) {
     return sample;
 }
 
 float Wavefolder::RenderPhaseEffect(float input_phase, float phase_increment, uint16_t fx_amount, uint16_t fx, bool isOscilloscope, bool downsampling) {
-    float amount = effect_manager.getDepth() * (fx_amount / 4095.0f);
+
+    float amount = settings_.fx_depth * ((float)fx_amount) / 65535.0f;
 
     float adjusted_phase = 0.0f;
-    float frequency = 48000.0f * phase_increment;
-        
-    if(!effect_manager.getSync())
-        frequency = pow(2, ((15.0 * fx) / 4095.0) - 3.0f);
+    
+    if(!settings_.fx_sync){
+        float index = (fx / 65535.0f) * kSineLUTSize;
+        MAKE_INTEGRAL_FRACTIONAL(index)
+        float a = lut_fx_pow[index_integral];
+        float b = lut_fx_pow[index_integral + 1];
+
+        phase_increment = a + (b - a) * index_fractional;
+    }
     else {
-        if(fx >= 2048) {
-            frequency *= int(1.0f + (fx - 2048.0f) * 15.0f / 2047.0f);
+        if(fx >= 32768) {
+            phase_increment *= static_cast<float>(1.0f + static_cast<uint8_t>((fx - 32768.0f) * 15.0f / 32767.0f));
         } else {
-            frequency /= int(1.0f + (2047 - fx) * 15.0f / 2047.0f);
+            phase_increment /= static_cast<float>(1.0f + static_cast<uint8_t>((32767 - fx) * 15.0f / 32767.0f));
         }
     }
-    
-    phase_increment = frequency / 48000.0f;
+
     
     float *target_phase;
     
@@ -57,15 +58,15 @@ float Wavefolder::RenderPhaseEffect(float input_phase, float phase_increment, ui
     
     // float oscillator = 0.0f; // unused
     
-    switch(effect_manager.getControlType()) {
+    switch(settings_.fx_control_type) {
         case INTERNAL_MODULATOR: {
             
             
-            float oscillator_sample = context.getEngine()->GetOscillatorSample(*target_phase, phase_increment);
+            float oscillator_sample = GetOscillatorSample(*target_phase, phase_increment);
 
             amount = amount * oscillator_sample;
             
-            adjusted_phase = 6 * context.getEngine()->GetSine(input_phase);
+            adjusted_phase = 6 * GetSine(input_phase);
             
             adjusted_phase = (1 - amount) * input_phase + amount * adjusted_phase;
             
@@ -77,9 +78,9 @@ float Wavefolder::RenderPhaseEffect(float input_phase, float phase_increment, ui
         }
         case EXTERNAL_MODULATOR:
         {
-            amount = amount * (2.0f * fx / 4095.0f - 1.0f);
+            amount = amount * (2.0f * fx / 65535.0f - 1.0f);
             
-            adjusted_phase = 6 * context.getEngine()->GetSine(input_phase);
+            adjusted_phase = 6 * GetSine(input_phase);
 
             adjusted_phase = (1 - amount) * input_phase + amount * adjusted_phase;
 
@@ -87,9 +88,9 @@ float Wavefolder::RenderPhaseEffect(float input_phase, float phase_increment, ui
         }
         case MANUAL_CONTROL:
         {
-            amount = amount * (2.0f * fx / 4095.0f - 1.0f);
+            amount = amount * (2.0f * fx / 65535.0f - 1.0f);
             
-            adjusted_phase = 6 * context.getEngine()->GetSine(input_phase);
+            adjusted_phase = 6 * GetSine(input_phase);
 
             adjusted_phase = (1 - amount) * input_phase + amount * adjusted_phase;
 

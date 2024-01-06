@@ -30,6 +30,10 @@ void DrumEngine::Init() {
     fm_decay_trigger_ = 1.0f;
 }
 
+float DrumEngine::GetSample(int16_t wavetable, int16_t frame, float phase) {
+    return 0.0f;
+}
+
 float DrumEngine::GetSampleBetweenFrames(float phase, float morph) {
     float frame = morph * 15.0f;
     uint16_t frame_integral = floor(frame);

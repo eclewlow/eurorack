@@ -11,6 +11,7 @@
 #include "waves/dsp/fx/effect.h"
 #include "waves/Globals.h"
 #include "math.h"
+#include "waves/dsp/dsp.h"
 
 
 void Drive::Init() {
@@ -21,28 +22,25 @@ void Drive::Reset() {
     phase_ = 0.0f;
 }
 
-float Drive::GetSample(float phase) {
-    float sample = sin(2 * M_PI * phase);
-    return sample;
-}
-
 float Drive::RenderSampleEffect(float sample, float input_phase, float phase_increment, uint16_t fx_amount, uint16_t fx, bool isOscilloscope, bool downsampling) {
-    float amount = effect_manager.getDepth() * (fx_amount / 4095.0f);
-    
-    // float adjusted_phase = 0.0f; // unused
-    float frequency = 48000.0f * phase_increment;
 
-    if(!effect_manager.getSync())
-        frequency = pow(2, ((15.0 * fx) / 4095.0) - 3.0f);
+    float amount = settings_.fx_depth * ((float)fx_amount) / 65535.0f;
+
+    if(!settings_.fx_sync){
+        float index = (fx / 65535.0f) * kSineLUTSize;
+        MAKE_INTEGRAL_FRACTIONAL(index)
+        float a = lut_fx_pow[index_integral];
+        float b = lut_fx_pow[index_integral + 1];
+
+        phase_increment = a + (b - a) * index_fractional;
+    }
     else {
-        if(fx >= 2048) {
-            frequency *= int(1.0f + (fx - 2048.0f) * 15.0f / 2047.0f);
+        if(fx >= 32768) {
+            phase_increment *= static_cast<float>(1.0f + static_cast<uint8_t>((fx - 32768.0f) * 15.0f / 32767.0f));
         } else {
-            frequency /= int(1.0f + (2047 - fx) * 15.0f / 2047.0f);
+            phase_increment /= static_cast<float>(1.0f + static_cast<uint8_t>((32767 - fx) * 15.0f / 32767.0f));
         }
     }
-    
-    phase_increment = frequency / 48000.0f;
     
     float *target_phase;
     
@@ -52,12 +50,12 @@ float Drive::RenderSampleEffect(float sample, float input_phase, float phase_inc
         target_phase = &phase_;
     
     
-    switch(effect_manager.getControlType()) {
+    switch(settings_.fx_control_type) {
         case INTERNAL_MODULATOR: {
             
             float modulator_sample = 0.0f;
             
-            modulator_sample = context.getEngine()->GetOscillatorSample(*target_phase, phase_increment);
+            modulator_sample = GetOscillatorSample(*target_phase, phase_increment);
 
             *target_phase += phase_increment;
             if(*target_phase >= 1.0)
@@ -83,7 +81,7 @@ float Drive::RenderSampleEffect(float sample, float input_phase, float phase_inc
         }
         case EXTERNAL_MODULATOR:
         {
-            float modulator_sample = fx / 4095.0;
+            float modulator_sample = fx / 65535.0f;
             
             float calculated_sample = 0.0f;
             
@@ -98,7 +96,7 @@ float Drive::RenderSampleEffect(float sample, float input_phase, float phase_inc
         }
         case MANUAL_CONTROL:
         {
-            float modulator_sample = fx / 4095.0;
+            float modulator_sample = fx / 65535.0f;
             
             float calculated_sample = 0.0f;
             

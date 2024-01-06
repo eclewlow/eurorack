@@ -13,6 +13,7 @@
 // #include "waves/dsp/ParameterInterpolator.h"
 #include "waves/Globals.h"
 #include "waves/dsp/downsampler/4x_downsampler.h"
+#include "waves/dsp/dsp.h"
 
 Suboscillator::Suboscillator() {
     phase_ = 0.0f;

@@ -456,7 +456,20 @@ void FillBuffer(AudioDac::Frame* output, size_t size) {
   uint16_t morph = adc.getChannel(3);
 
   // loading = 23;
-  abEngine.Render((AudioDac::Frame*)(output), size, tune, fx_amount, fx, morph);
+  switch(settings_.engine) {
+    case ENGINE_TYPE_AB:
+      abEngine.Render((AudioDac::Frame*)(output), size, tune, fx_amount, fx, morph);
+      break;
+    case ENGINE_TYPE_WAVETABLE:
+      wavetableEngine.Render((AudioDac::Frame*)(output), size, tune, fx_amount, fx, morph);
+      break;
+    case ENGINE_TYPE_MATRIX:
+      matrixEngine.Render((AudioDac::Frame*)(output), size, tune, fx_amount, fx, morph);
+      break;
+    case ENGINE_TYPE_DRUM:
+      drumEngine.Render((AudioDac::Frame*)(output), size, tune, fx_amount, fx, morph);
+      break;
+  }
     // if(context.getLastEngine()) {
     //     float last_engine_out[size];
     //     context.getLastEngine()->Render(last_engine_out, last_engine_out, size, tune, fx_amount, fx, morph);
@@ -867,8 +880,17 @@ void Init() {
   // matrixEngine.Init();
   // drumEngine.Init();
   abEngine.Init();
+
   effect_manager.Init();
+
+  bypass.Init();
   fm.Init();
+  ring_modulator.Init();
+  phase_distortion.Init();
+  wavefolder.Init();
+  wavewrapper.Init();
+  bitcrush.Init();
+  drive.Init();
   
   sys.StartTimers();
 
@@ -881,7 +903,16 @@ void Init() {
   // logger.Init(9600);
   // dac.Start(&FillBuffer);
   ResetSettings();
-  settings_.fx_effect = EFFECT_TYPE_FM;
+    // EFFECT_TYPE_BYPASS          
+  // EFFECT_TYPE_FM
+  // EFFECT_TYPE_RING_MODULATOR
+  // EFFECT_TYPE_PHASE_DISTORTION
+    // EFFECT_TYPE_WAVEFOLDER        
+    // EFFECT_TYPE_WAVEWRAPPER       
+    // EFFECT_TYPE_BITCRUSH          
+    // EFFECT_TYPE_DRIVE             
+
+  settings_.fx_effect = EFFECT_TYPE_BYPASS;
 
   context.setEngine(ENGINE_TYPE_AB);
 

@@ -36,17 +36,6 @@ public:
     virtual void FillWaveform(int16_t * waveform, uint16_t tune, uint16_t fx_amount, uint16_t fx, uint16_t morph, bool withFx = true) = 0;
     virtual float GetSampleNoFX(float phase, float fx, float morph) = 0;
     virtual void triggerUpdate() = 0;
-    // float GetSample(int16_t wavetable, int16_t frame, float phase);
-    float GetSine(float phase);
-    float GetRamp(float phase, float phase_increment);
-    float GetSawtooth(float phase, float phase_increment);
-    float GetSquare(float phase, float phase_increment);
-    float GetTriangle(float phase);
-    float GetOscillatorSample(float phase, float phase_increment);
-    double poly_blep(double t);
-    float poly_blep(float t, float dt);
-    inline float ThisBlepSample(float t) { return 0.5f * t * t; }
-    inline float NextBlepSample(float t) { t = 1.0f - t; return -0.5f * t * t; }
     inline void reset_phase() { phase_ = 0; }
     
     inline float NoteToFrequency(float midi_note) {

@@ -240,7 +240,7 @@ void ABEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, uint1
 
             // sample = fm.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
             switch(settings_.fx_effect) {
-                case 0:
+                case EFFECT_TYPE_BYPASS:
                     phase = bypass.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false, true);
 
                     sample = GetSampleBetweenFrames(phase, interpolated_morph);
@@ -248,7 +248,7 @@ void ABEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, uint1
 
                     sample = bypass.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
                     break;
-                case 1:
+                case EFFECT_TYPE_FM:
                     phase = fm.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false, true);
 
                     sample = GetSampleBetweenFrames(phase, interpolated_morph);
@@ -256,7 +256,7 @@ void ABEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, uint1
 
                     sample = fm.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
                     break;
-                case 2:
+                case EFFECT_TYPE_RING_MODULATOR:
                     phase = ring_modulator.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false, true);
 
                     sample = GetSampleBetweenFrames(phase, interpolated_morph);
@@ -264,7 +264,7 @@ void ABEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, uint1
 
                     sample = ring_modulator.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
                     break;
-                case 3:
+                case EFFECT_TYPE_PHASE_DISTORTION:
                     phase = phase_distortion.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false, true);
 
                     sample = GetSampleBetweenFrames(phase, interpolated_morph);
@@ -272,7 +272,7 @@ void ABEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, uint1
 
                     sample = phase_distortion.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
                     break;
-                case 4:
+                case EFFECT_TYPE_WAVEFOLDER:
                     phase = wavefolder.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false, true);
 
                     sample = GetSampleBetweenFrames(phase, interpolated_morph);
@@ -280,7 +280,7 @@ void ABEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, uint1
 
                     sample = wavefolder.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
                     break;
-                case 5:
+                case EFFECT_TYPE_WAVEWRAPPER:
                     phase = wavewrapper.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false, true);
 
                     sample = GetSampleBetweenFrames(phase, interpolated_morph);
@@ -288,7 +288,7 @@ void ABEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, uint1
 
                     sample = wavewrapper.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
                     break;
-                case 6:
+                case EFFECT_TYPE_BITCRUSH:
                     phase = bitcrush.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false, true);
 
                     sample = GetSampleBetweenFrames(phase, interpolated_morph);
@@ -296,7 +296,7 @@ void ABEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, uint1
 
                     sample = bitcrush.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
                     break;
-                case 7:
+                case EFFECT_TYPE_DRIVE:
                     phase = drive.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false, true);
 
                     sample = GetSampleBetweenFrames(phase, interpolated_morph);
