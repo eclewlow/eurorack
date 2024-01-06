@@ -99,14 +99,14 @@ bool FxMenu::handleKeyRelease(int key) {
     if(key == RIGHT_ENCODER_CCW) {
         switch(right_state_) {
             case FX_MENU_RIGHT_MOD:
-                if(effect_manager.getControlType() == EffectManager::MANUAL_CONTROL) {
+                if(effect_manager.getControlType() == MANUAL_CONTROL) {
                     ClearWaveform();
-                    effect_manager.setControlType(EffectManager::EXTERNAL_MODULATOR);
+                    effect_manager.setControlType(EXTERNAL_MODULATOR);
                 }
-                else if(effect_manager.getControlType() == EffectManager::INTERNAL_MODULATOR)
-                    effect_manager.setControlType(EffectManager::MANUAL_CONTROL);
-                else if(effect_manager.getControlType() == EffectManager::EXTERNAL_MODULATOR)
-                    effect_manager.setControlType(EffectManager::INTERNAL_MODULATOR);
+                else if(effect_manager.getControlType() == INTERNAL_MODULATOR)
+                    effect_manager.setControlType(MANUAL_CONTROL);
+                else if(effect_manager.getControlType() == EXTERNAL_MODULATOR)
+                    effect_manager.setControlType(INTERNAL_MODULATOR);
                 break;
             case FX_MENU_RIGHT_SYNC:
                 effect_manager.setSync(!effect_manager.getSync());
@@ -130,14 +130,14 @@ bool FxMenu::handleKeyRelease(int key) {
     if(key == RIGHT_ENCODER_CW) {
         switch(right_state_) {
             case FX_MENU_RIGHT_MOD:
-                if(effect_manager.getControlType() == EffectManager::MANUAL_CONTROL)
-                    effect_manager.setControlType(EffectManager::INTERNAL_MODULATOR);
-                else if(effect_manager.getControlType() == EffectManager::INTERNAL_MODULATOR) {
+                if(effect_manager.getControlType() == MANUAL_CONTROL)
+                    effect_manager.setControlType(INTERNAL_MODULATOR);
+                else if(effect_manager.getControlType() == INTERNAL_MODULATOR) {
                     ClearWaveform();
-                    effect_manager.setControlType(EffectManager::EXTERNAL_MODULATOR);
+                    effect_manager.setControlType(EXTERNAL_MODULATOR);
                 }
-                else if(effect_manager.getControlType() == EffectManager::EXTERNAL_MODULATOR)
-                    effect_manager.setControlType(EffectManager::MANUAL_CONTROL);
+                else if(effect_manager.getControlType() == EXTERNAL_MODULATOR)
+                    effect_manager.setControlType(MANUAL_CONTROL);
                 break;
             case FX_MENU_RIGHT_SYNC:
                 effect_manager.setSync(!effect_manager.getSync());
@@ -175,14 +175,14 @@ bool FxMenu::handleKeyRelease(int key) {
     if(key == RIGHT_ENCODER_CLICK) {
         switch(right_state_) {
             case FX_MENU_RIGHT_MOD:
-                if(effect_manager.getControlType() == EffectManager::MANUAL_CONTROL) {
+                if(effect_manager.getControlType() == MANUAL_CONTROL) {
                     break;
                 }
-                else if(effect_manager.getControlType() == EffectManager::EXTERNAL_MODULATOR) {
+                else if(effect_manager.getControlType() == EXTERNAL_MODULATOR) {
                     setRightState(FX_MENU_RIGHT_SCALE);
                     break;
                 }
-                else if(effect_manager.getControlType() == EffectManager::INTERNAL_MODULATOR) {
+                else if(effect_manager.getControlType() == INTERNAL_MODULATOR) {
                     setRightState(FX_MENU_RIGHT_WAVE);
                     break;
                 }
@@ -272,15 +272,15 @@ void FxMenu::paint(juce::Graphics& g) {
     Display::put_string_9x9(x_offset, y_offset, strlen("MOD"), "MOD", false, 2);
     
     char * controlName;
-    if(effect_manager.getControlType() == EffectManager::MANUAL_CONTROL)
+    if(effect_manager.getControlType() == MANUAL_CONTROL)
     {
         controlName = (char*)"POT";
     }
-    else if(effect_manager.getControlType() == EffectManager::INTERNAL_MODULATOR)
+    else if(effect_manager.getControlType() == INTERNAL_MODULATOR)
     {
         controlName = (char*)"OSC";
     }
-    else if(effect_manager.getControlType() == EffectManager::EXTERNAL_MODULATOR)
+    else if(effect_manager.getControlType() == EXTERNAL_MODULATOR)
     {
         controlName = (char*)"IN";
     }
@@ -311,12 +311,12 @@ void FxMenu::paint(juce::Graphics& g) {
 
     Display::Draw_Wave(1, graph_y_offset + 1, 64-3-2, graph_height - 2, BUF1);
 
-    if(effect_manager.getControlType() == EffectManager::MANUAL_CONTROL) {
+    if(effect_manager.getControlType() == MANUAL_CONTROL) {
         char pot_value_string[4];
         snprintf(pot_value_string, 4, "%d", (fx * 100) / 4095);
         Display::put_string_9x9(64 + (64-3) / 2 - Display::get_string_9x9_width(pot_value_string, 2) / 2, graph_y_offset + graph_height / 2 - 4, strlen(pot_value_string), pot_value_string, false, 2);
     }
-    else if(effect_manager.getControlType() == EffectManager::INTERNAL_MODULATOR) {
+    else if(effect_manager.getControlType() == INTERNAL_MODULATOR) {
         Display::Draw_Wave(64+1, graph_y_offset + 1, 64-3-2, graph_height - 2, BUF1);
         
         char * waveName;
@@ -384,7 +384,7 @@ void FxMenu::paint(juce::Graphics& g) {
             Display::put_string_5x5(64 + 6*6+1, depth_y_offset, strlen(rs_strings), rs_strings, right_state_ == FX_MENU_RIGHT_FREQUENCY);
         }
     }
-    else if(effect_manager.getControlType() == EffectManager::EXTERNAL_MODULATOR) {
+    else if(effect_manager.getControlType() == EXTERNAL_MODULATOR) {
         // TODO: draw incoming ADC FX CV value
         UpdateWaveform();
         Display::Draw_NWave(64 + 1, graph_y_offset + 1, 64 - 3 - 2, graph_height - 2, wavedata_, 59);

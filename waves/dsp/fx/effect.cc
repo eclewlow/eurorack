@@ -12,11 +12,11 @@
 #include "waves/Globals.h"
 
 void Effect::Init() {
-    phase = 0.0f;
-    oscilloscopePhase = 0.0f;
+    phase_ = 0.0f;
+    oscilloscope_phase_ = 0.0f;
 }
 
 void Effect::Reset() {
-    phase = 0.0f;
-    oscilloscopePhase = 0.0f;
+    phase_ = 0.0f;
+    oscilloscope_phase_ = 0.0f;
 }

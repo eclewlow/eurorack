@@ -43,25 +43,25 @@ void Context::paint() {
 
 void Context::setEngine(int8_t engine) { 
     // loading=41;
-    if(engine == user_settings.settings_ptr()->engine)
+    if(engine == settings_.engine)
         return;
     
-    last_engine_ = user_settings.settings_ptr()->engine;
+    last_engine_ = settings_.engine;
     // loading=42;
 
-    user_settings.settings_ptr()->engine = engine;
+    settings_.engine = engine;
 
-    switch(user_settings.settings_ptr()->engine) {
-        case Context::ENGINE_TYPE_AB:
+    switch(settings_.engine) {
+        case ENGINE_TYPE_AB:
             abEngine.triggerUpdate();
             break;
-        case Context::ENGINE_TYPE_WAVETABLE:
+        case ENGINE_TYPE_WAVETABLE:
             wavetableEngine.triggerUpdate();
             break;
-        case Context::ENGINE_TYPE_MATRIX:
+        case ENGINE_TYPE_MATRIX:
             matrixEngine.triggerUpdate();
             break;
-        case Context::ENGINE_TYPE_DRUM:
+        case ENGINE_TYPE_DRUM:
             drumEngine.triggerUpdate();
             break;
     }
@@ -69,17 +69,17 @@ void Context::setEngine(int8_t engine) {
 
 Engine* Context::getEngine() {
     Engine * engine = NULL;
-    switch(user_settings.settings_ptr()->engine) {
-        case Context::ENGINE_TYPE_AB:
+    switch(settings_.engine) {
+        case ENGINE_TYPE_AB:
             engine = &abEngine;
             break;
-        case Context::ENGINE_TYPE_WAVETABLE:
+        case ENGINE_TYPE_WAVETABLE:
             engine = &wavetableEngine;
             break;
-        case Context::ENGINE_TYPE_MATRIX:
+        case ENGINE_TYPE_MATRIX:
             engine = &matrixEngine;
             break;
-        case Context::ENGINE_TYPE_DRUM:
+        case ENGINE_TYPE_DRUM:
             engine = &drumEngine;
             break;
     }
@@ -88,16 +88,16 @@ Engine* Context::getEngine() {
 Engine* Context::getLastEngine() { 
     Engine * engine;
     switch(last_engine_) {
-        case Context::ENGINE_TYPE_AB:
+        case ENGINE_TYPE_AB:
             engine = &abEngine;
             break;
-        case Context::ENGINE_TYPE_WAVETABLE:
+        case ENGINE_TYPE_WAVETABLE:
             engine = &wavetableEngine;
             break;
-        case Context::ENGINE_TYPE_MATRIX:
+        case ENGINE_TYPE_MATRIX:
             engine = &matrixEngine;
             break;
-        case Context::ENGINE_TYPE_DRUM:
+        case ENGINE_TYPE_DRUM:
             engine = &drumEngine;
             break;
         default:

@@ -21,7 +21,7 @@ Engine::Engine() {
 }
 
 float Engine::GetSine(float phase) {
-    float sample = sinf(2 * M_PI * phase);
+    float sample = Sine(2 * M_PI * phase);
     return sample;
     // return 0;
 }
@@ -116,15 +116,15 @@ float Engine::GetTriangle(float phase) {
 }
 
 float Engine::GetOscillatorSample(float phase, float phase_increment) {
-    if(effect_manager.getOscillatorShape() == EffectManager::SINE_SHAPE)
+    if(effect_manager.getOscillatorShape() == SINE_SHAPE)
         return GetSine(phase);
-    else if(effect_manager.getOscillatorShape() == EffectManager::TRIANGLE_SHAPE)
+    else if(effect_manager.getOscillatorShape() == TRIANGLE_SHAPE)
         return GetTriangle(phase);
-    else if(effect_manager.getOscillatorShape() == EffectManager::SAWTOOTH_SHAPE)
+    else if(effect_manager.getOscillatorShape() == SAWTOOTH_SHAPE)
         return GetSawtooth(phase, phase_increment);
-    else if(effect_manager.getOscillatorShape() == EffectManager::RAMP_SHAPE)
+    else if(effect_manager.getOscillatorShape() == RAMP_SHAPE)
         return GetRamp(phase, phase_increment);
-    else if(effect_manager.getOscillatorShape() == EffectManager::SQUARE_SHAPE)
+    else if(effect_manager.getOscillatorShape() == SQUARE_SHAPE)
         return GetSquare(phase, phase_increment);
     else return 0.0f;
 }

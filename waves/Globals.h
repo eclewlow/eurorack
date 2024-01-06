@@ -99,7 +99,8 @@ extern uint8_t lcd_buffer[8][128];
 using namespace waves;
 
 extern Context context;
-extern UserSettings user_settings;
+// extern UserSettings user_settings;
+extern SNAPSHOT settings_;
 // extern Storage storage;
 
 // extern MainMenu mainMenu;

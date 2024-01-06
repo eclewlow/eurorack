@@ -20,14 +20,7 @@ class Context {
 public:
     Context();
     ~Context();
-    
-    enum EngineType {
-        ENGINE_TYPE_AB          = 0,
-        ENGINE_TYPE_WAVETABLE   = 1,
-        ENGINE_TYPE_MATRIX      = 2,
-        ENGINE_TYPE_DRUM        = 3,
-    };
-    
+        
     inline void setState(State* state, bool back_pressed = false) { if(_state == state) return; _state = state; _state->triggerUpdate(back_pressed); }
     inline State* getState() { return _state; }
     

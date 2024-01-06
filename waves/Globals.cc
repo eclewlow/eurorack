@@ -13,7 +13,8 @@
 using namespace waves;
 
 Context context;
-UserSettings user_settings;
+// UserSettings user_settings;
+SNAPSHOT settings_;
 // Storage storage;
 
 // MainMenu mainMenu;

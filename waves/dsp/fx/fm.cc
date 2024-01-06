@@ -13,11 +13,13 @@
 #include "math.h"
 
 void FM::Init() {
-    phase = 0.0f;
+    phase_ = 0.0f;
+        phase_test_ = 0.0f;
 }
 
 void FM::Reset() {
-    phase = 0.0f;
+    phase_ = 0.0f;
+        phase_test_ = 0.0f;
 }
 
 float FM::GetSample(float phase) {
@@ -29,60 +31,67 @@ float FM::RenderSampleEffect(float sample, float input_phase, float frequency, u
     return sample;
 }
 
-float FM::RenderPhaseEffect(float input_phase, float frequency, uint16_t fx_amount, uint16_t fx, bool isOscilloscope, bool downsampling) {
-    float amount = effect_manager.getDepth() * (fx_amount / 4095.0f);
+float FM::RenderPhaseEffect(float input_phase, float phase_increment, uint16_t fx_amount, uint16_t fx, bool isOscilloscope, bool downsampling) {
+
+    float amount = ((float)fx_amount) / 65535.0f;
 
     float adjusted_phase = 0.0f;
-    float phaseIncrement = frequency / 48000.0f;
 
-    if(true)
-    return input_phase;
+    if(!settings_.fx_sync){
+        float index = (fx / 65535.0f) * kSineLUTSize;
+        MAKE_INTEGRAL_FRACTIONAL(index)
+        float a = lut_fx_pow[index_integral];
+        float b = lut_fx_pow[index_integral + 1];
 
-    if(!effect_manager.getSync()){
-        // frequency = pow(2, ((15.0 * fx) / 4095.0) - 3.0f);
+        phase_increment = a + (b - a) * index_fractional;
     }
     else {
-        if(fx >= 2048) {
-            frequency *= int(1.0f + (fx - 2048.0f) * 15.0f / 2047.0f);
+        if(fx >= 32768) {
+            phase_increment *= static_cast<float>(1.0f + static_cast<uint8_t>((fx - 32768.0f) * 15.0f / 32767.0f));
         } else {
-            frequency /= int(1.0f + (2047 - fx) * 15.0f / 2047.0f);
+            phase_increment /= static_cast<float>(1.0f + static_cast<uint8_t>((32767 - fx) * 15.0f / 32767.0f));
         }
     }
-    
-    phaseIncrement = frequency / 48000.0f;
     
     float *target_phase;
 
     if(isOscilloscope)
-        target_phase = &oscilloscopePhase;
+        target_phase = &oscilloscope_phase_;
     else
-        target_phase = &phase;
+        target_phase = &phase_;
     
-    switch(effect_manager.getControlType()) {
-        case EffectManager::INTERNAL_MODULATOR:
+    switch(settings_.fx_control_type) {
+        case INTERNAL_MODULATOR:
         {
             float sample = 0.0f;
-            
-            sample = context.getEngine()->GetOscillatorSample(*target_phase, phaseIncrement);
 
-            *target_phase += phaseIncrement;
-            if(*target_phase >= 1.0)
-                *target_phase -= 1.0;
+            float index = *target_phase * kSineLUTSize;
+            MAKE_INTEGRAL_FRACTIONAL(index)
+            float a = lut_sine[index_integral];
+            float b = lut_sine[index_integral + 1];
+
+            sample = a + (b - a) * index_fractional;//stmlib::InterpolateWrap(lut_sine, 0.0f, kSineLUTSize);
+
+            phase_ = phase_ + phase_increment;
+            if(phase_ >= 1.0f) {
+                phase_ -= 1.0f;
+            }
+
             adjusted_phase = input_phase + amount * sample;
             
             break;
         }
-        case EffectManager::EXTERNAL_MODULATOR:
+        case EXTERNAL_MODULATOR:
         {
-            float sample = 2.0 * fx / 4095.0 - 1.0;//-1 to 1;
+            float sample = 2.0 * fx / 65535.0 - 1.0;//-1 to 1;
 
             adjusted_phase = input_phase + amount * sample;
 
             break;
         }
-        case EffectManager::MANUAL_CONTROL:
+        case MANUAL_CONTROL:
         {
-            float sample = 2.0 * fx / 4095.0 - 1.0;//-1 to 1;
+            float sample = 2.0 * fx / 65535.0 - 1.0;//-1 to 1;
 
             adjusted_phase = input_phase + amount * sample;
 
@@ -102,6 +111,4 @@ float FM::RenderPhaseEffect(float input_phase, float frequency, uint16_t fx_amou
 
     
     return adjusted_phase;
-    
-    //    gain = 4 * volume / volume_increment
 }

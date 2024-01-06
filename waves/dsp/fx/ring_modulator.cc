@@ -14,11 +14,11 @@
 
 
 void RingModulator::Init() {
-    phase = 0.0f;
+    phase_ = 0.0f;
 }
 
 void RingModulator::Reset() {
-    phase = 0.0f;
+    phase_ = 0.0f;
 }
 
 float RingModulator::GetSample(float phase) {
@@ -26,11 +26,11 @@ float RingModulator::GetSample(float phase) {
     return sample;
 }
 
-float RingModulator::RenderSampleEffect(float sample, float input_phase, float frequency, uint16_t fx_amount, uint16_t fx, bool isOscilloscope, bool downsampling) {
+float RingModulator::RenderSampleEffect(float sample, float input_phase, float phase_increment, uint16_t fx_amount, uint16_t fx, bool isOscilloscope, bool downsampling) {
     float amount = effect_manager.getDepth() * (fx_amount / 4095.0f);
     
     // float adjusted_phase = 0.0f; // unused
-    float phaseIncrement = frequency / 48000.0f;
+    float frequency = 48000.0f * phase_increment;
     
     if(!effect_manager.getSync())
         frequency = pow(2, ((15.0 * fx) / 4095.0) - 3.0f);
@@ -42,38 +42,38 @@ float RingModulator::RenderSampleEffect(float sample, float input_phase, float f
         }
     }
     
-    phaseIncrement = frequency / 48000.0f;
+    phase_increment = frequency / 48000.0f;
     
     float *target_phase;
     
     if(isOscilloscope)
-        target_phase = &oscilloscopePhase;
+        target_phase = &oscilloscope_phase_;
     else
-        target_phase = &phase;
+        target_phase = &phase_;
     
     
     switch(effect_manager.getControlType()) {
-        case EffectManager::INTERNAL_MODULATOR: {
+        case INTERNAL_MODULATOR: {
             
             float modulator_sample = 0.0f;
             
-            modulator_sample = context.getEngine()->GetOscillatorSample(*target_phase, phaseIncrement);
+            modulator_sample = context.getEngine()->GetOscillatorSample(*target_phase, phase_increment);
 
-            *target_phase += phaseIncrement;
+            *target_phase += phase_increment;
             if(*target_phase >= 1.0)
                 *target_phase -= 1.0;
             sample = sample * (1 - amount) + amount * sample * modulator_sample;
             
             break;
         }
-        case EffectManager::EXTERNAL_MODULATOR:
+        case EXTERNAL_MODULATOR:
         {
             float modulator_sample = 2.0 * fx / 4095.0 - 1.0;
             
             sample = sample * (1 - amount) + amount * sample * modulator_sample;
             break;
         }
-        case EffectManager::MANUAL_CONTROL:
+        case MANUAL_CONTROL:
         {
             float modulator_sample = 2.0 * fx / 4095.0 - 1.0;
             
@@ -89,6 +89,6 @@ float RingModulator::RenderSampleEffect(float sample, float input_phase, float f
     return sample;
 }
 
-float RingModulator::RenderPhaseEffect(float input_phase, float frequency, uint16_t fx_amount, uint16_t fx, bool isOscilloscope, bool downsampling) {
+float RingModulator::RenderPhaseEffect(float input_phase, float phase_increment, uint16_t fx_amount, uint16_t fx, bool isOscilloscope, bool downsampling) {
     return input_phase;
 }

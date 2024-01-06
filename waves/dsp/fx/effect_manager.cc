@@ -17,93 +17,93 @@ void EffectManager::Init() {
 void EffectManager::Reset() {
 }
 
-int16_t EffectManager::RenderSampleEffect(int16_t sample, float phase, float frequency, uint16_t fx_amount, uint16_t fx, bool isOscilloscope, bool downsampling) {
+int16_t EffectManager::RenderSampleEffect(int16_t sample, float phase, float phase_increment, uint16_t fx_amount, uint16_t fx, bool isOscilloscope, bool downsampling) {
 
-    switch(user_settings.settings_ptr()->fx_effect) {
+    switch(settings_.fx_effect) {
         case EFFECT_TYPE_BYPASS:
-            sample = bypass.RenderSampleEffect(sample, phase, frequency, fx_amount, fx, isOscilloscope, downsampling);
+            sample = bypass.RenderSampleEffect(sample, phase, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
             break;
         case EFFECT_TYPE_FM:
-            sample = fm.RenderSampleEffect(sample, phase, frequency, fx_amount, fx, isOscilloscope, downsampling);
+            sample = fm.RenderSampleEffect(sample, phase, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
             break;
         case EFFECT_TYPE_RING_MODULATOR:
-            sample = ring_modulator.RenderSampleEffect(sample, phase, frequency, fx_amount, fx, isOscilloscope, downsampling);
+            sample = ring_modulator.RenderSampleEffect(sample, phase, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
             break;
         case EFFECT_TYPE_PHASE_DISTORTION:
-            sample = phase_distortion.RenderSampleEffect(sample, phase, frequency, fx_amount, fx, isOscilloscope, downsampling);
+            sample = phase_distortion.RenderSampleEffect(sample, phase, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
             break;
         case EFFECT_TYPE_WAVEFOLDER:
-            sample = wavefolder.RenderSampleEffect(sample, phase, frequency, fx_amount, fx, isOscilloscope, downsampling);
+            sample = wavefolder.RenderSampleEffect(sample, phase, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
             break;
         case EFFECT_TYPE_WAVEWRAPPER:
-            sample = wavewrapper.RenderSampleEffect(sample, phase, frequency, fx_amount, fx, isOscilloscope, downsampling);
+            sample = wavewrapper.RenderSampleEffect(sample, phase, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
             break;
         case EFFECT_TYPE_BITCRUSH:
-            sample = bitcrush.RenderSampleEffect(sample, phase, frequency, fx_amount, fx, isOscilloscope, downsampling);
+            sample = bitcrush.RenderSampleEffect(sample, phase, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
             break;
         case EFFECT_TYPE_DRIVE:
-            sample = drive.RenderSampleEffect(sample, phase, frequency, fx_amount, fx, isOscilloscope, downsampling);
+            sample = drive.RenderSampleEffect(sample, phase, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
             break;
     }
     return sample;
 }
 
-float EffectManager::RenderSampleEffect(float sample, float phase, float frequency, uint16_t fx_amount, uint16_t fx, bool isOscilloscope, bool downsampling) {
+float EffectManager::RenderSampleEffect(float sample, float phase, float phase_increment, uint16_t fx_amount, uint16_t fx, bool isOscilloscope, bool downsampling) {
 
-    switch(user_settings.settings_ptr()->fx_effect) {
+    switch(settings_.fx_effect) {
         case EFFECT_TYPE_BYPASS:
-            sample = bypass.RenderSampleEffect(sample, phase, frequency, fx_amount, fx, isOscilloscope, downsampling);
+            sample = bypass.RenderSampleEffect(sample, phase, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
             break;
         case EFFECT_TYPE_FM:
-            sample = fm.RenderSampleEffect(sample, phase, frequency, fx_amount, fx, isOscilloscope, downsampling);
+            sample = fm.RenderSampleEffect(sample, phase, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
             break;
         case EFFECT_TYPE_RING_MODULATOR:
-            sample = ring_modulator.RenderSampleEffect(sample, phase, frequency, fx_amount, fx, isOscilloscope, downsampling);
+            sample = ring_modulator.RenderSampleEffect(sample, phase, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
             break;
         case EFFECT_TYPE_PHASE_DISTORTION:
-            sample = phase_distortion.RenderSampleEffect(sample, phase, frequency, fx_amount, fx, isOscilloscope, downsampling);
+            sample = phase_distortion.RenderSampleEffect(sample, phase, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
             break;
         case EFFECT_TYPE_WAVEFOLDER:
-            sample = wavefolder.RenderSampleEffect(sample, phase, frequency, fx_amount, fx, isOscilloscope, downsampling);
+            sample = wavefolder.RenderSampleEffect(sample, phase, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
             break;
         case EFFECT_TYPE_WAVEWRAPPER:
-            sample = wavewrapper.RenderSampleEffect(sample, phase, frequency, fx_amount, fx, isOscilloscope, downsampling);
+            sample = wavewrapper.RenderSampleEffect(sample, phase, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
             break;
         case EFFECT_TYPE_BITCRUSH:
-            sample = bitcrush.RenderSampleEffect(sample, phase, frequency, fx_amount, fx, isOscilloscope, downsampling);
+            sample = bitcrush.RenderSampleEffect(sample, phase, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
             break;
         case EFFECT_TYPE_DRIVE:
-            sample = drive.RenderSampleEffect(sample, phase, frequency, fx_amount, fx, isOscilloscope, downsampling);
+            sample = drive.RenderSampleEffect(sample, phase, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
             break;
     }
     return sample;
 }
-float EffectManager::RenderPhaseEffect(float phase, float frequency, uint16_t fx_amount, uint16_t fx, bool isOscilloscope, bool downsampling) {
+float EffectManager::RenderPhaseEffect(float phase, float phase_increment, uint16_t fx_amount, uint16_t fx, bool isOscilloscope, bool downsampling) {
 
-    switch(user_settings.settings_ptr()->fx_effect) {
+    switch(settings_.fx_effect) {
         case EFFECT_TYPE_BYPASS:
-            phase = bypass.RenderPhaseEffect(phase, frequency, fx_amount, fx, isOscilloscope, downsampling);
+            phase = bypass.RenderPhaseEffect(phase, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
             break;
         case EFFECT_TYPE_FM:
-            phase = fm.RenderPhaseEffect(phase, frequency, fx_amount, fx, isOscilloscope, downsampling);
+            phase = fm.RenderPhaseEffect(phase, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
             break;
         case EFFECT_TYPE_RING_MODULATOR:
-            phase = ring_modulator.RenderPhaseEffect(phase, frequency, fx_amount, fx, isOscilloscope, downsampling);
+            phase = ring_modulator.RenderPhaseEffect(phase, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
             break;
         case EFFECT_TYPE_PHASE_DISTORTION:
-            phase = phase_distortion.RenderPhaseEffect(phase, frequency, fx_amount, fx, isOscilloscope, downsampling);
+            phase = phase_distortion.RenderPhaseEffect(phase, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
             break;
         case EFFECT_TYPE_WAVEFOLDER:
-            phase = wavefolder.RenderPhaseEffect(phase, frequency, fx_amount, fx, isOscilloscope, downsampling);
+            phase = wavefolder.RenderPhaseEffect(phase, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
             break;
         case EFFECT_TYPE_WAVEWRAPPER:
-            phase = wavewrapper.RenderPhaseEffect(phase, frequency, fx_amount, fx, isOscilloscope, downsampling);
+            phase = wavewrapper.RenderPhaseEffect(phase, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
             break;
         case EFFECT_TYPE_BITCRUSH:
-            phase = bitcrush.RenderPhaseEffect(phase, frequency, fx_amount, fx, isOscilloscope, downsampling);
+            phase = bitcrush.RenderPhaseEffect(phase, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
             break;
         case EFFECT_TYPE_DRIVE:
-            phase = drive.RenderPhaseEffect(phase, frequency, fx_amount, fx, isOscilloscope, downsampling);
+            phase = drive.RenderPhaseEffect(phase, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
             break;
     }
     return phase;
@@ -111,7 +111,7 @@ float EffectManager::RenderPhaseEffect(float phase, float frequency, uint16_t fx
 
 void EffectManager::setEffect(uint8_t effect_type) {
     Effect* effect;
-    user_settings.settings_ptr()->fx_effect = effect_type;
+    settings_.fx_effect = effect_type;
     switch(effect_type) {
         case EFFECT_TYPE_BYPASS:
             effect = &bypass;
@@ -145,7 +145,7 @@ void EffectManager::setEffect(uint8_t effect_type) {
 Effect* EffectManager::getEffect() {
     Effect* effect = NULL;
 
-    switch(user_settings.settings_ptr()->fx_effect) {
+    switch(settings_.fx_effect) {
         case EFFECT_TYPE_BYPASS:
             effect = &bypass;
             break;
@@ -175,23 +175,23 @@ Effect* EffectManager::getEffect() {
 }
 
 uint8_t EffectManager::getEffectType() {
-    return user_settings.settings_ptr()->fx_effect;
+    return settings_.fx_effect;
 }
 
-int8_t EffectManager::getControlType() { return user_settings.settings_ptr()->fx_control_type; }
-void EffectManager::setControlType(int8_t control_type) { user_settings.settings_ptr()->fx_control_type = control_type; }
+int8_t EffectManager::getControlType() { return settings_.fx_control_type; }
+void EffectManager::setControlType(int8_t control_type) { settings_.fx_control_type = control_type; }
 
-int8_t EffectManager::getOscillatorShape() { return user_settings.settings_ptr()->fx_oscillator_shape; }
-void EffectManager::setOscillatorShape(int8_t oscillator_shape) { user_settings.settings_ptr()->fx_oscillator_shape = oscillator_shape; }
+int8_t EffectManager::getOscillatorShape() { return settings_.fx_oscillator_shape; }
+void EffectManager::setOscillatorShape(int8_t oscillator_shape) { settings_.fx_oscillator_shape = oscillator_shape; }
 
-bool EffectManager::getSync() { return user_settings.settings_ptr()->fx_sync; }
-void EffectManager::setSync(bool sync) { user_settings.settings_ptr()->fx_sync = sync; }
+bool EffectManager::getSync() { return settings_.fx_sync; }
+void EffectManager::setSync(bool sync) { settings_.fx_sync = sync; }
 
-float EffectManager::getDepth() { return user_settings.settings_ptr()->fx_depth; }
-void EffectManager::setDepth(float depth) { user_settings.settings_ptr()->fx_depth = CLAMP(depth, 0.0f, 1.0f); }
+float EffectManager::getDepth() { return settings_.fx_depth; }
+void EffectManager::setDepth(float depth) { settings_.fx_depth = CLAMP(depth, 0.0f, 1.0f); }
 
-int EffectManager::getScale() { return user_settings.settings_ptr()->fx_scale; }
-void EffectManager::setScale(int scale) { user_settings.settings_ptr()->fx_scale = CLAMP<int>(scale, 0, 100); }
+int EffectManager::getScale() { return settings_.fx_scale; }
+void EffectManager::setScale(int scale) { settings_.fx_scale = CLAMP<int>(scale, 0, 100); }
 
-int EffectManager::getRange() { return user_settings.settings_ptr()->fx_range; }
-void EffectManager::setRange(int range) { user_settings.settings_ptr()->fx_range = CLAMP<int>(range, 1, 10); }
+int EffectManager::getRange() { return settings_.fx_range; }
+void EffectManager::setRange(int range) { settings_.fx_range = CLAMP<int>(range, 1, 10); }

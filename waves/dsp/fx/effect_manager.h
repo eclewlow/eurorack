@@ -14,35 +14,6 @@
 
 class EffectManager {
 public:
-    enum OscillatorShape {
-        SINE_SHAPE              = 0,
-        TRIANGLE_SHAPE          = 1,
-        SAWTOOTH_SHAPE          = 2,
-        RAMP_SHAPE              = 3,
-        SQUARE_SHAPE            = 4,
-        SNH_SHAPE               = 5,
-        OSCILLATOR_SHAPE_LAST   = 6,
-    };
-
-    enum ControlType {
-        MANUAL_CONTROL      = 0,
-        EXTERNAL_MODULATOR  = 1,
-        INTERNAL_MODULATOR  = 2,
-        CONTROL_TYPE_LAST   = 3,
-    };
-    
-    enum EffectType {
-        EFFECT_TYPE_BYPASS              = 0,
-        EFFECT_TYPE_FM                  = 1,
-        EFFECT_TYPE_RING_MODULATOR      = 2,
-        EFFECT_TYPE_PHASE_DISTORTION    = 3,
-        EFFECT_TYPE_WAVEFOLDER          = 4,
-        EFFECT_TYPE_WAVEWRAPPER         = 5,
-        EFFECT_TYPE_BITCRUSH            = 6,
-        EFFECT_TYPE_DRIVE               = 7,
-    };
-
-    
     EffectManager() {
 //        depth_ = 1.0f;
 //        sync_ = false;

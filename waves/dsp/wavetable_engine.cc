@@ -10,7 +10,7 @@
 
 #include "waves/dsp/Engine.h"
 #include "waves/wavetables.h"
-#include "waves/dsp/ParameterInterpolator.h"
+// #include "waves/dsp/ParameterInterpolator.h"
 #include "waves/Globals.h"
 #include "waves/dsp/downsampler/4x_downsampler.h"
 
@@ -135,7 +135,7 @@ void WavetableEngine::on_load_finished() {
 }
 
 
-void WavetableEngine::Render(AudioDac::Frame* output, uint32_t size, uint16_t tune, uint16_t fx_amount, uint16_t fx, uint16_t morph)
+void WavetableEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, uint16_t fx_amount, uint16_t fx, uint16_t morph)
 {
         loading = 58;
 
@@ -158,7 +158,7 @@ void WavetableEngine::Render(AudioDac::Frame* output, uint32_t size, uint16_t tu
     float swap_increment = 1.0f / 10000.0f;
 
     // float note = (120.0f * tune_interpolator.Next()) / 4095.0;
-    float note = tune_interpolator.Next() * user_settings.getCalibrationX() + user_settings.getCalibrationY();
+    float note = tune_interpolator.Next() * settings_.calibration_x + settings_.calibration_y;
     note = CLAMP<float>(note, 0.0f, 120.0f);
 
     note = quantizer.Quantize(note);
@@ -191,7 +191,7 @@ void WavetableEngine::Render(AudioDac::Frame* output, uint32_t size, uint16_t tu
             
             float sample = 0.0f;
 
-            float phase = effect_manager.RenderPhaseEffect(phase_, 1 / phase_increment, fx_amount, fx, false, true);
+            float phase = effect_manager.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false, true);
 
             float index = phase * 2048.0;
             uint16_t integral = floor(index);
@@ -240,7 +240,7 @@ void WavetableEngine::Render(AudioDac::Frame* output, uint32_t size, uint16_t tu
               sample = sample1 * (1.0f - swap_counter_) + sample3 * swap_counter_;
             }
 
-            sample = effect_manager.RenderSampleEffect(sample, phase_, 1 / phase_increment, fx_amount, fx, false, true);
+            sample = effect_manager.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, false, true);
             
             phase_ += phase_increment;
             
@@ -273,6 +273,6 @@ void WavetableEngine::Render(AudioDac::Frame* output, uint32_t size, uint16_t tu
 }
 
 void WavetableEngine::SetWavetable(int wavetable) {
-    user_settings.settings_ptr()->wavetable_engine_wavetable = CLAMP(wavetable, 0, USER_WAVETABLE_COUNT + FACTORY_WAVETABLE_COUNT - 1);
+    settings_.wavetable_engine_wavetable = CLAMP(wavetable, 0, USER_WAVETABLE_COUNT + FACTORY_WAVETABLE_COUNT - 1);
 }
-int WavetableEngine::GetWavetable() { return user_settings.settings_ptr()->wavetable_engine_wavetable; }
+int WavetableEngine::GetWavetable() { return settings_.wavetable_engine_wavetable; }

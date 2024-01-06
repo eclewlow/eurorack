@@ -10,7 +10,7 @@
 
 #include "waves/dsp/Engine.h"
 #include "waves/wavetables.h"
-#include "waves/dsp/ParameterInterpolator.h"
+// #include "waves/dsp/ParameterInterpolator.h"
 #include "waves/Globals.h"
 #include "waves/dsp/downsampler/4x_downsampler.h"
 #include "math.h"
@@ -33,7 +33,7 @@ float ABEngine::GetSample(int16_t wavetable, int16_t frame, float phase, bool is
     float sample = 0;
     float next_sample = 0;
     float interpolated16 = 0;
-    // float interpolatedFloat = 0;
+    float interpolatedFloat = 0;
 
     float index = phase * 2048.0;
     uint16_t integral = floor(index);
@@ -64,7 +64,7 @@ float ABEngine::GetSample(int16_t wavetable, int16_t frame, float phase, bool is
     // }
     
     interpolated16 = sample + (next_sample - sample) * fractional;
-    // interpolatedFloat = interpolated16 / 32768.0f;
+    interpolatedFloat = interpolated16 / 32768.0f;
     
 
     // interpolated16 = sample;
@@ -72,8 +72,8 @@ float ABEngine::GetSample(int16_t wavetable, int16_t frame, float phase, bool is
     // interpolatedFloat += 0;
     // sample += 0;
     // interpolatedFloat = sample;
-    // return interpolatedFloat;
-    return interpolated16;
+    return interpolatedFloat;
+    // return interpolated16;
 }
 
 float ABEngine::GetSampleBetweenFrames(float phase, float morph) {
@@ -131,7 +131,7 @@ float ABEngine::GetSampleNoFX(float phase, float fx, float morph) {
 
 void ABEngine::on_load_both_ab_left_finished() {
     SetFlag(&_EREG_, _RXNE_, FLAG_CLEAR);
-    flash.StartFrameDMARead((uint32_t*)&back_buffer_1[2048], 4096, abEngine.GetRightFrame() * 4096, ABEngine::on_load_both_ab_right_finished);
+    flash.StartFrameDMARead((uint32_t*)&back_buffer_1[2048], 4096, 15 * 4096, ABEngine::on_load_both_ab_right_finished);
 }
 void ABEngine::on_load_both_ab_right_finished() {
     int16_t * temp_buffer = front_buffer_1;
@@ -154,7 +154,7 @@ void ABEngine::triggerUpdate() {
     flash.StartFrameDMARead((uint32_t*)back_buffer_1, 4096, GetLeftFrame() * 4096, ABEngine::on_load_both_ab_left_finished);
  }
 
-void ABEngine::Render(AudioDac::Frame* output, uint32_t size, uint16_t tune, uint16_t fx_amount, uint16_t fx, uint16_t morph)
+void ABEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, uint16_t fx_amount, uint16_t fx, uint16_t morph)
 {
     // if(GetFlag(&_EREG_, _BUSY_)) {
     //     return;
@@ -173,6 +173,7 @@ void ABEngine::Render(AudioDac::Frame* output, uint32_t size, uint16_t tune, uin
     ParameterInterpolator morph_interpolator(&morph_, morphTarget, size);
     // ParameterInterpolator tune_interpolator(&tune_, tuneTarget, size);
     Downsampler carrier_downsampler(&carrier_fir_);
+    Downsampler sub_carrier_downsampler(&sub_carrier_fir_);
 
 
     // TODO:  interpolate phase_increment instead of tune.  pass in phase increment to effects-functions instead of frequency.
@@ -183,48 +184,147 @@ void ABEngine::Render(AudioDac::Frame* output, uint32_t size, uint16_t tune, uin
     note = quantizer.Quantize(note);
 
     // note = note - 24.0f;
+    // Effect * effect;
+    // switch(settings_.fx_effect) {
+    // case 0:
+    //     effect = &bypass;
+    //     break;
+    // case 1:
+    //     effect = &fm;
+    //     break;
+    // case 2:
+    //     effect = &ring_modulator;
+    //     break;
+    // case 3:
+    //     effect = &phase_distortion;
+    //     break;
+    // case 4:
+    //     effect = &wavefolder;
+    //     break;
+    // case 5:
+    //     effect = &wavewrapper;
+    //     break;
+    // case 6:
+    //     effect = &bitcrush;
+    //     break;
+    // case 7:
+    //     effect = &drive;
+    //     break;
+    // }
 
     ParameterInterpolator phase_increment_interpolator(&phase_increment_, NoteToFrequency(note), size);
+    ParameterInterpolator sub_phase_increment_interpolator(&sub_phase_increment_, NoteToFrequency((note + settings_.subosc_detune / 100.0f + settings_.subosc_offset)), size);
 
     while (size--) {
         
         float interpolated_morph = morph_interpolator.Next();
         interpolated_morph = CLAMP<float>(interpolated_morph, 0.0, 0.9999);
-// //        printf("%f\n", interpolated_morph);
 
         float phase_increment = phase_increment_interpolator.Next();
-        // phase_increment = CLAMP<float>(phase_increment, 0.0f, 1.0f);
-        // phase_increment += 0;
+        phase_increment = CLAMP<float>(phase_increment, 0.0f, 1.0f);
+        float sub_phase_increment = sub_phase_increment_interpolator.Next();
+        sub_phase_increment = CLAMP<float>(sub_phase_increment, 0.0f, 1.0f);
+
         // for (size_t j = 0; j < kOversampling; ++j) {
 
-            // float phase = effect_manager.RenderPhaseEffect(phase_, 1  / phase_increment, fx_amount, fx, false, true);
+            // float phase = fm.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false, true);
 
-            // int16_t sample = GetSampleBetweenFrames(phase, interpolated_morph);
+            // float sample = GetSampleBetweenFrames(phase, interpolated_morph);
+            // float sub_sample = GetSampleBetweenFrames(sub_phase_, interpolated_morph);
 
-            // sample = effect_manager.RenderSampleEffect(sample, phase_, 1  / phase_increment, fx_amount, fx, false, true);
-            
+            float phase = 0;
+            float sample = 0;
+            float sub_sample = 0;
+            bool isOscilloscope = false;
+            bool downsampling = true;
 
-            float index = phase_ * 2048.0;
-            uint16_t integral = floor(index);
-            // float fractional = index - integral;
-            
-            // uint16_t nextIntegral = (integral + 1) % 2048;
-            
-            int16_t sample = front_buffer_1[integral];
-            // int16_t next_sample = front_buffer_1[nextIntegral];
+            // sample = fm.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
+            switch(settings_.fx_effect) {
+                case 0:
+                    phase = bypass.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false, true);
+
+                    sample = GetSampleBetweenFrames(phase, interpolated_morph);
+                    sub_sample = GetSampleBetweenFrames(sub_phase_, interpolated_morph);
+
+                    sample = bypass.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
+                    break;
+                case 1:
+                    phase = fm.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false, true);
+
+                    sample = GetSampleBetweenFrames(phase, interpolated_morph);
+                    sub_sample = GetSampleBetweenFrames(sub_phase_, interpolated_morph);
+
+                    sample = fm.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
+                    break;
+                case 2:
+                    phase = ring_modulator.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false, true);
+
+                    sample = GetSampleBetweenFrames(phase, interpolated_morph);
+                    sub_sample = GetSampleBetweenFrames(sub_phase_, interpolated_morph);
+
+                    sample = ring_modulator.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
+                    break;
+                case 3:
+                    phase = phase_distortion.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false, true);
+
+                    sample = GetSampleBetweenFrames(phase, interpolated_morph);
+                    sub_sample = GetSampleBetweenFrames(sub_phase_, interpolated_morph);
+
+                    sample = phase_distortion.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
+                    break;
+                case 4:
+                    phase = wavefolder.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false, true);
+
+                    sample = GetSampleBetweenFrames(phase, interpolated_morph);
+                    sub_sample = GetSampleBetweenFrames(sub_phase_, interpolated_morph);
+
+                    sample = wavefolder.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
+                    break;
+                case 5:
+                    phase = wavewrapper.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false, true);
+
+                    sample = GetSampleBetweenFrames(phase, interpolated_morph);
+                    sub_sample = GetSampleBetweenFrames(sub_phase_, interpolated_morph);
+
+                    sample = wavewrapper.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
+                    break;
+                case 6:
+                    phase = bitcrush.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false, true);
+
+                    sample = GetSampleBetweenFrames(phase, interpolated_morph);
+                    sub_sample = GetSampleBetweenFrames(sub_phase_, interpolated_morph);
+
+                    sample = bitcrush.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
+                    break;
+                case 7:
+                    phase = drive.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false, true);
+
+                    sample = GetSampleBetweenFrames(phase, interpolated_morph);
+                    sub_sample = GetSampleBetweenFrames(sub_phase_, interpolated_morph);
+
+                    sample = drive.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope, downsampling);
+                    break;
+            }
 
             phase_ += phase_increment;
+            sub_phase_ += sub_phase_increment;
             
             if(phase_ >= 1.0f)
                 phase_ -= 1.0f;
+
+            if(sub_phase_ >= 1.0f)
+                sub_phase_ -= 1.0f;
             
             // carrier_downsampler.Accumulate(j, sample);
+            // sub_carrier_downsampler.Accumulate(j, sub_sample);
         // }
         
         // float sample = carrier_downsampler.Read();
+        // float sub_sample = sub_carrier_downsampler.Read();
 
-            loading = front_buffer_1[3];
-        output->l = sample;
+        // loading = front_buffer_1[3];
+        output->l = sample * 26000.0f;
+        output->r = sub_sample * 26000.0f;
         ++output;
     }
 }
@@ -243,23 +343,23 @@ bool ABEngine::SetRightWave(int table, int frame) {
 
 void ABEngine::SetLeftWavetable(int left_wavetable)
 { 
-    user_settings.settings_ptr()->ab_engine_left_wavetable = CLAMP(left_wavetable, 0, USER_WAVETABLE_COUNT + FACTORY_WAVETABLE_COUNT - 1);
+    settings_.ab_engine_left_wavetable = CLAMP(left_wavetable, 0, USER_WAVETABLE_COUNT + FACTORY_WAVETABLE_COUNT - 1);
 }
 void ABEngine::SetLeftFrame(int left_frame) {
-    user_settings.settings_ptr()->ab_engine_left_frame = CLAMP(left_frame, 0, 15);
+    settings_.ab_engine_left_frame = CLAMP(left_frame, 0, 15);
 }
-int ABEngine::GetLeftWavetable() { return user_settings.settings_ptr()->ab_engine_left_wavetable; }
-int ABEngine::GetLeftFrame() { return user_settings.settings_ptr()->ab_engine_left_frame; }
+int ABEngine::GetLeftWavetable() { return settings_.ab_engine_left_wavetable; }
+int ABEngine::GetLeftFrame() { return settings_.ab_engine_left_frame; }
 void ABEngine::SetRightWavetable(int right_wavetable)
 {
-    user_settings.settings_ptr()->ab_engine_right_wavetable = CLAMP(right_wavetable, 0, USER_WAVETABLE_COUNT + FACTORY_WAVETABLE_COUNT - 1);
+    settings_.ab_engine_right_wavetable = CLAMP(right_wavetable, 0, USER_WAVETABLE_COUNT + FACTORY_WAVETABLE_COUNT - 1);
 }
-void ABEngine::SetRightFrame(int right_frame) { user_settings.settings_ptr()->ab_engine_right_frame = CLAMP(right_frame, 0, 15); }
-int ABEngine::GetRightWavetable() { return user_settings.settings_ptr()->ab_engine_right_wavetable; }
-int ABEngine::GetRightFrame() { return user_settings.settings_ptr()->ab_engine_right_frame; }
-bool ABEngine::IsEditingLeft() { return user_settings.settings_ptr()->ab_engine_is_editing_left; }
-bool ABEngine::IsEditingRight() { return user_settings.settings_ptr()->ab_engine_is_editing_right; }
-void ABEngine::SetIsEditingLeft(bool is_editing_left) { user_settings.settings_ptr()->ab_engine_is_editing_left = is_editing_left; }
-void ABEngine::SetIsEditingRight(bool is_editing_right) { user_settings.settings_ptr()->ab_engine_is_editing_right = is_editing_right; }
+void ABEngine::SetRightFrame(int right_frame) { settings_.ab_engine_right_frame = CLAMP(right_frame, 0, 15); }
+int ABEngine::GetRightWavetable() { return settings_.ab_engine_right_wavetable; }
+int ABEngine::GetRightFrame() { return settings_.ab_engine_right_frame; }
+bool ABEngine::IsEditingLeft() { return settings_.ab_engine_is_editing_left; }
+bool ABEngine::IsEditingRight() { return settings_.ab_engine_is_editing_right; }
+void ABEngine::SetIsEditingLeft(bool is_editing_left) { settings_.ab_engine_is_editing_left = is_editing_left; }
+void ABEngine::SetIsEditingRight(bool is_editing_right) { settings_.ab_engine_is_editing_right = is_editing_right; }
 
 }

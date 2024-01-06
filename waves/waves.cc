@@ -147,7 +147,7 @@ void SysTick_Handler() {
 }
 
 int counter = 0;
-float phase = 0.0f;
+// float phase = 0.0f;
 
 
 void TIM1_UP_TIM10_IRQHandler(void) {
@@ -208,7 +208,7 @@ void TIM1_UP_TIM10_IRQHandler(void) {
   uint8_t status = 0;
   // status = flash.ReadStatusRegister(EEPROM_FACTORY_SS);
 
-  sample1 = flash.w25qxx.ID;
+  // sample1 = flash.w25qxx.ID;
   // flash.Read66Mhz((uint8_t *)&sample1, 2, 0, EEPROM_FACTORY_SS);
   // flash.Read25Mhz((uint8_t *)&sample2, 2, 2, EEPROM_FACTORY_SS);
 
@@ -251,15 +251,15 @@ void TIM1_UP_TIM10_IRQHandler(void) {
   // float clamped_morph = CLAMP<float>(morph_target, 0.0, 0.9999);
   // float frame = clamped_morph * 15.0f;
   // uint16_t frame_integral = floor(frame);
-  loading = adc.getChannel(0);
+  // loading = adc.getChannel(2);
   // memcpy(&result, dataBuffer, 2);
   // snprintf(value, 80, "c=%d, s=%d, frame=%d, %d\n", counter, loading, frame_integral, front_buffer[(2048 - 20) + counter%20]);
-  snprintf(value, 80, "l=%lu, busy=%d, rxne=%d, %d\n", (int32_t)loading, GetFlag(&_EREG_, _BUSY_), GetFlag(&_EREG_, _RXNE_), front_buffer[(2048 - 20) + counter%20]);
+  snprintf(value, 80, "l=%ld, busy=%d, rxne=%d, %d\n", (int32_t)loading, GetFlag(&_EREG_, _BUSY_), GetFlag(&_EREG_, _RXNE_), front_buffer[(2048 - 20) + counter%20]);
   // snprintf(value, 80, "%08lx\n", dataBuffer[0]);
   // snprintf(value, 80, "buf=%04x, db=%08lx\n, %08lx", buffer[0], dataBuffer[0], flash.w25qxx.ID);
   // snprintf(value, 40, "f=%d\n", static_cast<int>(phase*100.0f));
   // sample += 1;
-  _write(0, (char*)value, 80);
+  // _write(0, (char*)value, 80);
 
 
       // GPIO_ResetBits(GPIOA, kPinFactorySS);
@@ -789,6 +789,69 @@ void FillBuffer(AudioDac::Frame* output, size_t size) {
 //   }
 // }
 
+void ResetSettings() {
+      settings_.brightness = 100;
+    settings_.contrast = 100;
+    settings_.invert = false;
+    settings_.scope_setting = SETTING_SCOPE_LINE;
+    settings_.morph_setting = SETTING_MORPH_SMOOTH;
+    // sub osc parameters
+    settings_.subosc_offset = -24;
+    settings_.subosc_detune = 0;
+    settings_.subosc_mix = 100;
+    settings_.subosc_wave = 0;
+    
+    settings_.fx_depth = 1.0f;
+    settings_.fx_sync = false;
+    settings_.fx_scale = 0;
+    settings_.fx_range = 1;
+    settings_.fx_oscillator_shape = SINE_SHAPE;
+    settings_.fx_control_type = INTERNAL_MODULATOR;
+    settings_.fx_effect = 0;//EffectManager::EFFECT_TYPE_FM;
+
+    settings_.engine = ENGINE_TYPE_AB;
+    // ab engine parameters
+    settings_.ab_engine_left_wavetable = 0;
+    settings_.ab_engine_left_frame = 0;
+    settings_.ab_engine_right_wavetable = 0;
+    settings_.ab_engine_right_frame = 0;
+    settings_.ab_engine_is_editing_left = false;
+    settings_.ab_engine_is_editing_right = false;
+
+    // wavetable engine parameters
+    settings_.wavetable_engine_wavetable = 0;
+    
+    // matrix engine parameters
+    settings_.matrix_engine_x1 = 0;
+    settings_.matrix_engine_x2 = 7;
+    settings_.matrix_engine_y1 = 0;
+    settings_.matrix_engine_y2 = 7;
+    settings_.matrix_engine_wavelist_offset = 0;
+    
+    // drum engine parameters
+    settings_.drum_engine_amp_decay = 1.0f;
+    settings_.drum_engine_fm_decay = 1.0f;
+    settings_.drum_engine_fm_shape = 0.5f;
+    settings_.drum_engine_fm_depth = 0.5f;
+    settings_.drum_engine_wavetable = 0;
+
+    // pot settings
+    settings_.pot_fx_amount = 0;//adc.getChannel(1);
+    settings_.pot_fx = 0;//adc.getChannel(2);
+    settings_.pot_morph = 0;//adc.getChannel(3);
+    
+    // calibration settings
+    for(int i = 0; i < 4; i++) {
+        settings_.io_gain[i] = 1.0f;   // don't randomize this, but save in snapshot
+        settings_.io_bias[i] = 0.0f;   // don't randomize this, but save in snapshot
+    }
+
+//    settings_.calibration_x = 0.029304029304029;
+//    settings_.calibration_y = 0;
+    settings_.calibration_x = 0.023619047619048;    // don't randomize this, but save in snapshot
+    settings_.calibration_y = 12.0f;    // don't randomize this, but save in snapshot
+    
+}
 
 void Init() {
   System sys;
@@ -805,7 +868,7 @@ void Init() {
   // drumEngine.Init();
   abEngine.Init();
   effect_manager.Init();
-
+  fm.Init();
   
   sys.StartTimers();
 
@@ -817,15 +880,17 @@ void Init() {
   // lcd.Draw();
   // logger.Init(9600);
   // dac.Start(&FillBuffer);
+  ResetSettings();
+  settings_.fx_effect = EFFECT_TYPE_FM;
 
-  context.setEngine(Context::ENGINE_TYPE_AB);
+  context.setEngine(ENGINE_TYPE_AB);
 
   abEngine.triggerUpdate();
   // if(effect_manager != NULL)
   // loading = 27;
   // else
   // loading = 28;
-  effect_manager.setEffect(EffectManager::EFFECT_TYPE_BYPASS);
+  // effect_manager.setEffect(EFFECT_TYPE_FM);
   // loading = 26;
 
   audio_dac.Init(48000, kBlockSize);

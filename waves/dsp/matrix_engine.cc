@@ -10,7 +10,7 @@
 
 #include "waves/dsp/Engine.h"
 #include "waves/wavetables.h"
-#include "waves/dsp/ParameterInterpolator.h"
+// #include "waves/dsp/ParameterInterpolator.h"
 #include "waves/Globals.h"
 #include "waves/dsp/downsampler/4x_downsampler.h"
 
@@ -91,7 +91,7 @@ void MatrixEngine::triggerUpdate() {
     phase_ = 0.0f;
 }
 
-void MatrixEngine::Render(AudioDac::Frame* output, uint32_t size, uint16_t tune, uint16_t fx_amount, uint16_t fx, uint16_t morph)
+void MatrixEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, uint16_t fx_amount, uint16_t fx, uint16_t morph)
 {
         loading = 57;
 
@@ -117,7 +117,7 @@ void MatrixEngine::Render(AudioDac::Frame* output, uint32_t size, uint16_t tune,
     
     while (size--) {
 //        float note = (120.0f * tune_interpolator.Next()) / 4095.0;
-        float note = tune_interpolator.Next() * user_settings.getCalibrationX() + user_settings.getCalibrationY();
+        float note = tune_interpolator.Next() * settings_.calibration_x + settings_.calibration_y;
         note = CLAMP<float>(note, 0.0f, 120.0f);
 
         note = quantizer.Quantize(note);
@@ -151,26 +151,26 @@ void MatrixEngine::Render(AudioDac::Frame* output, uint32_t size, uint16_t tune,
     }
 }
 
-void MatrixEngine::SetX1(int8_t x1) { user_settings.settings_ptr()->matrix_engine_x1 = x1; }
-void MatrixEngine::SetY1(int8_t y1) { user_settings.settings_ptr()->matrix_engine_y1 = y1; }
-void MatrixEngine::SetX2(int8_t x2) { user_settings.settings_ptr()->matrix_engine_x2 = x2; }
-void MatrixEngine::SetY2(int8_t y2) { user_settings.settings_ptr()->matrix_engine_y2 = y2; }
+void MatrixEngine::SetX1(int8_t x1) { settings_.matrix_engine_x1 = x1; }
+void MatrixEngine::SetY1(int8_t y1) { settings_.matrix_engine_y1 = y1; }
+void MatrixEngine::SetX2(int8_t x2) { settings_.matrix_engine_x2 = x2; }
+void MatrixEngine::SetY2(int8_t y2) { settings_.matrix_engine_y2 = y2; }
 void MatrixEngine::IncrementX1(int8_t dx) {
-    user_settings.settings_ptr()->matrix_engine_x1 = CLAMP<int8_t>(user_settings.settings_ptr()->matrix_engine_x1 + dx, 0, user_settings.settings_ptr()->matrix_engine_x2);
+    settings_.matrix_engine_x1 = CLAMP<int8_t>(settings_.matrix_engine_x1 + dx, 0, settings_.matrix_engine_x2);
 }
 void MatrixEngine::IncrementY1(int8_t dy) {
-    user_settings.settings_ptr()->matrix_engine_y1 = CLAMP<int8_t>(user_settings.settings_ptr()->matrix_engine_y1 + dy, 0, user_settings.settings_ptr()->matrix_engine_y2);
+    settings_.matrix_engine_y1 = CLAMP<int8_t>(settings_.matrix_engine_y1 + dy, 0, settings_.matrix_engine_y2);
 }
 void MatrixEngine::IncrementX2(int8_t dx) {
-    user_settings.settings_ptr()->matrix_engine_x2 = CLAMP<int8_t>(user_settings.settings_ptr()->matrix_engine_x2 + dx, user_settings.settings_ptr()->matrix_engine_x1, 15);
+    settings_.matrix_engine_x2 = CLAMP<int8_t>(settings_.matrix_engine_x2 + dx, settings_.matrix_engine_x1, 15);
 }
 void MatrixEngine::IncrementY2(int8_t dy) {
-    user_settings.settings_ptr()->matrix_engine_y2 = CLAMP<int8_t>(user_settings.settings_ptr()->matrix_engine_y2 + dy, user_settings.settings_ptr()->matrix_engine_y1, 15);
+    settings_.matrix_engine_y2 = CLAMP<int8_t>(settings_.matrix_engine_y2 + dy, settings_.matrix_engine_y1, 15);
 }
-int8_t MatrixEngine::GetX1() { return user_settings.settings_ptr()->matrix_engine_x1; }
-int8_t MatrixEngine::GetY1() { return user_settings.settings_ptr()->matrix_engine_y1; }
-int8_t MatrixEngine::GetX2() { return user_settings.settings_ptr()->matrix_engine_x2; }
-int8_t MatrixEngine::GetY2() { return user_settings.settings_ptr()->matrix_engine_y2; }
+int8_t MatrixEngine::GetX1() { return settings_.matrix_engine_x1; }
+int8_t MatrixEngine::GetY1() { return settings_.matrix_engine_y1; }
+int8_t MatrixEngine::GetX2() { return settings_.matrix_engine_x2; }
+int8_t MatrixEngine::GetY2() { return settings_.matrix_engine_y2; }
 
-void MatrixEngine::SetWavelistOffset(int8_t offset) { user_settings.settings_ptr()->matrix_engine_wavelist_offset = offset; }
-int8_t MatrixEngine::GetWavelistOffset() { return user_settings.settings_ptr()->matrix_engine_wavelist_offset; }
+void MatrixEngine::SetWavelistOffset(int8_t offset) { settings_.matrix_engine_wavelist_offset = offset; }
+int8_t MatrixEngine::GetWavelistOffset() { return settings_.matrix_engine_wavelist_offset; }

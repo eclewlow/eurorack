@@ -10,7 +10,7 @@
 
 #include "waves/dsp/Engine.h"
 #include "waves/wavetables.h"
-#include "waves/dsp/ParameterInterpolator.h"
+// #include "waves/dsp/ParameterInterpolator.h"
 #include "waves/Globals.h"
 #include "waves/dsp/downsampler/4x_downsampler.h"
 
@@ -135,7 +135,7 @@ float DrumEngine::GetY(float x) {
     return y;
 }
 
-void DrumEngine::Render(AudioDac::Frame* output, uint32_t size, uint16_t tune, uint16_t fx_amount, uint16_t fx, uint16_t morph)
+void DrumEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, uint16_t fx_amount, uint16_t fx, uint16_t morph)
 {
         loading = 56;
 
@@ -168,7 +168,7 @@ void DrumEngine::Render(AudioDac::Frame* output, uint32_t size, uint16_t tune, u
         float amp_decay_trigger_increment = (1.0f / (6.0f * (GetAmpDecay() + 0.001f))) / 48000.0f;
         float fm_decay_trigger_increment = (1.0f / (6.0f * (GetFMDecay() + 0.001f))) / 48000.0f;
 
-        float note = tune_interpolator.Next() * user_settings.getCalibrationX() + user_settings.getCalibrationY();
+        float note = tune_interpolator.Next() * settings_.calibration_x + settings_.calibration_y;
         note = CLAMP<float>(note, 0.0f, 120.0f);
 
         note = quantizer.Quantize(note);
@@ -221,22 +221,22 @@ void DrumEngine::Render(AudioDac::Frame* output, uint32_t size, uint16_t tune, u
 
 void DrumEngine::SetWavetable(int wavetable)
 {
-    user_settings.settings_ptr()->drum_engine_wavetable = CLAMP<int>(wavetable, 0, USER_WAVETABLE_COUNT + FACTORY_WAVETABLE_COUNT - 1);
+    settings_.drum_engine_wavetable = CLAMP<int>(wavetable, 0, USER_WAVETABLE_COUNT + FACTORY_WAVETABLE_COUNT - 1);
 }
-int DrumEngine::GetWavetable() { return user_settings.settings_ptr()->drum_engine_wavetable; }
+int DrumEngine::GetWavetable() { return settings_.drum_engine_wavetable; }
 void DrumEngine::SetAmpDecay(float value) {
-    user_settings.settings_ptr()->drum_engine_amp_decay = CLAMP<float>(value, 0.0f, 1.0f);
+    settings_.drum_engine_amp_decay = CLAMP<float>(value, 0.0f, 1.0f);
 }
-float DrumEngine::GetAmpDecay() { return user_settings.settings_ptr()->drum_engine_amp_decay; }
+float DrumEngine::GetAmpDecay() { return settings_.drum_engine_amp_decay; }
 void DrumEngine::SetFMDecay(float value) {
-    user_settings.settings_ptr()->drum_engine_fm_decay = CLAMP<float>(value, 0.0f, 1.0f);
+    settings_.drum_engine_fm_decay = CLAMP<float>(value, 0.0f, 1.0f);
 }
-float DrumEngine::GetFMDecay() { return user_settings.settings_ptr()->drum_engine_fm_decay; }
+float DrumEngine::GetFMDecay() { return settings_.drum_engine_fm_decay; }
 void DrumEngine::SetFMShape(float value) {
-    user_settings.settings_ptr()->drum_engine_fm_shape = CLAMP<float>(value, 0.0f, 1.0f);
+    settings_.drum_engine_fm_shape = CLAMP<float>(value, 0.0f, 1.0f);
 }
-float DrumEngine::GetFMShape() { return user_settings.settings_ptr()->drum_engine_fm_shape; }
+float DrumEngine::GetFMShape() { return settings_.drum_engine_fm_shape; }
 void DrumEngine::SetFMDepth(float value) {
-    user_settings.settings_ptr()->drum_engine_fm_depth = CLAMP<float>(value, 0.0f, 1.0f);
+    settings_.drum_engine_fm_depth = CLAMP<float>(value, 0.0f, 1.0f);
 }
-float DrumEngine::GetFMDepth() { return user_settings.settings_ptr()->drum_engine_fm_depth; }
+float DrumEngine::GetFMDepth() { return settings_.drum_engine_fm_depth; }
