@@ -16,6 +16,8 @@
 
 WavetableEngine::WavetableEngine() {
     phase_ = 0.0f;
+    sub_phase_ = 0;
+
     current_frame_ = 0;
     target_frame_ = 0;
     swap_counter_ = 0.0f;
@@ -28,6 +30,8 @@ WavetableEngine::~WavetableEngine() {
 
 void WavetableEngine::Init() {
     phase_ = 0.0f;
+    sub_phase_ = 0;
+
     current_frame_ = 0;
     target_frame_ = 0;
     swap_counter_ = 0.0f;
@@ -189,8 +193,8 @@ void WavetableEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune
 
     // float swap_increment = 1.0f / 10000.0f;
 
-    float note = (120.0f * tuneTarget) / 65535.0;
-    // float note = tune_interpolator.Next() * settings_.calibration_x + settings_.calibration_y;
+    // float note = (120.0f * tuneTarget) / 65535.0;
+    float note = tuneTarget * settings_.calibration_x + settings_.calibration_y;
     note = CLAMP<float>(note, 0.0f, 120.0f);
 
     note = quantizer.Quantize(note);

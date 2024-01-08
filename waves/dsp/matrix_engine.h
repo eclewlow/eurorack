@@ -49,5 +49,9 @@ public:
     int8_t GetWavelistOffset();
 
 private:
+    int current_frame_x;
+    int target_frame_x;
+    int current_frame_y;
+    int target_frame_y;
     DISALLOW_COPY_AND_ASSIGN (MatrixEngine);
 };

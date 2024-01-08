@@ -16,6 +16,12 @@
 
 MatrixEngine::MatrixEngine() {
     phase_ = 0;
+    sub_phase_ = 0;
+
+    current_frame_x = 0;
+    target_frame_x = 0;
+    current_frame_y = 0;
+    target_frame_y = 0;
 }
 
 MatrixEngine::~MatrixEngine() {
@@ -23,7 +29,13 @@ MatrixEngine::~MatrixEngine() {
 }
 
 void MatrixEngine::Init() {
-    phase_ = 0.0f;
+    phase_ = 0;
+    sub_phase_ = 0;
+
+    current_frame_x = 0;
+    target_frame_x = 0;
+    current_frame_y = 0;
+    target_frame_y = 0;
 }
 
 float MatrixEngine::GetSample(int16_t wavetable, int16_t frame, float phase) {
@@ -96,14 +108,9 @@ void MatrixEngine::triggerUpdate() {
 
 void MatrixEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, uint16_t fx_amount, uint16_t fx, uint16_t morph)
 {
-        loading = 57;
+    float morphTarget = morph / 65535.0;
+    float fxTarget = fx / 65535.0;
 
-    float morphTarget;
-    float fxTarget;
-
-    morphTarget = morph * 1.0 / 4095.0;
-    fxTarget = fx * 1.0f / 4095.0f;
-    
     float tuneTarget = static_cast<float>(tune);
     
     if(!started_) {
@@ -115,20 +122,26 @@ void MatrixEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, u
 
     ParameterInterpolator morph_interpolator(&morph_, morphTarget, size);
     ParameterInterpolator fx_interpolator(&fx_, fxTarget, size);
-    ParameterInterpolator tune_interpolator(&tune_, tuneTarget, size);
+    // ParameterInterpolator tune_interpolator(&tune_, tuneTarget, size);
     Downsampler carrier_downsampler(&carrier_fir_);
+
+    // float note = (120.0f * tune_interpolator.Next()) / 4095.0;
+    float note = tuneTarget * settings_.calibration_x + settings_.calibration_y;
+    note = CLAMP<float>(note, 0.0f, 120.0f);
+
+    note = quantizer.Quantize(note);
+
+    // note = note - 24.0f;
+
+    ParameterInterpolator phase_increment_interpolator(&phase_increment_, NoteToFrequency(note), size);
+    ParameterInterpolator sub_phase_increment_interpolator(&sub_phase_increment_, NoteToFrequency((note + settings_.subosc_detune / 100.0f + settings_.subosc_offset)), size);
     
+    float phase = 0;
+    float sample = 0;
+    float sub_sample = 0;
+    bool isOscilloscope = false;
+
     while (size--) {
-//        float note = (120.0f * tune_interpolator.Next()) / 4095.0;
-        float note = tune_interpolator.Next() * settings_.calibration_x + settings_.calibration_y;
-        note = CLAMP<float>(note, 0.0f, 120.0f);
-
-        note = quantizer.Quantize(note);
-
-        note = note - 24.0f;
-        float a = 440; //frequency of A (coomon value is 440Hz)
-        float frequency = (a / 32) * pow(2, ((note - 9) / 12.0));
-        float phaseIncrement = frequency / 48000.0f;
         
         float interpolated_morph = morph_interpolator.Next();
         interpolated_morph = CLAMP<float>(interpolated_morph, 0.0, 1.0);
@@ -136,20 +149,96 @@ void MatrixEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, u
         float interpolated_fx = fx_interpolator.Next();
         interpolated_fx = CLAMP<float>(interpolated_fx, 0.0, 1.0);
 
-        for (size_t j = 0; j < kOversampling; ++j) {
-            float sample = GetSampleBetweenFrames(phase_, interpolated_fx, interpolated_morph);
-            
-            phase_ += phaseIncrement;
+        float phase_increment = phase_increment_interpolator.Next();
+        phase_increment = CLAMP<float>(phase_increment, 0.0f, 1.0f);
+        float sub_phase_increment = sub_phase_increment_interpolator.Next();
+        sub_phase_increment = CLAMP<float>(sub_phase_increment, 0.0f, 1.0f);
+
+        // for (size_t j = 0; j < kOversampling; ++j) {
+            // float sample = GetSampleBetweenFrames(phase_, interpolated_fx, interpolated_morph);
+            switch(settings_.fx_effect) {
+                case EFFECT_TYPE_BYPASS:
+                    phase = bypass.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false);
+
+                    sample = GetSampleBetweenFrames(phase, interpolated_fx, interpolated_morph);
+                    sub_sample = GetSampleBetweenFrames(sub_phase_, interpolated_fx, interpolated_morph);
+
+                    sample = bypass.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope);
+                    break;
+                case EFFECT_TYPE_FM:
+                    phase = fm.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false);
+
+                    sample = GetSampleBetweenFrames(phase, interpolated_fx, interpolated_morph);
+                    sub_sample = GetSampleBetweenFrames(sub_phase_, interpolated_fx, interpolated_morph);
+
+                    sample = fm.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope);
+                    break;
+                case EFFECT_TYPE_RING_MODULATOR:
+                    phase = ring_modulator.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false);
+
+                    sample = GetSampleBetweenFrames(phase, interpolated_fx, interpolated_morph);
+                    sub_sample = GetSampleBetweenFrames(sub_phase_, interpolated_fx, interpolated_morph);
+
+                    sample = ring_modulator.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope);
+                    break;
+                case EFFECT_TYPE_PHASE_DISTORTION:
+                    phase = phase_distortion.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false);
+
+                    sample = GetSampleBetweenFrames(phase, interpolated_fx, interpolated_morph);
+                    sub_sample = GetSampleBetweenFrames(sub_phase_, interpolated_fx, interpolated_morph);
+
+                    sample = phase_distortion.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope);
+                    break;
+                case EFFECT_TYPE_WAVEFOLDER:
+                    phase = wavefolder.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false);
+
+                    sample = GetSampleBetweenFrames(phase, interpolated_fx, interpolated_morph);
+                    sub_sample = GetSampleBetweenFrames(sub_phase_, interpolated_fx, interpolated_morph);
+
+                    sample = wavefolder.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope);
+                    break;
+                case EFFECT_TYPE_WAVEWRAPPER:
+                    phase = wavewrapper.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false);
+
+                    sample = GetSampleBetweenFrames(phase, interpolated_fx, interpolated_morph);
+                    sub_sample = GetSampleBetweenFrames(sub_phase_, interpolated_fx, interpolated_morph);
+
+                    sample = wavewrapper.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope);
+                    break;
+                case EFFECT_TYPE_BITCRUSH:
+                    phase = bitcrush.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false);
+
+                    sample = GetSampleBetweenFrames(phase, interpolated_fx, interpolated_morph);
+                    sub_sample = GetSampleBetweenFrames(sub_phase_, interpolated_fx, interpolated_morph);
+
+                    sample = bitcrush.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope);
+                    break;
+                case EFFECT_TYPE_DRIVE:
+                    phase = drive.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false);
+
+                    sample = GetSampleBetweenFrames(phase, interpolated_fx, interpolated_morph);
+                    sub_sample = GetSampleBetweenFrames(sub_phase_, interpolated_fx, interpolated_morph);
+
+                    sample = drive.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope);
+                    break;
+            }
+
+            phase_ += phase_increment;
+            sub_phase_ += sub_phase_increment;
             
             if(phase_ >= 1.0f)
                 phase_ -= 1.0f;
+
+            if(sub_phase_ >= 1.0f)
+                sub_phase_ -= 1.0f;
             
-            carrier_downsampler.Accumulate(j, sample);
-        }
+            // carrier_downsampler.Accumulate(j, sample);
+        // }
         
-        float sample = carrier_downsampler.Read();
+        // float sample = carrier_downsampler.Read();
         
-        output->l = static_cast<int32_t>(26000.0f * sample);
+        output->l = sample * 26000.0f;
+        output->r = sub_sample * 26000.0f;
         ++output;
     }
 }

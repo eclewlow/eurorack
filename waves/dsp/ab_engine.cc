@@ -19,6 +19,7 @@ namespace waves {
 
 ABEngine::ABEngine() {
     phase_ = 0.0f;
+    sub_phase_ = 0;
 }
 
 ABEngine::~ABEngine() {
@@ -27,6 +28,7 @@ ABEngine::~ABEngine() {
 
 void ABEngine::Init() {
     phase_ = 0.0f;
+    sub_phase_ = 0;
 }
 
 float ABEngine::GetSample(int16_t wavetable, int16_t frame, float phase, bool isLeft) {
@@ -177,8 +179,8 @@ void ABEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, uint1
 
 
     // TODO:  interpolate phase_increment instead of tune.  pass in phase increment to effects-functions instead of frequency.
-    float note = (120.0f * tuneTarget) / 65535.0;
-    // float note = tuneTarget * user_settings.getCalibrationX() + user_settings.getCalibrationY();
+    // float note = (120.0f * tuneTarget) / 65535.0;
+    float note = tuneTarget * settings_.calibration_x + settings_.calibration_y;
     note = CLAMP<float>(note, 0.0f, 120.0f);
 
     note = quantizer.Quantize(note);

@@ -35,6 +35,22 @@ void UserSettings::Calibrate(uint16_t c1, uint16_t c5) {
     // 5 V -> 2540.32258064516129
     // x = 0.023619047619048
     // y = 12
+
+    // 1v - 24 midi note
+    // 5v - 72 midi note
+
+    // try 65535
+    // 5V * 33k / 80.6k = 2.047146401985112 = x
+    // (x / 3.3) * 65535 = 40654.466501240694789 (5 volts)
+    // 5v = 40654.466501240694789
+    // 1v = 8130.893300248138958
+    // (1v) * x + y = 24
+    // (5v) * x + y = 72
+    // (5v -1v) * x = 48
+    // x = 0.001475852597848
+    // 40654.466501240694789 * x + y = 72
+    // y = 12
+    // 
     
     // 0 4095   is 0-8 volts   c0 to c8. 33k / 80k
     // c1 = 511.875
@@ -202,7 +218,7 @@ bool UserSettings::RandomizeSettings() {
         settings_.io_bias[i] = 0.0f;   // don't randomize this, but save in snapshot
     }
 
-    settings_.calibration_x = 0.023619047619048;    // don't randomize this, but save in snapshot
+    settings_.calibration_x = 0.001475852597848;    // don't randomize this, but save in snapshot
     settings_.calibration_y = 12;    // don't randomize this, but save in snapshot
     
     return true;

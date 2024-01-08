@@ -861,7 +861,7 @@ void ResetSettings() {
 
 //    settings_.calibration_x = 0.029304029304029;
 //    settings_.calibration_y = 0;
-    settings_.calibration_x = 0.023619047619048;    // don't randomize this, but save in snapshot
+    settings_.calibration_x = 0.001475852597848;    // don't randomize this, but save in snapshot
     settings_.calibration_y = 12.0f;    // don't randomize this, but save in snapshot
     
 }
