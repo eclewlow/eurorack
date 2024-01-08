@@ -39,29 +39,92 @@ void MatrixEngine::Init() {
 }
 
 float MatrixEngine::GetSample(int16_t wavetable, int16_t frame, float phase) {
-    return 0.0f;
+    float sample = 0;
+    float next_sample = 0;
+    float interpolated16 = 0;
+    float interpolatedFloat = 0;
+
+    float index = phase * 2048.0;
+    uint16_t integral = floor(index);
+    float fractional = index - integral;
+    
+    uint16_t nextIntegral = (integral + 1) % 2048;
+    
+    int16_t * buffer;
+
+    buffer = (wavetable == 1 ? front_buffer_1 : front_buffer_2);
+
+    sample = buffer[frame * 4096 + integral];
+    next_sample = buffer[frame * 4096 + nextIntegral];
+    
+    interpolated16 = sample + (next_sample - sample) * fractional;
+    interpolatedFloat = interpolated16 / 32768.0f;
+
+    return interpolatedFloat;
+
+}
+
+
+void MatrixEngine::on_load_1_finished() {
+
+    // x morphs between frames;
+    // y morphs between wavetables  morph
+    
+    SetFlag(&_EREG_, _RXNE_, FLAG_CLEAR);
+    flash.StartFrameDMARead((uint32_t*)back_buffer_2, 8192, (matrixEngine.target_frame_y + 1) * 65536 + (matrixEngine.target_frame_x + 1) * 4096, MatrixEngine::on_load_2_finished);
+}
+
+void MatrixEngine::on_load_2_finished() {
+    int16_t * temp_buffer = front_buffer_1;
+    front_buffer_1 = back_buffer_1;
+    back_buffer_1 = temp_buffer;
+
+    temp_buffer = front_buffer_2;
+    front_buffer_2 = back_buffer_2;
+    back_buffer_2 = temp_buffer;
+
+    matrixEngine.current_frame_x = matrixEngine.target_frame_x;
+    matrixEngine.current_frame_y = matrixEngine.target_frame_y;
+
+    SetFlag(&_EREG_, _RXNE_, FLAG_CLEAR);
+    SetFlag(&_EREG_, _BUSY_, FLAG_CLEAR);
 }
 
 float MatrixEngine::GetSampleBetweenFrames(float phase, float morph_x, float morph_y) {
     // if x1 = 8 and x2 = 12. and morph_x = 0.5, then x1 + morph_x * (x2 - x1)
+
+    // y sits between two wavetable numbers
+    // x sists between two wavetable frames
     float frame_x = GetX1() + morph_x * ( GetX2() -  GetX1());
     uint16_t frame_x_integral = floor(frame_x);
     float frame_x_fractional = frame_x - frame_x_integral;
 
-    uint16_t next_frame_x_integral = (frame_x_integral + 1) % 16;
+    // uint16_t next_frame_x_integral = (frame_x_integral + 1) % 16;
 
     float frame_y =  GetY1() + morph_y * ( GetY2() -  GetY1());
     uint16_t frame_y_integral = floor(frame_y);
     float frame_y_fractional = frame_y - frame_y_integral;
 
-    uint16_t next_frame_y_integral = (frame_y_integral + 1) % 16;
+    // uint16_t next_frame_y_integral = (frame_y_integral + 1) % 16;
+
+    if((frame_y_integral != current_frame_y || frame_x_integral != current_frame_x) && !GetFlag(&_EREG_, _BUSY_) && !GetFlag(&_EREG_, _RXNE_)) {
+        target_frame_y = frame_y_integral;
+        target_frame_x = frame_x_integral;
+        // flash.StopDMA(true);
+        flash.StartFrameDMARead((uint32_t*)back_buffer_1, 8192, (target_frame_y) * 65536 + (target_frame_x) * 4096, MatrixEngine::on_load_1_finished);
+    }    
 
     // TODO: get sample across 4 frames
-    float frame_x1y1_sample = GetSample(GetWavelistOffset() + frame_y_integral, frame_x_integral, phase);
-    float frame_x2y1_sample = GetSample(GetWavelistOffset() + frame_y_integral, next_frame_x_integral, phase);
+    float frame_x1y1_sample = GetSample(1, 1, phase);
+    float frame_x2y1_sample = GetSample(1, 2, phase);
 
-    float frame_x1y2_sample = GetSample(GetWavelistOffset() + next_frame_y_integral, frame_x_integral, phase);
-    float frame_x2y2_sample = GetSample(GetWavelistOffset() + next_frame_y_integral, next_frame_x_integral, phase);
+    float frame_x1y2_sample = GetSample(2, 1, phase);
+    float frame_x2y2_sample = GetSample(2, 2, phase);
+    // float frame_x1y1_sample = GetSample(GetWavelistOffset() + frame_y_integral, frame_x_integral, phase);
+    // float frame_x2y1_sample = GetSample(GetWavelistOffset() + frame_y_integral, next_frame_x_integral, phase);
+
+    // float frame_x1y2_sample = GetSample(GetWavelistOffset() + next_frame_y_integral, frame_x_integral, phase);
+    // float frame_x2y2_sample = GetSample(GetWavelistOffset() + next_frame_y_integral, next_frame_x_integral, phase);
     
     float upper_sample = frame_x1y1_sample * (1 - frame_x_fractional) + frame_x2y1_sample * frame_x_fractional;
     float lower_sample = frame_x1y2_sample * (1 - frame_x_fractional) + frame_x2y2_sample * frame_x_fractional;
@@ -144,10 +207,10 @@ void MatrixEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, u
     while (size--) {
         
         float interpolated_morph = morph_interpolator.Next();
-        interpolated_morph = CLAMP<float>(interpolated_morph, 0.0, 1.0);
+        interpolated_morph = CLAMP<float>(interpolated_morph, 0.0, 0.9999);
 
         float interpolated_fx = fx_interpolator.Next();
-        interpolated_fx = CLAMP<float>(interpolated_fx, 0.0, 1.0);
+        interpolated_fx = CLAMP<float>(interpolated_fx, 0.0, 0.9999);
 
         float phase_increment = phase_increment_interpolator.Next();
         phase_increment = CLAMP<float>(phase_increment, 0.0f, 1.0f);

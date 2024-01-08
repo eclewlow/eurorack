@@ -48,10 +48,13 @@ public:
     void SetWavelistOffset(int8_t offset);
     int8_t GetWavelistOffset();
 
+    static void on_load_1_finished();
+    static void on_load_2_finished();
+
 private:
-    int current_frame_x;
-    int target_frame_x;
-    int current_frame_y;
-    int target_frame_y;
+    int8_t current_frame_x;
+    int8_t target_frame_x;
+    int8_t current_frame_y;
+    int8_t target_frame_y;
     DISALLOW_COPY_AND_ASSIGN (MatrixEngine);
 };

@@ -168,6 +168,7 @@ void WavetableEngine::on_load_finished() {
     int16_t * temp_buffer = front_buffer_1;
     front_buffer_1 = back_buffer_1;
     back_buffer_1 = temp_buffer;
+    
     wavetableEngine.current_frame_ = wavetableEngine.target_frame_;
 
     SetFlag(&_EREG_, _RXNE_, FLAG_CLEAR);
