@@ -125,11 +125,32 @@ float MatrixEngine::GetSampleBetweenFrames(float phase, float morph_x, float mor
 
     // float frame_x1y2_sample = GetSample(GetWavelistOffset() + next_frame_y_integral, frame_x_integral, phase);
     // float frame_x2y2_sample = GetSample(GetWavelistOffset() + next_frame_y_integral, next_frame_x_integral, phase);
+    float upper_sample;
+    float lower_sample;
+    float sample;
     
-    float upper_sample = frame_x1y1_sample * (1 - frame_x_fractional) + frame_x2y1_sample * frame_x_fractional;
-    float lower_sample = frame_x1y2_sample * (1 - frame_x_fractional) + frame_x2y2_sample * frame_x_fractional;
+    if(frame_x_integral > current_frame_x)
+        upper_sample = frame_x2y1_sample;
+    else if(frame_x_integral < current_frame_x)
+        upper_sample = frame_x1y1_sample;
+    else
+        upper_sample = frame_x1y1_sample * (1 - frame_x_fractional) + frame_x2y1_sample * frame_x_fractional;
 
-    float sample = upper_sample * (1.0f - frame_y_fractional) + lower_sample * frame_y_fractional;
+    if(frame_x_integral > current_frame_x)
+        lower_sample = frame_x2y2_sample;
+    else if(frame_x_integral < current_frame_x)
+        lower_sample = frame_x1y2_sample;
+    else
+        lower_sample = frame_x1y2_sample * (1 - frame_x_fractional) + frame_x2y2_sample * frame_x_fractional;
+
+
+    if(frame_y_integral > current_frame_y)
+        sample = lower_sample;
+    else if(frame_y_integral < current_frame_y)
+        sample = upper_sample;
+    else
+        sample = upper_sample * (1.0f - frame_y_fractional) + lower_sample * frame_y_fractional;
+
     return sample;
 }
 

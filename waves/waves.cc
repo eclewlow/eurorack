@@ -920,14 +920,14 @@ void Init() {
   // context.setEngine(ENGINE_TYPE_WAVETABLE);
   // settings_.engine = ENGINE_TYPE_AB;
   settings_.engine = ENGINE_TYPE_WAVETABLE;
-  
+
   // abEngine.triggerUpdate();
   wavetableEngine.triggerUpdate();
 
   audio_dac.Init(48000, kBlockSize);
   audio_dac.Start(&FillBuffer);
 
-  sys.StartTimers();
+  // sys.StartTimers();
 
 }
 
@@ -937,8 +937,12 @@ int main(void) {
   while (1) {
     if(fresh_start) {
       fresh_start = false;
-      // flash.W25qxx_Init();
+      system_clock.Delay(1000);
+      flash.W25qxx_Init();
       // lcd.Initial();
+
+      system_clock.Delay(1000);
+      sys.StartTimers();
 
 
 

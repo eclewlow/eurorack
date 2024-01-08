@@ -1045,13 +1045,16 @@ void W25qxx_Init (void)
 
     while(GetFlag(&_EREG_, _BUSY_));
     SetFlag(&_EREG_, _BUSY_, FLAG_SET);
+
+    int wavetable = 0;
+
     for(int i = 0; i < 16; i++) {
     // loading++;
         // system_clock.Delay(10);
     // int i = 0;
-    // SectorErase4K(4096*i, EEPROM_FACTORY_SS);
+      SectorErase4K(wavetable * 65536 + 4096 * i, EEPROM_FACTORY_SS);
     // system_clock.Delay(i == 0 ? 25 : 25);
-    // AAI_Word_Program((uint8_t *)&ROM[2048*i], 4096, 4096*i, EEPROM_FACTORY_SS);
+      AAI_Word_Program((uint8_t *)&ROM[2048*i], 4096, wavetable * 65536 + 4096 * i, EEPROM_FACTORY_SS);
     }
 
 
