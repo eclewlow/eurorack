@@ -811,7 +811,7 @@ void ResetSettings() {
     // sub osc parameters
     settings_.subosc_offset = -24;
     settings_.subosc_detune = 0;
-    settings_.subosc_mix = 100;
+    settings_.subosc_mix = 0.0f;
     settings_.subosc_wave = 0;
     
     settings_.fx_depth = 1.0f;
@@ -927,7 +927,7 @@ void Init() {
   audio_dac.Init(48000, kBlockSize);
   audio_dac.Start(&FillBuffer);
 
-  // sys.StartTimers();
+  sys.StartTimers();
 
 }
 
@@ -942,7 +942,7 @@ int main(void) {
       // lcd.Initial();
 
       system_clock.Delay(1000);
-      sys.StartTimers();
+      // sys.StartTimers();
 
 
 

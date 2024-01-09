@@ -13,6 +13,7 @@
 // #include "waves/dsp/ParameterInterpolator.h"
 #include "waves/Globals.h"
 #include "waves/dsp/downsampler/4x_downsampler.h"
+#include "waves/dsp/dsp.h"
 
 WavetableEngine::WavetableEngine() {
     phase_ = 0.0f;
@@ -168,7 +169,7 @@ void WavetableEngine::on_load_finished() {
     int16_t * temp_buffer = front_buffer_1;
     front_buffer_1 = back_buffer_1;
     back_buffer_1 = temp_buffer;
-    
+
     wavetableEngine.current_frame_ = wavetableEngine.target_frame_;
 
     SetFlag(&_EREG_, _RXNE_, FLAG_CLEAR);
@@ -283,7 +284,6 @@ void WavetableEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune
                     phase = bypass.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false);
 
                     sample = GetSampleBetweenFrames(phase, interpolated_morph);
-                    sub_sample = GetSampleBetweenFrames(sub_phase_, interpolated_morph);
 
                     sample = bypass.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope);
                     break;
@@ -291,7 +291,6 @@ void WavetableEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune
                     phase = fm.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false);
 
                     sample = GetSampleBetweenFrames(phase, interpolated_morph);
-                    sub_sample = GetSampleBetweenFrames(sub_phase_, interpolated_morph);
 
                     sample = fm.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope);
                     break;
@@ -299,7 +298,6 @@ void WavetableEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune
                     phase = ring_modulator.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false);
 
                     sample = GetSampleBetweenFrames(phase, interpolated_morph);
-                    sub_sample = GetSampleBetweenFrames(sub_phase_, interpolated_morph);
 
                     sample = ring_modulator.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope);
                     break;
@@ -307,7 +305,6 @@ void WavetableEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune
                     phase = phase_distortion.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false);
 
                     sample = GetSampleBetweenFrames(phase, interpolated_morph);
-                    sub_sample = GetSampleBetweenFrames(sub_phase_, interpolated_morph);
 
                     sample = phase_distortion.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope);
                     break;
@@ -315,7 +312,6 @@ void WavetableEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune
                     phase = wavefolder.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false);
 
                     sample = GetSampleBetweenFrames(phase, interpolated_morph);
-                    sub_sample = GetSampleBetweenFrames(sub_phase_, interpolated_morph);
 
                     sample = wavefolder.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope);
                     break;
@@ -323,7 +319,6 @@ void WavetableEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune
                     phase = wavewrapper.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false);
 
                     sample = GetSampleBetweenFrames(phase, interpolated_morph);
-                    sub_sample = GetSampleBetweenFrames(sub_phase_, interpolated_morph);
 
                     sample = wavewrapper.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope);
                     break;
@@ -331,7 +326,6 @@ void WavetableEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune
                     phase = bitcrush.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false);
 
                     sample = GetSampleBetweenFrames(phase, interpolated_morph);
-                    sub_sample = GetSampleBetweenFrames(sub_phase_, interpolated_morph);
 
                     sample = bitcrush.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope);
                     break;
@@ -339,11 +333,31 @@ void WavetableEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune
                     phase = drive.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false);
 
                     sample = GetSampleBetweenFrames(phase, interpolated_morph);
-                    sub_sample = GetSampleBetweenFrames(sub_phase_, interpolated_morph);
 
                     sample = drive.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope);
                     break;
             }
+
+            if(settings_.subosc_wave == SUBOSC_WAVE_SINE) {
+                sub_sample = GetSine(sub_phase_);
+            }
+            else if(settings_.subosc_wave == SUBOSC_WAVE_TRIANGLE) {
+                sub_sample = GetTriangle(sub_phase_);
+            }
+            else if(settings_.subosc_wave == SUBOSC_WAVE_SAWTOOTH) {
+                sub_sample = GetSawtooth(sub_phase_, sub_phase_increment);
+            }
+            else if(settings_.subosc_wave == SUBOSC_WAVE_RAMP) {
+                sub_sample = GetRamp(sub_phase_, sub_phase_increment);
+            }
+            else if(settings_.subosc_wave == SUBOSC_WAVE_SQUARE) {
+                sub_sample = GetSquare(sub_phase_, sub_phase_increment);
+            }
+            else if(settings_.subosc_wave == SUBOSC_WAVE_COPY) {
+                sub_sample = GetSampleBetweenFrames(sub_phase_, interpolated_morph);
+            }
+
+            sub_sample = settings_.subosc_mix * sample + (1.0f - settings_.subosc_mix) * sub_sample;
 
             phase_ += phase_increment;
             sub_phase_ += sub_phase_increment;

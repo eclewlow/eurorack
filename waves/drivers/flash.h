@@ -30,14 +30,14 @@
 #ifndef WAVES_DRIVERS_FLASH_H_
 #define WAVES_DRIVERS_FLASH_H_
 
-#include "stmlib/stmlib.h"
-// #include "waves/drivers/wavetables.h"
+// #include "stmlib/stmlib.h"
 // #include "stmlib/system/system_clock.h"
-
-#include <stm32f4xx_conf.h>
+// #include "waves/Globals.h"
+#include "waves/drivers/wavetables.h"
+// #include <stm32f4xx_conf.h>
 #include <cstring>
 #include <stdio.h>
-#include "math.h"
+// #include "math.h"
 
 namespace waves {
 
@@ -1044,6 +1044,7 @@ void W25qxx_Init (void)
     // Program(0xaa, 1, EEPROM_FACTORY_SS);
 
     while(GetFlag(&_EREG_, _BUSY_));
+
     SetFlag(&_EREG_, _BUSY_, FLAG_SET);
 
     int wavetable = 0;

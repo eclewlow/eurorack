@@ -1,4 +1,5 @@
-#include <stdint.h>
-#include "waves/Globals.h"
+#pragma once
 
-extern int16_t ROM[32768];
+#include <stdint.h>
+
+// extern int16_t ROM[0];

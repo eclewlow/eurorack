@@ -236,7 +236,7 @@ typedef struct {
     // sub osc parameters
     int8_t subosc_offset;                    // (-24, 24)
     int8_t subosc_detune;                    // (-50, 50)
-    int8_t subosc_mix;                       // (0, 100)
+    float subosc_mix;                        // (0.0f, 1.0f)
     int8_t subosc_wave;                      // (0, 5)
     
     // fx parameters

@@ -10,11 +10,7 @@
 
 #pragma once
 
-// #include "waves/Globals.h"
-#include "waves/State.h"
-#include "waves/dsp/fx/effect.h"
-#include "waves/dsp/Engine.h"
-#include "stdint.h"
+#include "waves/Globals.h"
 
 class Context {
 public:

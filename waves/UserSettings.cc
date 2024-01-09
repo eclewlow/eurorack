@@ -170,7 +170,7 @@ bool UserSettings::RandomizeSettings() {
     // sub osc parameters
     settings_.subosc_offset = RandomInt(-24, 24);
     settings_.subosc_detune = RandomInt(-50, 50);
-    settings_.subosc_mix = RandomInt(0, 100);
+    settings_.subosc_mix = RandomFloat(0, 1.0f);
     settings_.subosc_wave = RandomInt(0, 5);
     
     settings_.fx_depth = RandomFloat(0.0f, 1.0f);
