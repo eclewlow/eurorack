@@ -165,6 +165,7 @@ void WavetableEngine::triggerUpdate() {
 }
 
 void WavetableEngine::on_load_finished() {
+    loading = 12;
     // wavetableEngine.swap_ = true;
     int16_t * temp_buffer = front_buffer_1;
     front_buffer_1 = back_buffer_1;
@@ -358,6 +359,8 @@ void WavetableEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune
             }
 
             sub_sample = settings_.subosc_mix * sample + (1.0f - settings_.subosc_mix) * sub_sample;
+
+            // loading = front_buffer_1[0];
 
             phase_ += phase_increment;
             sub_phase_ += sub_phase_increment;

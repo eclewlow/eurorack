@@ -817,39 +817,6 @@ uint8_t ReadStatusRegister(uint8_t pin) {
     return byte;
 }
 
-bool SectorErase4K(uint32_t address, uint8_t pin) {
-
-    // SET WREN first
-    CMD(WRITE_ENABLE, pin);
-
-    LOW(pin);
-
-    uint8_t buf[4];
-
-    buf[0] = SECTOR_ERASE_4K;
-    buf[1] = ((address >> 16) & 0xFF);
-    buf[2] = ((address >> 8) & 0xFF);
-    buf[3] = ((address) & 0xFF);
-
-    Write(buf, 4);
-
-    // SPI_I2S_SendData(SPI1, 0);
-    // while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
-    // SPI_I2S_ReceiveData(SPI1);
-    // while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
-
-    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_BSY));
-
-    HIGH(pin);
-
-    // while(ReadStatusRegister(pin) & 0x01);  // BUSY
-    system_clock.Delay(25);
-
-
-    CMD(WRITE_DISABLE, pin);
-
-    return true;
-}
 
 void Read25Mhz(uint8_t * buf, uint32_t size, uint32_t address, uint8_t pin) {
 
@@ -957,8 +924,8 @@ bool Program(uint8_t byte, uint32_t address, uint8_t pin) {
 
     HIGH(pin);
 
-    // while(ReadStatusRegister(pin) & 0x01);  // BUSY
-    system_clock.Delay(25);
+    while(ReadStatusRegister(pin) & 0x01);  // BUSY
+    // system_clock.Delay(25);
 
     // wrdi
     CMD(WRITE_DISABLE, pin);
@@ -970,6 +937,8 @@ bool Program(uint8_t byte, uint32_t address, uint8_t pin) {
 bool AAI_Word_Program(uint8_t * buffer, uint32_t size, uint32_t address, uint8_t pin) {
     if(size < 2) return false;
     if(size % 2 != 0) return false;
+
+    WriteStatusRegister(0x00, EEPROM_FACTORY_SS);
 
     // TODO: USE HARDWARE BSY FOR FASTER WRITE
     // wren
@@ -997,8 +966,10 @@ bool AAI_Word_Program(uint8_t * buffer, uint32_t size, uint32_t address, uint8_t
 
     HIGH(pin);
 
-    // while(ReadStatusRegister(pin) & 0x01);  // BUSY
-    system_clock.Delay(10);
+      // while(ReadStatusRegister(pin) & 0x01) {
+        // loading = ReadStatusRegister(pin);
+      // }  // BUSY
+    system_clock.Delay(1);
 
     while(i < size) {
 
@@ -1016,9 +987,13 @@ bool AAI_Word_Program(uint8_t * buffer, uint32_t size, uint32_t address, uint8_t
 
         HIGH(pin);
 
-        // while(ReadStatusRegister(pin) & 0x01);  // BUSY
+        // while(ReadStatusRegister(pin) & 0x01) {
+          // loading = ReadStatusRegister(pin);
+        // }  // BUSY
+
         system_clock.Delay(1);
     }
+    // loading = 37;
 
     // wrdi
     CMD(WRITE_DISABLE, pin);
@@ -1029,16 +1004,60 @@ bool AAI_Word_Program(uint8_t * buffer, uint32_t size, uint32_t address, uint8_t
     return true;
 }
 
+bool SectorErase4K(uint32_t address, uint8_t pin) {
+
+    WriteStatusRegister(0x00, EEPROM_FACTORY_SS);
+
+    // loading = 22;
+    // SET WREN first
+    CMD(WRITE_ENABLE, pin);
+
+    LOW(pin);
+
+    uint8_t buf[4];
+
+    buf[0] = SECTOR_ERASE_4K;
+    buf[1] = ((address >> 16) & 0xFF);
+    buf[2] = ((address >> 8) & 0xFF);
+    buf[3] = ((address) & 0xFF);
+
+    // loading = 23;
+    Write(buf, 4);
+
+    // SPI_I2S_SendData(SPI1, 0);
+    // while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
+    // SPI_I2S_ReceiveData(SPI1);
+    // while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
+
+    // loading = 24;
+    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_BSY));
+
+    HIGH(pin);
+
+    // loading = 28;
+    // loading = ReadStatusRegister(pin);
+    // while(ReadStatusRegister(pin) & 0x01) {
+      // loading = ReadStatusRegister(pin);
+    // }  // BUSY
+    system_clock.Delay(25);
+
+
+    // loading = 26;
+    CMD(WRITE_DISABLE, pin);
+
+    return true;
+}
+
 // -------------------------------------------------------------  
 void W25qxx_Init (void)
 {
     // system_clock.Delay(1000);
 
-    w25qxx.ID = __REV(Jedec_ID_Read());
+    // w25qxx.ID = __REV(Jedec_ID_Read());
 
     WriteStatusRegister(0x00, EEPROM_FACTORY_SS);
 
-    w25qxx.Lock = ReadStatusRegister(EEPROM_FACTORY_SS);
+    // w25qxx.Lock = ReadStatusRegister(EEPROM_FACTORY_SS);
 
     // Program(0xef, 0, EEPROM_FACTORY_SS);
     // Program(0xaa, 1, EEPROM_FACTORY_SS);
@@ -1049,14 +1068,29 @@ void W25qxx_Init (void)
 
     int wavetable = 0;
 
+    loading = 0;
+    // loading = 45;
     for(int i = 0; i < 16; i++) {
-    // loading++;
+    loading++;
         // system_clock.Delay(10);
     // int i = 0;
       SectorErase4K(wavetable * 65536 + 4096 * i, EEPROM_FACTORY_SS);
-    // system_clock.Delay(i == 0 ? 25 : 25);
+      // system_clock.Delay(25);
+    // loading++;
+      // for(int j = 0; j < 4096; j++) {
+        // loading++;
+        // Program(0x2, 4096 * i + j, EEPROM_FACTORY_SS);
+      // }
       AAI_Word_Program((uint8_t *)&ROM[2048*i], 4096, wavetable * 65536 + 4096 * i, EEPROM_FACTORY_SS);
+      // system_clock.Delay(25);
     }
+    // system_clock.Delay(25);
+
+    // SectorErase4K(0, EEPROM_FACTORY_SS);
+
+    // system_clock.Delay(25);
+
+    // AAI_Word_Program((uint8_t *)ROM, 4096, 0, EEPROM_FACTORY_SS);
 
 
     SetFlag(&_EREG_, _BUSY_, FLAG_CLEAR);

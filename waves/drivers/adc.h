@@ -36,7 +36,7 @@ namespace waves {
 
 const uint8_t kNumAdcChannels = 8;
 const uint8_t kHistoryLength = 64;
-const uint16_t kThreshold = 200;
+const uint16_t kThreshold = 64;
 
 class Adc {
  public:

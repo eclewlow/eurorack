@@ -200,6 +200,7 @@ enum IOConfigurationMenuGain {
 };
 
 enum EngineType {
+    ENGINE_TYPE_NONE        = -1,
     ENGINE_TYPE_AB          = 0,
     ENGINE_TYPE_WAVETABLE   = 1,
     ENGINE_TYPE_MATRIX      = 2,

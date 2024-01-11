@@ -154,7 +154,7 @@ void ABEngine::triggerUpdate() {
     phase_ = 0.0f;
     // TODO: Load current left frame into left side of buffer, and right frame into right side of buffer
     flash.StopDMA(true);
-    flash.StartFrameDMARead((uint32_t*)back_buffer_1, 4096, GetLeftFrame() * 4096, ABEngine::on_load_both_ab_left_finished);
+    flash.StartFrameDMARead((uint32_t*)back_buffer_1, 4096, 0 * 4096, ABEngine::on_load_both_ab_left_finished);
  }
 
 void ABEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, uint16_t fx_amount, uint16_t fx, uint16_t morph)

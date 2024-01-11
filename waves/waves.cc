@@ -252,7 +252,9 @@ void TIM1_UP_TIM10_IRQHandler(void) {
   // float frame = clamped_morph * 15.0f;
   // uint16_t frame_integral = floor(frame);
   // loading = adc.getChannel(2);
+  // loading = flash.ReadStatusRegister(EEPROM_FACTORY_SS);
   // memcpy(&result, dataBuffer, 2);
+  // loading = front_buffer_1[counter % 10];
   // snprintf(value, 80, "c=%d, s=%d, frame=%d, %d\n", counter, loading, frame_integral, front_buffer[(2048 - 20) + counter%20]);
   snprintf(value, 80, "l=%ld, busy=%d, rxne=%d, %d\n", (int32_t)loading, GetFlag(&_EREG_, _BUSY_), GetFlag(&_EREG_, _RXNE_), front_buffer[(2048 - 20) + counter%20]);
   // snprintf(value, 80, "%08lx\n", dataBuffer[0]);
@@ -457,6 +459,8 @@ void FillBuffer(AudioDac::Frame* output, size_t size) {
 
   // loading = 23;
   switch(settings_.engine) {
+    case ENGINE_TYPE_NONE:
+      break;
     case ENGINE_TYPE_AB:
       abEngine.Render((AudioDac::Frame*)(output), size, tune, fx_amount, fx, morph);
       break;
@@ -913,6 +917,7 @@ void Init() {
   // EFFECT_TYPE_DRIVE             
   settings_.fx_effect = EFFECT_TYPE_FM;
 
+  // ENGINE_TYPE_NONE
   // ENGINE_TYPE_AB
   // ENGINE_TYPE_WAVETABLE
   // ENGINE_TYPE_MATRIX
@@ -922,7 +927,7 @@ void Init() {
   settings_.engine = ENGINE_TYPE_WAVETABLE;
 
   // abEngine.triggerUpdate();
-  wavetableEngine.triggerUpdate();
+  // wavetableEngine.triggerUpdate();
 
   audio_dac.Init(48000, kBlockSize);
   audio_dac.Start(&FillBuffer);
@@ -937,11 +942,15 @@ int main(void) {
   while (1) {
     if(fresh_start) {
       fresh_start = false;
-      system_clock.Delay(1000);
-      flash.W25qxx_Init();
+      loading = 23;
+      // system_clock.Delay(1000);
+      // flash.W25qxx_Init();
       // lcd.Initial();
+      loading = 24;
 
-      system_clock.Delay(1000);
+      // system_clock.Delay(1000);
+      // abEngine.triggerUpdate();
+      wavetableEngine.triggerUpdate();
       // sys.StartTimers();
 
 
