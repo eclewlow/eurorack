@@ -298,7 +298,7 @@ void LCD::DisplayOn() {
   HIGH(LCD_SS);
   HIGH(LCD_CMD);
 
-  Wait<100>();
+  system_clock.Delay(1);
 
   LOW(LCD_CMD);
   LOW(LCD_SS);
@@ -313,7 +313,7 @@ void LCD::DisplayOn() {
 
 void LCD::Write_Instruction(uint8_t byte) {
 
-  Wait<100>();
+  system_clock.Delay(1);
 
   LOW(LCD_CMD);
 
@@ -321,7 +321,7 @@ void LCD::Write_Instruction(uint8_t byte) {
 
   LOW(LCD_SS);
 
-  Wait<100>();
+  system_clock.Delay(1);
 
   Write(&byte, 1);
 
@@ -329,16 +329,40 @@ void LCD::Write_Instruction(uint8_t byte) {
 
   HIGH(LCD_SS);
 
-  Wait<100>();
+  system_clock.Delay(1);
 
   return;
 }
 
 
+void LCD::Write_Data(uint8_t byte)
+{
+
+  system_clock.Delay(1);
+
+  HIGH(LCD_CMD);
+
+  LOW(LCD_CLOCK);
+
+  LOW(LCD_SS);
+
+  system_clock.Delay(1);
+
+  Write(&byte, 1);
+
+  // while (SPI_I2S_GetFlagStatus(SPI3, SPI_I2S_FLAG_BSY));
+
+  HIGH(LCD_SS);
+
+  system_clock.Delay(1);
+
+  return;
+}
+
 void LCD::Initial() {
   // RESET
   loading = 10;
-  Write_Instruction(0xe2);
+  // Write_Instruction(0xe2);
 
   loading = 20;
   HIGH(LCD_RESET);
@@ -350,54 +374,70 @@ void LCD::Initial() {
 
   loading = 40;
   HIGH(LCD_RESET);
+  system_clock.Delay(2000);
 
-  loading = 11;
-  // CLEAR ADC
-  Write_Instruction(0xa0);
+  loading = 41;
 
-  loading = 12;
-  // set shl
-  Write_Instruction(0xc8); // c8 or c0
-
-  loading = 13;
-  // clear bias
+  // referential c code
   Write_Instruction(0xa2);
-
-  loading = 14;
-  // power control
-  Write_Instruction((0x28|0x07));
-
-  loading = 15;
-  // regulator resistor select
-  Write_Instruction((0x20|0x05));
-
-  loading = 16;
-  // set contrast level
+  Write_Instruction(0xa0);
+  Write_Instruction(0xc0);
+  Write_Instruction(0x24);
   Write_Instruction(0x81);
-  Write_Instruction(30);
+  Write_Instruction(0x20);
+  Write_Instruction(0x2c);
+  Write_Instruction(0x2e);
+  Write_Instruction(0x2f);
 
-  loading = 17;
-  // INITIAL LINE
-  Write_Instruction(0x40 | 0x00);
-
-  loading = 18;
-  // display on
-  Write_Instruction(0xaf);
-  loading = 19;
-
-  // Write_Instruction(0xa7);   //  Reverse display : 0 illuminated
-  loading = 20;
-  // Write_Instruction(0xa6);   //  Normal display : 1 illuminated
-  // Write_Instruction(0xa5);   //  Entire dislay   Force whole LCD point
-  // Write_Instruction(0xa4); //  Normal display
-
-  // reverse display off
-  Write_Instruction(0xa6);
-
-  // entire display off
-  Write_Instruction(0xa4);
+  // display on?
+  loading = 42;
 
   Display_Picture(pic);
+
+  loading = 43;
+  Write_Instruction(0xaf);
+
+  loading = 50;
+  // // CLEAR ADC
+  // Write_Instruction(0xa0);
+
+  // // set shl
+  // Write_Instruction(0xc8); // c8 or c0
+
+  // // clear bias
+  // Write_Instruction(0xa2);
+
+  // // power control
+  // Write_Instruction((0x28|0x07));
+
+  // // regulator resistor select
+  // Write_Instruction((0x20|0x05));
+
+  // // set contrast level
+  // Write_Instruction(0x81);
+  // Write_Instruction(30);
+
+  // // INITIAL LINE
+  // Write_Instruction(0x40 | 0x00);
+
+  // // display on
+  // Write_Instruction(0xaf);
+
+  // // Write_Instruction(0xa7);   //  Reverse display : 0 illuminated
+  // // Write_Instruction(0xa6);   //  Normal display : 1 illuminated
+  // // Write_Instruction(0xa5);   //  Entire dislay   Force whole LCD point
+  // // Write_Instruction(0xa4); //  Normal display
+
+  // // reverse display off
+  // Write_Instruction(0xa6);
+
+  // // entire display off
+  // Write_Instruction(0xa4);
+
+  // // display on
+  // Write_Instruction(0xaf);
+
+  // Display_Picture(pic);
 }
 
 void LCD::Display_Picture(uint8_t pic[])
@@ -451,7 +491,7 @@ void LCD::DisplayOff() {
   HIGH(LCD_SS);
   HIGH(LCD_CMD);
 
-  Wait<100>();
+  system_clock.Delay(1);
 
   LOW(LCD_CMD);
   LOW(LCD_SS);
@@ -464,27 +504,12 @@ void LCD::DisplayOff() {
   HIGH(LCD_CMD);
 }
 
-void LCD::Write_Data(uint8_t byte)
-{
-  HIGH(LCD_CMD);
 
-  LOW(LCD_CLOCK);
-
-  LOW(LCD_SS);
-
-  Write(&byte, 1);
-
-  // while (SPI_I2S_GetFlagStatus(SPI3, SPI_I2S_FLAG_BSY));
-
-  HIGH(LCD_SS);
-
-  return;
-}
 
 void LCD::Draw() {
   Write_Instruction(0xB0);
 
-  Wait<100>();
+  system_clock.Delay(1);
 
   HIGH(LCD_CMD);
   LOW(LCD_SS);

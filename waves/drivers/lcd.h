@@ -192,20 +192,19 @@ void Write(uint8_t * buf, uint32_t size) {
     // loading = 48;
         LOW(LCD_CLOCK);
 
-        Wait<100>();
+        system_clock.Delay(1);
     // loading = 46;
         if((buf[i] >> j) & 0x1) {
           HIGH(LCD_MOSI);
         } else {
           LOW(LCD_MOSI);
         }
-        Wait<100>();
+        system_clock.Delay(1);
 
     // loading = 47;
         HIGH(LCD_CLOCK);
 
-        Wait<100>();
-
+        system_clock.Delay(1);
         // Wait<10>();
 
         j--;

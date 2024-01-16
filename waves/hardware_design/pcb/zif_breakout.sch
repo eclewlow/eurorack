@@ -1619,10 +1619,12 @@ This footprint was designed to help hold the alignment of a through-hole compone
 </net>
 <net name="N$3" class="0">
 <segment>
-<pinref part="J8" gate="G$1" pin="4"/>
-<wire x1="281.94" y1="210.82" x2="302.26" y2="210.82" width="0.1524" layer="91"/>
 <wire x1="302.26" y1="210.82" x2="302.26" y2="208.28" width="0.1524" layer="91"/>
 <pinref part="C17" gate="G$1" pin="1"/>
+<pinref part="J8" gate="G$1" pin="5"/>
+<wire x1="281.94" y1="208.28" x2="299.72" y2="208.28" width="0.1524" layer="91"/>
+<wire x1="299.72" y1="208.28" x2="299.72" y2="210.82" width="0.1524" layer="91"/>
+<wire x1="299.72" y1="210.82" x2="302.26" y2="210.82" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$12" class="0">

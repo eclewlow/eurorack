@@ -924,7 +924,7 @@ void Init() {
   // ENGINE_TYPE_DRUM
   // context.setEngine(ENGINE_TYPE_WAVETABLE);
   // settings_.engine = ENGINE_TYPE_AB;
-  settings_.engine = ENGINE_TYPE_WAVETABLE;
+  settings_.engine = ENGINE_TYPE_NONE;
 
   // abEngine.triggerUpdate();
   // wavetableEngine.triggerUpdate();
@@ -943,14 +943,14 @@ int main(void) {
     if(fresh_start) {
       fresh_start = false;
       loading = 23;
-      // system_clock.Delay(1000);
+      system_clock.Delay(1000);
       // flash.W25qxx_Init();
-      // lcd.Initial();
+      lcd.Initial();
       loading = 24;
 
-      // system_clock.Delay(1000);
+      system_clock.Delay(1000);
       // abEngine.triggerUpdate();
-      wavetableEngine.triggerUpdate();
+      // wavetableEngine.triggerUpdate();
       // sys.StartTimers();
 
 
