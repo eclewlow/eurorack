@@ -313,7 +313,7 @@ void LCD::DisplayOn() {
 
 void LCD::Write_Instruction(uint8_t byte) {
 
-  system_clock.Delay(1);
+  // system_clock.Delay(1);
 
   LOW(LCD_CMD);
 
@@ -321,7 +321,11 @@ void LCD::Write_Instruction(uint8_t byte) {
 
   LOW(LCD_SS);
 
-  system_clock.Delay(1);
+  __asm__("nop");
+  __asm__("nop");
+  __asm__("nop");
+  __asm__("nop");
+  __asm__("nop");
 
   Write(&byte, 1);
 
@@ -329,7 +333,11 @@ void LCD::Write_Instruction(uint8_t byte) {
 
   HIGH(LCD_SS);
 
-  system_clock.Delay(1);
+  __asm__("nop");
+  __asm__("nop");
+  __asm__("nop");
+  __asm__("nop");
+  __asm__("nop");
 
   return;
 }
@@ -337,16 +345,17 @@ void LCD::Write_Instruction(uint8_t byte) {
 
 void LCD::Write_Data(uint8_t byte)
 {
-
-  system_clock.Delay(1);
-
   HIGH(LCD_CMD);
 
   LOW(LCD_CLOCK);
 
   LOW(LCD_SS);
 
-  system_clock.Delay(1);
+  __asm__("nop");
+  __asm__("nop");
+  __asm__("nop");
+  __asm__("nop");
+  __asm__("nop");
 
   Write(&byte, 1);
 
@@ -354,40 +363,51 @@ void LCD::Write_Data(uint8_t byte)
 
   HIGH(LCD_SS);
 
-  system_clock.Delay(1);
+  __asm__("nop");
+  __asm__("nop");
+  __asm__("nop");
+  __asm__("nop");
+  __asm__("nop");
 
   return;
 }
 
 void LCD::Initial() {
   // RESET
-  loading = 10;
   // Write_Instruction(0xe2);
 
-  loading = 20;
-  HIGH(LCD_RESET);
-  system_clock.Delay(2000);
+  // one cpu frame is 0.000000005952381 = 1 / 168MHz
+  // or 5.952381 nanoseconds
+  // clock low for min 25ns
+  // high for min of 25 ns
+  // 25ns = 5 noop
+  // one write instruction is (9 * 10 * cpu) 
+  // = 0.00000053571429 or 535.71429 ns
+  // x 9 instructions = 4 us
+  // HIGH(LCD_RESET);
+  // Wait<100>();
 
-  loading = 30;
-  LOW(LCD_RESET);
-  system_clock.Delay(2000);
+  // loading = 30;
+  // LOW(LCD_RESET);
+  // Wait<100>();
 
-  loading = 40;
-  HIGH(LCD_RESET);
-  system_clock.Delay(2000);
-
-  loading = 41;
+  // loading = 40;
+  // HIGH(LCD_RESET);
+  // Wait<100>();
 
   // referential c code
-  Write_Instruction(0xa2);
-  Write_Instruction(0xa0);
-  Write_Instruction(0xc0);
-  Write_Instruction(0x24);
-  Write_Instruction(0x81);
-  Write_Instruction(0x20);
-  Write_Instruction(0x2c);
-  Write_Instruction(0x2e);
-  Write_Instruction(0x2f);
+  Write_Instruction(0xa3); // set 1/9 bias
+  Write_Instruction(0xa0); // seg normal direction
+  Write_Instruction(0xc0); // com normal direction
+
+  Write_Instruction(0x20 | 0x4); // regulation ratio 5.0 (0x4)
+
+  Write_Instruction(0x81); // set ev command
+  Write_Instruction(0x20); // ev=32
+
+  Write_Instruction(0x2c); // booster on
+  Write_Instruction(0x2e); // regulator on
+  Write_Instruction(0x2f); // follower on
 
   // display on?
   loading = 42;

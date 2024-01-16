@@ -180,32 +180,33 @@ void CMD(uint8_t code, uint8_t pin) {
 }
 
 void Write(uint8_t * buf, uint32_t size) {
-    // loading = 44;
 
-    LOW(LCD_CLOCK);
     for(uint32_t i = 0; i < size; i++) {
 
-    // loading = 45;
       int8_t j = 7;
       while(j >= 0) {
 
-    // loading = 48;
         LOW(LCD_CLOCK);
 
-        system_clock.Delay(1);
-    // loading = 46;
         if((buf[i] >> j) & 0x1) {
           HIGH(LCD_MOSI);
         } else {
           LOW(LCD_MOSI);
         }
-        system_clock.Delay(1);
 
-    // loading = 47;
+        __asm__("nop");
+        __asm__("nop");
+        __asm__("nop");
+        __asm__("nop");
+        __asm__("nop");
+
         HIGH(LCD_CLOCK);
 
-        system_clock.Delay(1);
-        // Wait<10>();
+        __asm__("nop");
+        __asm__("nop");
+        __asm__("nop");
+        __asm__("nop");
+        __asm__("nop");
 
         j--;
       }

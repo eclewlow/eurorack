@@ -874,9 +874,12 @@ void Init() {
   System sys;
   sys.Init(true);
 
+  lcd.Init();
+  lcd.Initial();
+
   adc.Init(false);
   flash.Init();
-  lcd.Init();
+
   // flash.InitMemory();
 
   // abEngine.Init();
@@ -943,9 +946,8 @@ int main(void) {
     if(fresh_start) {
       fresh_start = false;
       loading = 23;
-      system_clock.Delay(1000);
+      system_clock.Delay(2);
       // flash.W25qxx_Init();
-      lcd.Initial();
       loading = 24;
 
       system_clock.Delay(1000);
