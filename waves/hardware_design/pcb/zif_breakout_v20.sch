@@ -1438,9 +1438,9 @@ This footprint was designed to help hold the alignment of a through-hole compone
 <attribute name="LAST_DATE_TIME" x="344.17" y="10.16" size="2.286" layer="94"/>
 <attribute name="SHEET" x="357.505" y="5.08" size="2.54" layer="94"/>
 </instance>
-<instance part="J8" gate="G$1" x="256.54" y="218.44" smashed="yes">
-<attribute name="NAME" x="278.13" y="226.06" size="1.778" layer="95" align="center-left"/>
-<attribute name="VALUE" x="278.13" y="223.52" size="1.778" layer="96" align="center-left"/>
+<instance part="J8" gate="G$1" x="254" y="144.78" smashed="yes" rot="MR180">
+<attribute name="NAME" x="275.59" y="137.16" size="1.778" layer="95" rot="MR180" align="center-left"/>
+<attribute name="VALUE" x="275.59" y="139.7" size="1.778" layer="96" rot="MR180" align="center-left"/>
 </instance>
 <instance part="C14" gate="G$1" x="287.02" y="177.8" smashed="yes">
 <attribute name="NAME" x="288.544" y="180.721" size="1.778" layer="95" font="vector"/>
@@ -1489,8 +1489,6 @@ This footprint was designed to help hold the alignment of a through-hole compone
 <nets>
 <net name="GND" class="0">
 <segment>
-<pinref part="J8" gate="G$1" pin="16"/>
-<wire x1="281.94" y1="180.34" x2="284.48" y2="180.34" width="0.1524" layer="91"/>
 <wire x1="284.48" y1="180.34" x2="284.48" y2="182.88" width="0.1524" layer="91"/>
 <wire x1="284.48" y1="182.88" x2="287.02" y2="182.88" width="0.1524" layer="91"/>
 <pinref part="C14" gate="G$1" pin="1"/>
@@ -1500,11 +1498,8 @@ This footprint was designed to help hold the alignment of a through-hole compone
 <wire x1="297.18" y1="182.88" x2="302.26" y2="182.88" width="0.1524" layer="91"/>
 <junction x="297.18" y="182.88"/>
 <pinref part="GND23" gate="1" pin="GND"/>
-</segment>
-<segment>
-<pinref part="J8" gate="G$1" pin="2"/>
-<wire x1="281.94" y1="215.9" x2="287.02" y2="215.9" width="0.1524" layer="91"/>
-<pinref part="GND24" gate="1" pin="GND"/>
+<pinref part="J8" gate="G$1" pin="15"/>
+<wire x1="279.4" y1="180.34" x2="284.48" y2="180.34" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <pinref part="C17" gate="G$1" pin="2"/>
@@ -1516,11 +1511,14 @@ This footprint was designed to help hold the alignment of a through-hole compone
 <wire x1="218.44" y1="111.76" x2="220.98" y2="111.76" width="0.1524" layer="91"/>
 <label x="218.44" y="111.76" size="1.778" layer="95"/>
 </segment>
+<segment>
+<pinref part="J8" gate="G$1" pin="29"/>
+<pinref part="GND24" gate="1" pin="GND"/>
+<wire x1="279.4" y1="215.9" x2="287.02" y2="215.9" width="0.1524" layer="91"/>
+</segment>
 </net>
 <net name="+3V3" class="0">
 <segment>
-<pinref part="J8" gate="G$1" pin="17"/>
-<wire x1="281.94" y1="177.8" x2="284.48" y2="177.8" width="0.1524" layer="91"/>
 <wire x1="284.48" y1="177.8" x2="284.48" y2="175.26" width="0.1524" layer="91"/>
 <wire x1="284.48" y1="175.26" x2="287.02" y2="175.26" width="0.1524" layer="91"/>
 <pinref part="C14" gate="G$1" pin="2"/>
@@ -1531,64 +1529,72 @@ This footprint was designed to help hold the alignment of a through-hole compone
 <junction x="297.18" y="175.26"/>
 <wire x1="302.26" y1="175.26" x2="302.26" y2="172.72" width="0.1524" layer="91"/>
 <pinref part="+3V6" gate="G$1" pin="+3V3"/>
-</segment>
-<segment>
-<pinref part="J8" gate="G$1" pin="3"/>
-<wire x1="281.94" y1="213.36" x2="287.02" y2="213.36" width="0.1524" layer="91"/>
-<pinref part="+3V7" gate="G$1" pin="+3V3"/>
-</segment>
-<segment>
-<pinref part="J8" gate="G$1" pin="18"/>
-<pinref part="J8" gate="G$1" pin="19"/>
-<wire x1="281.94" y1="175.26" x2="281.94" y2="172.72" width="0.1524" layer="91"/>
-<pinref part="J8" gate="G$1" pin="20"/>
-<wire x1="281.94" y1="172.72" x2="281.94" y2="170.18" width="0.1524" layer="91"/>
-<junction x="281.94" y="172.72"/>
-<pinref part="J8" gate="G$1" pin="21"/>
-<wire x1="281.94" y1="170.18" x2="281.94" y2="167.64" width="0.1524" layer="91"/>
-<junction x="281.94" y="170.18"/>
-<wire x1="281.94" y1="170.18" x2="287.02" y2="170.18" width="0.1524" layer="91"/>
-<pinref part="+3V8" gate="G$1" pin="+3V3"/>
-</segment>
-<segment>
-<pinref part="J8" gate="G$1" pin="26"/>
-<pinref part="J8" gate="G$1" pin="27"/>
-<wire x1="281.94" y1="154.94" x2="281.94" y2="152.4" width="0.1524" layer="91"/>
-<junction x="281.94" y="154.94"/>
-<wire x1="281.94" y1="154.94" x2="284.48" y2="154.94" width="0.1524" layer="91"/>
-<pinref part="+3V9" gate="G$1" pin="+3V3"/>
+<pinref part="J8" gate="G$1" pin="14"/>
+<wire x1="279.4" y1="177.8" x2="284.48" y2="177.8" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <pinref part="J1" gate="G$1" pin="1"/>
 <wire x1="218.44" y1="109.22" x2="220.98" y2="109.22" width="0.1524" layer="91"/>
 <label x="218.44" y="109.22" size="1.778" layer="95"/>
 </segment>
+<segment>
+<pinref part="J8" gate="G$1" pin="28"/>
+<pinref part="+3V7" gate="G$1" pin="+3V3"/>
+<wire x1="279.4" y1="213.36" x2="287.02" y2="213.36" width="0.1524" layer="91"/>
+</segment>
+<segment>
+<pinref part="J8" gate="G$1" pin="10"/>
+<wire x1="279.4" y1="167.64" x2="281.94" y2="167.64" width="0.1524" layer="91"/>
+<wire x1="281.94" y1="167.64" x2="281.94" y2="170.18" width="0.1524" layer="91"/>
+<pinref part="J8" gate="G$1" pin="11"/>
+<wire x1="281.94" y1="170.18" x2="279.4" y2="170.18" width="0.1524" layer="91"/>
+<pinref part="J8" gate="G$1" pin="12"/>
+<wire x1="279.4" y1="172.72" x2="281.94" y2="172.72" width="0.1524" layer="91"/>
+<wire x1="281.94" y1="172.72" x2="281.94" y2="170.18" width="0.1524" layer="91"/>
+<junction x="281.94" y="170.18"/>
+<pinref part="J8" gate="G$1" pin="13"/>
+<wire x1="279.4" y1="175.26" x2="281.94" y2="175.26" width="0.1524" layer="91"/>
+<wire x1="281.94" y1="175.26" x2="281.94" y2="172.72" width="0.1524" layer="91"/>
+<junction x="281.94" y="172.72"/>
+<pinref part="+3V8" gate="G$1" pin="+3V3"/>
+<wire x1="281.94" y1="170.18" x2="287.02" y2="170.18" width="0.1524" layer="91"/>
+</segment>
+<segment>
+<pinref part="J8" gate="G$1" pin="5"/>
+<pinref part="+3V9" gate="G$1" pin="+3V3"/>
+<wire x1="279.4" y1="154.94" x2="281.94" y2="154.94" width="0.1524" layer="91"/>
+<pinref part="J8" gate="G$1" pin="4"/>
+<wire x1="281.94" y1="154.94" x2="284.48" y2="154.94" width="0.1524" layer="91"/>
+<wire x1="279.4" y1="152.4" x2="281.94" y2="152.4" width="0.1524" layer="91"/>
+<wire x1="281.94" y1="152.4" x2="281.94" y2="154.94" width="0.1524" layer="91"/>
+<junction x="281.94" y="154.94"/>
+</segment>
 </net>
 <net name="LCD_CS" class="0">
-<segment>
-<pinref part="J8" gate="G$1" pin="30"/>
-<wire x1="281.94" y1="144.78" x2="284.48" y2="144.78" width="0.1524" layer="91"/>
-<label x="284.48" y="144.78" size="1.778" layer="95"/>
-</segment>
 <segment>
 <pinref part="J1" gate="G$1" pin="7"/>
 <wire x1="218.44" y1="124.46" x2="220.98" y2="124.46" width="0.1524" layer="91"/>
 <label x="218.44" y="124.46" size="1.778" layer="95"/>
 </segment>
+<segment>
+<pinref part="J8" gate="G$1" pin="1"/>
+<wire x1="279.4" y1="144.78" x2="284.48" y2="144.78" width="0.1524" layer="91"/>
+<label x="284.48" y="144.78" size="1.778" layer="95"/>
+</segment>
 </net>
 <net name="LCD_DIN" class="0">
 <segment>
-<pinref part="J8" gate="G$1" pin="23"/>
-<wire x1="281.94" y1="162.56" x2="284.48" y2="162.56" width="0.1524" layer="91"/>
 <label x="287.02" y="162.56" size="1.778" layer="95"/>
-<pinref part="J8" gate="G$1" pin="22"/>
 <wire x1="284.48" y1="162.56" x2="287.02" y2="162.56" width="0.1524" layer="91"/>
-<wire x1="281.94" y1="165.1" x2="284.48" y2="165.1" width="0.1524" layer="91"/>
 <wire x1="284.48" y1="165.1" x2="284.48" y2="162.56" width="0.1524" layer="91"/>
 <junction x="284.48" y="162.56"/>
-<pinref part="J8" gate="G$1" pin="24"/>
-<wire x1="281.94" y1="160.02" x2="284.48" y2="160.02" width="0.1524" layer="91"/>
 <wire x1="284.48" y1="160.02" x2="284.48" y2="162.56" width="0.1524" layer="91"/>
+<pinref part="J8" gate="G$1" pin="9"/>
+<wire x1="279.4" y1="165.1" x2="284.48" y2="165.1" width="0.1524" layer="91"/>
+<pinref part="J8" gate="G$1" pin="8"/>
+<wire x1="279.4" y1="162.56" x2="284.48" y2="162.56" width="0.1524" layer="91"/>
+<pinref part="J8" gate="G$1" pin="7"/>
+<wire x1="279.4" y1="160.02" x2="284.48" y2="160.02" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <pinref part="J1" gate="G$1" pin="3"/>
@@ -1598,64 +1604,64 @@ This footprint was designed to help hold the alignment of a through-hole compone
 </net>
 <net name="LCD_SCK" class="0">
 <segment>
-<pinref part="J8" gate="G$1" pin="25"/>
-<wire x1="281.94" y1="157.48" x2="284.48" y2="157.48" width="0.1524" layer="91"/>
-<label x="284.48" y="157.48" size="1.778" layer="95"/>
-</segment>
-<segment>
 <pinref part="J1" gate="G$1" pin="4"/>
 <wire x1="218.44" y1="116.84" x2="220.98" y2="116.84" width="0.1524" layer="91"/>
 <label x="218.44" y="116.84" size="1.778" layer="95"/>
 </segment>
+<segment>
+<pinref part="J8" gate="G$1" pin="6"/>
+<wire x1="279.4" y1="157.48" x2="284.48" y2="157.48" width="0.1524" layer="91"/>
+<label x="284.48" y="157.48" size="1.778" layer="95"/>
+</segment>
 </net>
 <net name="LCD_CMD" class="0">
-<segment>
-<pinref part="J8" gate="G$1" pin="28"/>
-<wire x1="281.94" y1="149.86" x2="284.48" y2="149.86" width="0.1524" layer="91"/>
-<label x="284.48" y="149.86" size="1.778" layer="95"/>
-</segment>
 <segment>
 <pinref part="J1" gate="G$1" pin="5"/>
 <wire x1="218.44" y1="119.38" x2="220.98" y2="119.38" width="0.1524" layer="91"/>
 <label x="218.44" y="119.38" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="J8" gate="G$1" pin="3"/>
+<wire x1="279.4" y1="149.86" x2="284.48" y2="149.86" width="0.1524" layer="91"/>
+<label x="284.48" y="149.86" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="N$3" class="0">
 <segment>
 <wire x1="304.8" y1="208.28" x2="304.8" y2="205.74" width="0.1524" layer="91"/>
 <pinref part="C17" gate="G$1" pin="1"/>
-<pinref part="J8" gate="G$1" pin="5"/>
-<wire x1="281.94" y1="208.28" x2="304.8" y2="208.28" width="0.1524" layer="91"/>
+<pinref part="J8" gate="G$1" pin="26"/>
+<wire x1="279.4" y1="208.28" x2="304.8" y2="208.28" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$12" class="0">
 <segment>
-<pinref part="J8" gate="G$1" pin="13"/>
-<wire x1="281.94" y1="187.96" x2="284.48" y2="187.96" width="0.1524" layer="91"/>
 <wire x1="284.48" y1="187.96" x2="284.48" y2="185.42" width="0.1524" layer="91"/>
 <wire x1="284.48" y1="185.42" x2="289.56" y2="185.42" width="0.1524" layer="91"/>
 <pinref part="C16" gate="G$1" pin="2"/>
-</segment>
-</net>
-<net name="N$13" class="0">
-<segment>
-<pinref part="J8" gate="G$1" pin="12"/>
-<wire x1="281.94" y1="190.5" x2="284.48" y2="190.5" width="0.1524" layer="91"/>
-<wire x1="284.48" y1="190.5" x2="284.48" y2="193.04" width="0.1524" layer="91"/>
-<wire x1="284.48" y1="193.04" x2="289.56" y2="193.04" width="0.1524" layer="91"/>
-<pinref part="C16" gate="G$1" pin="1"/>
+<pinref part="J8" gate="G$1" pin="18"/>
+<wire x1="279.4" y1="187.96" x2="284.48" y2="187.96" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="LCD_RESET" class="0">
 <segment>
-<pinref part="J8" gate="G$1" pin="29"/>
-<wire x1="281.94" y1="147.32" x2="284.48" y2="147.32" width="0.1524" layer="91"/>
-<label x="284.48" y="147.32" size="1.778" layer="95"/>
-</segment>
-<segment>
 <pinref part="J1" gate="G$1" pin="6"/>
 <wire x1="218.44" y1="121.92" x2="220.98" y2="121.92" width="0.1524" layer="91"/>
 <label x="218.44" y="121.92" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="J8" gate="G$1" pin="2"/>
+<wire x1="279.4" y1="147.32" x2="284.48" y2="147.32" width="0.1524" layer="91"/>
+<label x="284.48" y="147.32" size="1.778" layer="95"/>
+</segment>
+</net>
+<net name="N$1" class="0">
+<segment>
+<pinref part="J8" gate="G$1" pin="19"/>
+<wire x1="279.4" y1="190.5" x2="284.48" y2="190.5" width="0.1524" layer="91"/>
+<wire x1="284.48" y1="190.5" x2="284.48" y2="193.04" width="0.1524" layer="91"/>
+<pinref part="C16" gate="G$1" pin="1"/>
+<wire x1="284.48" y1="193.04" x2="289.56" y2="193.04" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>

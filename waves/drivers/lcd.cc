@@ -189,7 +189,7 @@ void LCD::Init() {
 
   HIGH(LCD_SS);
   HIGH(LCD_CMD);
-
+  HIGH(LCD_RESET);
   // // Initialize SPI.
   // SPI_InitTypeDef spi_init;
   // spi_init.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
@@ -384,16 +384,16 @@ void LCD::Initial() {
   // one write instruction is (9 * 10 * cpu) 
   // = 0.00000053571429 or 535.71429 ns
   // x 9 instructions = 4 us
-  // HIGH(LCD_RESET);
-  // Wait<100>();
+  HIGH(LCD_RESET);
+  Wait<100>();
 
   // loading = 30;
-  // LOW(LCD_RESET);
-  // Wait<100>();
+  LOW(LCD_RESET);
+  Wait<100>();
 
   // loading = 40;
-  // HIGH(LCD_RESET);
-  // Wait<100>();
+  HIGH(LCD_RESET);
+  Wait<100>();
 
   // referential c code
   Write_Instruction(0xa3); // set 1/9 bias

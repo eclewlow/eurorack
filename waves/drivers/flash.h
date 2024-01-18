@@ -969,7 +969,8 @@ bool AAI_Word_Program(uint8_t * buffer, uint32_t size, uint32_t address, uint8_t
       // while(ReadStatusRegister(pin) & 0x01) {
         // loading = ReadStatusRegister(pin);
       // }  // BUSY
-    system_clock.Delay(1);
+    // system_clock.Delay(1);
+    for(int16_t t = 0; t < 2000; t++) { __asm__("nop"); }
 
     while(i < size) {
 
@@ -991,7 +992,8 @@ bool AAI_Word_Program(uint8_t * buffer, uint32_t size, uint32_t address, uint8_t
           // loading = ReadStatusRegister(pin);
         // }  // BUSY
 
-        system_clock.Delay(1);
+        // system_clock.Delay(1);
+        for(int16_t t = 0; t < 2000; t++) { __asm__("nop"); }
     }
     // loading = 37;
 
