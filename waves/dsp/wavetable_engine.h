@@ -37,6 +37,7 @@ public:
 private:
     int current_frame_;
     int target_frame_;
+    int buffered_frame_;
     float swap_counter_;
     bool swap_;
     DISALLOW_COPY_AND_ASSIGN (WavetableEngine);

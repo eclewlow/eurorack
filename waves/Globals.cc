@@ -100,6 +100,29 @@ int16_t * front_buffer_2 = double_waveframe_buffer_2;
 int16_t * back_buffer_1 = double_waveframe_buffer_3;
 int16_t * back_buffer_2 = double_waveframe_buffer_4;
 
+// if 3.5. load 3 -> 4 -> 2 -> 5 (2 -> 3 -> 4 -> 5)
+// moved to 4.x, replace 2 with 6 (6 -> 3 -> 4 -> 5)
+// reorder (3 -> 4 -> 5 -> 6).
+// how do we keep this order... 
+// we need a data structure that aligns a -> b -> c -> d
+// and has a centroid x.y, or just x.
+// 
+
+int16_t waveframe_buffer_1[2048];
+int16_t waveframe_buffer_2[2048];
+int16_t waveframe_buffer_3[2048];
+int16_t waveframe_buffer_4[2048];
+int16_t waveframe_buffer_5[2048];
+int16_t waveframe_buffer_6[2048];
+int16_t waveframe_buffer_7[2048];
+int16_t waveframe_buffer_8[2048];
+
+int16_t * front_buf_1 = waveframe_buffer_1;
+int16_t * front_buf_2 = waveframe_buffer_2;
+int16_t * front_buf_3 = waveframe_buffer_3;
+int16_t * front_buf_4 = waveframe_buffer_4;
+int16_t * back_buf_1  = waveframe_buffer_5;
+int16_t * back_buf_2  = waveframe_buffer_6;
 
 float loading = 0;
 

@@ -55,10 +55,39 @@ inline float WavetableEngine::GetSampleBetweenFrames(float phase, float morph, b
     uint16_t frame_integral = floor(frame);
     float frame_fractional = frame - frame_integral;
     
-    if(frame_integral != current_frame_ && !GetFlag(&_EREG_, _BUSY_) && !GetFlag(&_EREG_, _RXNE_) /* && !swap_ */) {
-        target_frame_ = frame_integral;
-        // flash.StopDMA(true);
-        flash.StartFrameDMARead((uint32_t*)back_buffer_1, 8192, target_frame_ * 4096, WavetableEngine::on_load_finished);
+    if(!GetFlag(&_EREG_, _BUSY_) && !GetFlag(&_EREG_, _RXNE_)) {
+
+        if(frame_integral != current_frame_) {
+
+            // target_frame_ = frame_integral;
+            
+            if(frame_integral == buffered_frame_) {
+                int16_t * temp_buffer = front_buffer_1;
+                front_buffer_1 = back_buffer_1;
+                back_buffer_1 = temp_buffer;
+
+                int temp_frame = current_frame_;
+                current_frame_ = buffered_frame_;
+                buffered_frame_= temp_frame;
+            } else {
+                target_frame_ = frame_integral;
+                // flash.StopDMA(true);
+                flash.StartFrameDMARead((uint32_t*)back_buffer_1, 8192, target_frame_ * 4096, WavetableEngine::on_load_finished);
+            }
+        }
+        /* check fractional */
+        // >= 0.5 is closer to 1. < 0.5 is closer to 0
+        if(frame_fractional >= 0.5 && buffered_frame_ != current_frame_ + 1 && current_frame_ != 14) {
+            // buffer frame
+            target_frame_ = current_frame_ + 1;
+            flash.StartFrameDMARead((uint32_t*)back_buffer_1, 8192, target_frame_ * 4096, WavetableEngine::on_load_finished);
+
+        } else if (frame_fractional < 0.5 && buffered_frame_ != current_frame_ - 1 && current_frame_ != 0) {
+            // buffer frame
+            target_frame_ = current_frame_ - 1;
+            flash.StartFrameDMARead((uint32_t*)back_buffer_1, 8192, target_frame_ * 4096, WavetableEngine::on_load_finished);
+
+        }
     }
 
     int16_t * buf = front_buffer_1;
@@ -165,13 +194,13 @@ void WavetableEngine::triggerUpdate() {
 }
 
 void WavetableEngine::on_load_finished() {
-    loading = 12;
+    // loading = 12;
     // wavetableEngine.swap_ = true;
-    int16_t * temp_buffer = front_buffer_1;
-    front_buffer_1 = back_buffer_1;
-    back_buffer_1 = temp_buffer;
+    // int16_t * temp_buffer = front_buffer_1;
+    // front_buffer_1 = back_buffer_1;
+    // back_buffer_1 = temp_buffer;
 
-    wavetableEngine.current_frame_ = wavetableEngine.target_frame_;
+    wavetableEngine.buffered_frame_ = wavetableEngine.target_frame_;
 
     SetFlag(&_EREG_, _RXNE_, FLAG_CLEAR);
     SetFlag(&_EREG_, _BUSY_, FLAG_CLEAR);

@@ -56,5 +56,7 @@ private:
     int8_t target_frame_x;
     int8_t current_frame_y;
     int8_t target_frame_y;
+    int8_t buffered_frame_x;
+    int8_t buffered_frame_y;
     DISALLOW_COPY_AND_ASSIGN (MatrixEngine);
 };

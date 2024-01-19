@@ -29,6 +29,7 @@ extern int16_t double_waveframe_buffer_1[4096];
 extern int16_t double_waveframe_buffer_2[4096];
 extern int16_t double_waveframe_buffer_3[4096];
 extern int16_t double_waveframe_buffer_4[4096];
+
 extern int16_t * front_buffer;
 extern int16_t * back_buffer;
 extern int16_t * front_buffer_1;
