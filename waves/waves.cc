@@ -840,9 +840,9 @@ void ResetSettings() {
     
     // matrix engine parameters
     settings_.matrix_engine_x1 = 0;
-    settings_.matrix_engine_x2 = 2;
+    settings_.matrix_engine_x2 = 7;
     settings_.matrix_engine_y1 = 0;
-    settings_.matrix_engine_y2 = 2;
+    settings_.matrix_engine_y2 = 7;
     settings_.matrix_engine_wavelist_offset = 0;
     
     // drum engine parameters
@@ -927,11 +927,11 @@ void Init() {
   // ENGINE_TYPE_DRUM
   // context.setEngine(ENGINE_TYPE_WAVETABLE);
   // settings_.engine = ENGINE_TYPE_AB;
-  settings_.engine = ENGINE_TYPE_WAVETABLE;
+  settings_.engine = ENGINE_TYPE_MATRIX;
 
   // abEngine.triggerUpdate();
-  wavetableEngine.triggerUpdate();
-  // matrixEngine.triggerUpdate();
+  // wavetableEngine.triggerUpdate();
+  matrixEngine.triggerUpdate();
 
   audio_dac.Init(48000, kBlockSize);
   audio_dac.Start(&FillBuffer);

@@ -86,8 +86,8 @@ void MatrixEngine::on_load_2_finished() {
 
     // matrixEngine.current_frame_x = matrixEngine.target_frame_x;
     // matrixEngine.current_frame_y = matrixEngine.target_frame_y;
-    wavetableEngine.buffered_frame_x = wavetableEngine.target_frame_x;
-    wavetableEngine.buffered_frame_y = wavetableEngine.target_frame_y;
+    matrixEngine.buffered_frame_x = matrixEngine.target_frame_x;
+    matrixEngine.buffered_frame_y = matrixEngine.target_frame_y;
 
     SetFlag(&_EREG_, _RXNE_, FLAG_CLEAR);
     SetFlag(&_EREG_, _BUSY_, FLAG_CLEAR);
@@ -112,36 +112,74 @@ float MatrixEngine::GetSampleBetweenFrames(float phase, float morph_x, float mor
 
     if(!GetFlag(&_EREG_, _BUSY_) && !GetFlag(&_EREG_, _RXNE_)) {
 
-        if(frame_integral != current_frame_) {
+        if(frame_x_integral != current_frame_x || frame_y_integral != current_frame_y) {
 
             // target_frame_ = frame_integral;
 
-            if(frame_integral == buffered_frame_) {
+            if(frame_y_integral == buffered_frame_y && frame_x_integral == buffered_frame_x) {
                 int16_t * temp_buffer = front_buffer_1;
                 front_buffer_1 = back_buffer_1;
                 back_buffer_1 = temp_buffer;
 
-                int temp_frame = current_frame_;
-                current_frame_ = buffered_frame_;
-                buffered_frame_= temp_frame;
+                temp_buffer = front_buffer_2;
+                front_buffer_2 = back_buffer_2;
+                back_buffer_2 = temp_buffer;
+
+                int temp_frame = current_frame_x;
+                current_frame_x = buffered_frame_x;
+                buffered_frame_x = temp_frame;
+
+                temp_frame = current_frame_y;
+                current_frame_y = buffered_frame_y;
+                buffered_frame_y = temp_frame;
             } else {
-                target_frame_ = frame_integral;
+                target_frame_x = frame_x_integral;
+                target_frame_y = frame_y_integral;
                 // flash.StopDMA(true);
-                flash.StartFrameDMARead((uint32_t*)back_buffer_1, 8192, target_frame_ * 4096, WavetableEngine::on_load_finished);
+                flash.StartFrameDMARead((uint32_t*)back_buffer_1, 8192, (target_frame_y) * 65536 + (target_frame_x) * 4096, MatrixEngine::on_load_1_finished);
             }
         }
         /* check fractional */
         // >= 0.5 is closer to 1. < 0.5 is closer to 0
-        if(frame_fractional >= 0.5 && buffered_frame_ != current_frame_ + 1 && current_frame_ != 14) {
-            // buffer frame
-            target_frame_ = current_frame_ + 1;
-            flash.StartFrameDMARead((uint32_t*)back_buffer_1, 8192, target_frame_ * 4096, WavetableEngine::on_load_finished);
+        // check first which is closer to 0/1, x or y fractional.
+        if(abs(0.5 - frame_x_fractional) > abs(0.5 - frame_y_fractional)) {
+            // frame x buffer
+            if(frame_x_fractional >= 0.5 && \
+                    (buffered_frame_x != current_frame_x + 1 && buffered_frame_y != current_frame_y) && \
+                    current_frame_x != GetX2() - 1) {
+                // buffer frame
+                target_frame_x = current_frame_x + 1;
+                target_frame_y = current_frame_y;
+                flash.StartFrameDMARead((uint32_t*)back_buffer_1, 8192, (target_frame_y) * 65536 + (target_frame_x) * 4096, MatrixEngine::on_load_1_finished);
 
-        } else if (frame_fractional < 0.5 && buffered_frame_ != current_frame_ - 1 && current_frame_ != 0) {
-            // buffer frame
-            target_frame_ = current_frame_ - 1;
-            flash.StartFrameDMARead((uint32_t*)back_buffer_1, 8192, target_frame_ * 4096, WavetableEngine::on_load_finished);
+            } else if (frame_x_fractional < 0.5 && \
+                    (buffered_frame_x != current_frame_x - 1 && buffered_frame_y != current_frame_y) && \
+                    current_frame_x != GetX1()) {
+                // buffer frame
+                target_frame_x = current_frame_x - 1;
+                target_frame_y = current_frame_y;
+                flash.StartFrameDMARead((uint32_t*)back_buffer_1, 8192, (target_frame_y) * 65536 + (target_frame_x) * 4096, MatrixEngine::on_load_1_finished);
 
+            }
+        } else {
+            // frame x buffer
+            if(frame_y_fractional >= 0.5 && \
+                    (buffered_frame_y != current_frame_y + 1 || buffered_frame_x != current_frame_x) && \
+                    current_frame_y != GetY2() - 1) {
+                // buffer frame
+                target_frame_y = current_frame_y + 1;
+                target_frame_x = current_frame_x;
+                flash.StartFrameDMARead((uint32_t*)back_buffer_1, 8192, (target_frame_y) * 65536 + (target_frame_x) * 4096, MatrixEngine::on_load_1_finished);
+
+            } else if (frame_y_fractional < 0.5 && \
+                    (buffered_frame_y != current_frame_y - 1 || buffered_frame_x != current_frame_x) && \
+                    current_frame_y != GetY1()) {
+                // buffer frame
+                target_frame_y = current_frame_y - 1;
+                target_frame_x = current_frame_x;
+                flash.StartFrameDMARead((uint32_t*)back_buffer_1, 8192, (target_frame_y) * 65536 + (target_frame_x) * 4096, MatrixEngine::on_load_1_finished);
+
+            }            
         }
     }
     // if((frame_y_integral != current_frame_y || frame_x_integral != current_frame_x) && !GetFlag(&_EREG_, _BUSY_) && !GetFlag(&_EREG_, _RXNE_)) {
