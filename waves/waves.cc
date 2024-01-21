@@ -927,11 +927,11 @@ void Init() {
   // ENGINE_TYPE_DRUM
   // context.setEngine(ENGINE_TYPE_WAVETABLE);
   // settings_.engine = ENGINE_TYPE_AB;
-  settings_.engine = ENGINE_TYPE_MATRIX;
+  settings_.engine = ENGINE_TYPE_WAVETABLE;
 
   // abEngine.triggerUpdate();
-  // wavetableEngine.triggerUpdate();
-  matrixEngine.triggerUpdate();
+  wavetableEngine.triggerUpdate();
+  // matrixEngine.triggerUpdate();
 
   audio_dac.Init(48000, kBlockSize);
   audio_dac.Start(&FillBuffer);

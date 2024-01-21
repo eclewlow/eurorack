@@ -60,7 +60,7 @@ inline float WavetableEngine::GetSampleBetweenFrames(float phase, float morph, b
         if(frame_integral != current_frame_) {
 
             // target_frame_ = frame_integral;
-            
+
             if(frame_integral == buffered_frame_) {
                 int16_t * temp_buffer = front_buffer_1;
                 front_buffer_1 = back_buffer_1;
@@ -184,11 +184,12 @@ float WavetableEngine::GetSampleNoFX(float phase, float fx, float morph) {
 void WavetableEngine::triggerUpdate() {
     phase_ = 0.0f;
 
-    current_frame_ = 0;
+    current_frame_ = 1;
     target_frame_ = 0;
     // swap_counter_ = 0.0f;
     // swap_ = false;
     // target_frame_ = 0;
+    // buffered_frame_ = 0;
     flash.StopDMA(true);
     flash.StartFrameDMARead((uint32_t*)back_buffer_1, 8192, target_frame_ * 4096, WavetableEngine::on_load_finished);
 }
