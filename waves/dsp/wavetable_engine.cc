@@ -77,7 +77,7 @@ inline float WavetableEngine::GetSampleBetweenFrames(float phase, float morph, b
         }
         /* check fractional */
         // >= 0.5 is closer to 1. < 0.5 is closer to 0
-        if(frame_fractional >= 0.5 && buffered_frame_ != current_frame_ + 1 && current_frame_ != 14) {
+        else if(frame_fractional >= 0.5 && buffered_frame_ != current_frame_ + 1 && current_frame_ != 14) {
             // buffer frame
             target_frame_ = current_frame_ + 1;
             flash.StartFrameDMARead((uint32_t*)back_buffer_1, 8192, target_frame_ * 4096, WavetableEngine::on_load_finished);

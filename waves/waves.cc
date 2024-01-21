@@ -840,9 +840,9 @@ void ResetSettings() {
     
     // matrix engine parameters
     settings_.matrix_engine_x1 = 0;
-    settings_.matrix_engine_x2 = 7;
+    settings_.matrix_engine_x2 = 15;
     settings_.matrix_engine_y1 = 0;
-    settings_.matrix_engine_y2 = 7;
+    settings_.matrix_engine_y2 = 15;
     settings_.matrix_engine_wavelist_offset = 0;
     
     // drum engine parameters

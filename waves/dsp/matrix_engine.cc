@@ -142,10 +142,10 @@ float MatrixEngine::GetSampleBetweenFrames(float phase, float morph_x, float mor
         /* check fractional */
         // >= 0.5 is closer to 1. < 0.5 is closer to 0
         // check first which is closer to 0/1, x or y fractional.
-        if(abs(0.5 - frame_x_fractional) > abs(0.5 - frame_y_fractional)) {
+        else if(abs(0.5 - frame_x_fractional) > abs(0.5 - frame_y_fractional)) {
             // frame x buffer
             if(frame_x_fractional >= 0.5 && \
-                    (buffered_frame_x != current_frame_x + 1 && buffered_frame_y != current_frame_y) && \
+                    (buffered_frame_x != current_frame_x + 1 || buffered_frame_y != current_frame_y) && \
                     current_frame_x != GetX2() - 1) {
                 // buffer frame
                 target_frame_x = current_frame_x + 1;
@@ -153,7 +153,7 @@ float MatrixEngine::GetSampleBetweenFrames(float phase, float morph_x, float mor
                 flash.StartFrameDMARead((uint32_t*)back_buffer_1, 8192, (target_frame_y) * 65536 + (target_frame_x) * 4096, MatrixEngine::on_load_1_finished);
 
             } else if (frame_x_fractional < 0.5 && \
-                    (buffered_frame_x != current_frame_x - 1 && buffered_frame_y != current_frame_y) && \
+                    (buffered_frame_x != current_frame_x - 1 || buffered_frame_y != current_frame_y) && \
                     current_frame_x != GetX1()) {
                 // buffer frame
                 target_frame_x = current_frame_x - 1;
