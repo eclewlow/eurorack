@@ -48,13 +48,33 @@ public:
     void SetWavelistOffset(int8_t offset);
     int8_t GetWavelistOffset();
 
+    inline bool is_in_buffer(int8_t integral_x, int8_t integral_y, int8_t index_x, int8_t index_y) {
+      return integral_x >= index_x && integral_x < index_x + 2 && integral_y >= index_y && integral_y < index_y + 2;            
+    }
+
+    inline void swap_buffers(int16_t ** buf_1, int16_t ** buf_2) {
+      int16_t * temp_buffer = *buf_1;
+      *buf_1 = *buf_2;
+      *buf_2 = temp_buffer;
+    }
+
+    inline void swap_int(int8_t *int_1, int8_t *int_2) {
+      int temp = *int_1;
+      *int_1 = *int_2;
+      *int_2 = temp;
+    }
+
     static void on_load_1_finished();
     static void on_load_2_finished();
 
+    static void on_triple_load_1_finished();
+    static void on_triple_load_2_finished();
+    static void on_triple_load_3_finished();
+
 private:
     int8_t current_frame_x;
-    int8_t target_frame_x;
     int8_t current_frame_y;
+    int8_t target_frame_x;
     int8_t target_frame_y;
     int8_t buffered_frame_x;
     int8_t buffered_frame_y;

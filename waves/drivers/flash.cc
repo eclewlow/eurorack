@@ -165,7 +165,7 @@ void Flash::Init() {
 void Flash::StartDMARead(uint16_t __bytes) {
   uint8_t pump = 0;
 
-  loading = 33;
+  // loading = 33;
   DMA_SetCurrDataCounter(DMA2_Stream3, __bytes);
   DMA_SetCurrDataCounter(DMA2_Stream0, __bytes);
   DMA2_Stream3->M0AR = (int)&pump;
@@ -190,7 +190,7 @@ void Flash::StartFrameDMARead(uint32_t * buffer, uint32_t __bytes, uint32_t addr
 
   set_on_dma_read_finished_func(func);
 
-  loading = 3;
+  // loading = 3;
   LOW(EEPROM_FACTORY_SS);
 
   uint8_t send_buf[5];
@@ -205,7 +205,7 @@ void Flash::StartFrameDMARead(uint32_t * buffer, uint32_t __bytes, uint32_t addr
   // system_clock.Delay(1);
   // uint8_t pump = 0;
 
-  loading = 4;
+  // loading = 4;
 
   SPI_I2S_SendData(SPI1, 0);
   while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
@@ -214,7 +214,7 @@ void Flash::StartFrameDMARead(uint32_t * buffer, uint32_t __bytes, uint32_t addr
     SPI_I2S_ReceiveData(SPI1);    
   }
 
-  loading = 5;
+  // loading = 5;
 
   DMA_SetCurrDataCounter(DMA2_Stream3, __bytes);
   DMA_SetCurrDataCounter(DMA2_Stream0, __bytes);
@@ -225,7 +225,7 @@ void Flash::StartFrameDMARead(uint32_t * buffer, uint32_t __bytes, uint32_t addr
   SPI_I2S_DMACmd(SPI1, SPI_I2S_DMAReq_Tx, ENABLE);
   SPI_I2S_DMACmd(SPI1, SPI_I2S_DMAReq_Rx, ENABLE);
 
-  loading = 6;
+  // loading = 6;
 
   // loading++;
 
@@ -248,7 +248,7 @@ void Flash::StartDMAWrite(uint16_t __bytes) {
 }
 
 void Flash::StopDMA(bool bypass) {
-  loading = 2;
+  // loading = 2;
   DMA_ClearFlag(DMA2_Stream0, DMA_FLAG_TCIF0 | DMA_FLAG_HTIF0);
   DMA_ClearFlag(DMA2_Stream3, DMA_FLAG_TCIF3 | DMA_FLAG_HTIF3);
 
@@ -279,7 +279,7 @@ extern "C" {
 
 // Rx Transfer complete
 void DMA2_Stream0_IRQHandler(void) {
-    loading = 1;
+    // loading = 1;
   if(DMA_GetFlagStatus(DMA2_Stream0, DMA_FLAG_TCIF0)) {
     DMA_ClearFlag(DMA2_Stream0, DMA_FLAG_TCIF0 | DMA_FLAG_HTIF0);
 

@@ -30,13 +30,27 @@ extern int16_t double_waveframe_buffer_2[4096];
 extern int16_t double_waveframe_buffer_3[4096];
 extern int16_t double_waveframe_buffer_4[4096];
 
+extern int16_t triple_waveframe_buffer_1[6144];
+extern int16_t triple_waveframe_buffer_2[6144];
+extern int16_t triple_waveframe_buffer_3[6144];
+extern int16_t triple_waveframe_buffer_4[6144];
+extern int16_t triple_waveframe_buffer_5[6144];
+extern int16_t triple_waveframe_buffer_6[6144];
+
+extern int16_t * matrix_front_buffer_1;
+extern int16_t * matrix_front_buffer_2;
+extern int16_t * matrix_front_buffer_3;
+extern int16_t * matrix_back_buffer_1;
+extern int16_t * matrix_back_buffer_2;
+extern int16_t * matrix_back_buffer_3;
+
 extern int16_t * front_buffer;
 extern int16_t * back_buffer;
 extern int16_t * front_buffer_1;
 extern int16_t * front_buffer_2;
 extern int16_t * back_buffer_1;
 extern int16_t * back_buffer_2;
-extern int16_t pump_buffer[4096];
+extern int16_t pump_buffer[6144];
 extern float loading;
 extern uint8_t lcd_buffer[8][128];
 

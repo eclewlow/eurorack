@@ -66,6 +66,25 @@ float MatrixEngine::GetSample(int16_t wavetable, int16_t frame, float phase) {
 }
 
 
+void MatrixEngine::on_triple_load_1_finished() {
+    SetFlag(&_EREG_, _RXNE_, FLAG_CLEAR);
+    flash.StartFrameDMARead((uint32_t*)matrix_back_buffer_2, 12288, (matrixEngine.target_frame_y + 1) * 65536 + (matrixEngine.target_frame_x) * 4096, MatrixEngine::on_triple_load_2_finished);
+}
+
+void MatrixEngine::on_triple_load_2_finished() {
+    SetFlag(&_EREG_, _RXNE_, FLAG_CLEAR);
+    flash.StartFrameDMARead((uint32_t*)matrix_back_buffer_3, 12288, (matrixEngine.target_frame_y + 2) * 65536 + (matrixEngine.target_frame_x) * 4096, MatrixEngine::on_triple_load_3_finished);
+}
+
+void MatrixEngine::on_triple_load_3_finished() {
+    matrixEngine.buffered_frame_x = matrixEngine.target_frame_x;
+    matrixEngine.buffered_frame_y = matrixEngine.target_frame_y;
+
+    SetFlag(&_EREG_, _RXNE_, FLAG_CLEAR);
+    SetFlag(&_EREG_, _BUSY_, FLAG_CLEAR);
+}
+
+
 void MatrixEngine::on_load_1_finished() {
 
     // x morphs between frames;
@@ -93,6 +112,97 @@ void MatrixEngine::on_load_2_finished() {
     SetFlag(&_EREG_, _BUSY_, FLAG_CLEAR);
 }
 
+/**
+ * 
+ * step 1: calculate integral x,y
+ * step 2: is current?
+ *      (HOW do we know if it is current?)
+ *                      if the integral is 1,1 and the current is (0, 0) -> (2, 2),
+ *                          x: 0 <= 1 < 0+2, and y: 0 <= 1 < 0+2, so it is buffered.
+ *                      )
+ *      
+ *      a: NO
+ *          1: is back buffered?
+ *                      (how do we know if it is back buffered? 
+ *                      the buffer is a 3x3 matrix.
+ *                      we store the top-left corner index as the current buffer?
+ *                      we can then calculate if the calculated integral falls inside the buffered zone
+ *                      if the integral is 1,1 and the buffer is (0, 0) -> (2, 2),
+ *                          x: 0 <= 1 < 0+2, and y: 0 <= 1 < 0+2, so it is buffered.
+ *                      )
+ *              a: NO
+ *                  1: load buffer.
+ *                      (which 3x3 index to we want to buffer?
+ *                      well we want to determine which quadrant the target/integral x,y lies in.
+ *                      if the integral is 1,1 and bottom-right quadrant, then we want to buffer (1,1)-> (3,3)
+ *                      if the integral is 1, 1 and the top-right quandrant, then we want to buffer (1, 0) -> (3, 2)
+ *                      1, 1 and bottom-left, then buffer (0, 1) -> (2, 3)
+ *                      1, 1 and top-left, then buffer (0, 0)
+ *                      // so top-left  is -1,-1
+ *                      // top-right    is +0, -1
+ *                      // bottom-right is +0,+0
+ *                      // bottom-left  is -1,+0
+ * 
+ *                      // exception. x = 0 and left, y = 0 and upper quadrants
+ *                      // exception. x >= 14 and right, y >= 14 and lower quadrants
+ *              b: YES
+ *                  1. swap buffer with front
+ *                      (how do we swap the buffer?
+ *                      swap all front buffers with back buffers
+ *                      // so we have a current front 3x3 frame, and current back 3x3 frame.
+ *                  2. sample front
+ *                      first we need to know which buffer to use.
+ *                      how do we know which buffer to use?
+ *                      if the integral is 1, 1 and the buffer is (0, 0) -> (2,2) then the buffer to use is 1 - 0 = 1, 1 - 0 = 1
+ *                      if the integral is 1, 1 and the buffer is (1, 1) -> (2,2) then the buffer to use is 1 - 1 = 0, 1 - 1 = 0
+ *                      if the integral is 1, 1 and the buffer is (0, 1) -> (3, 4) then the buffer to use is 1 - 0 = 1, 1 - 1 = 0
+ *                      // so the buffer to use is integral-x minus buf-x, integral-y - buf-y.
+ *                      // IF integral-y minus buf-y = 0 ,
+ *                                      THEN front_buffer_1 = triple_waveframe_buffer_1[2048 * (integral-x minus buf-x)]
+ *                                      THEN front_buffer_2 = triple_waveframe_buffer_2[2048 * (integral-x minus buf-x)]
+ *                      // IF integral-y minus buf-y = 1 , THEN use front_buffer = triple_waveframe_buffer_2[2048 * (integral-x minus buf-x)]
+ *                                      THEN front_buffer_1 = triple_waveframe_buffer_2[2048 * (integral-x minus buf-x)]
+ *                                      THEN front_buffer_2 = triple_waveframe_buffer_3[2048 * (integral-x minus buf-x)]
+
+ *                      (how do we sample the front?
+ *                      the front buffer is a double frame buffer pointer that points to an index in a triple frame buffer.
+ *                      // so we use the getsample function which samples between frames from a double frame buffer.
+ *                      // but we need to first offset the integral.
+ *                      // so if the integral is 2, 2 and the current is 1, 1, we want to sample offset (1,1)-> (2, 2) within the buffer
+ *                      // so we sample the correctly adjusted frame index -> (2 - 1, 2 - 1), 
+ *                                  2-1 = 1:
+ *                                      THEN front_buffer_1 = triple_waveframe_buffer_2[2048 * (2-1)]
+ *                                      THEN front_buffer_2 = triple_waveframe_buffer_3[2048 * (2-1)]
+ *      b: YES
+ *          1. sample front.
+ *          // which buffer do we sample from?
+ *          // since the calculated integral is current, we sample from the current front buffer.
+ *          // just using the getsample function
+ * 
+ * step 3: caculate fractional quadrant
+ * step 4: does the quadrant align with the current buffer?
+ *                      (how do we know if the quadrant aligns with the current buffer?)
+ *                      if the front buffer index is 0, 0, and the calculated integral is 1,1, we would expect the quadrant
+ *                      to be the top-left.
+ *                      BUT if the calculated quadrant (derived from fractional) is anywhere else, the back buffer should be loaded
+ *      a: NO
+ *          1. load buffer based on integral/fractional
+ *              integral is 1, 1. current is for example 0, 0. quadrant is 0.5, 0.5. so target buffer 1, 1.
+ *              target-frame 1, 1. if buffered frame is not 1, 1, load 1, 1. when dma finishes set buffered_frame to target frame.
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ **/
+
 float MatrixEngine::GetSampleBetweenFrames(float phase, float morph_x, float morph_y) {
     // if x1 = 8 and x2 = 12. and morph_x = 0.5, then x1 + morph_x * (x2 - x1)
 
@@ -112,82 +222,55 @@ float MatrixEngine::GetSampleBetweenFrames(float phase, float morph_x, float mor
 
     if(!GetFlag(&_EREG_, _BUSY_) && !GetFlag(&_EREG_, _RXNE_)) {
 
-        if(frame_x_integral != current_frame_x || frame_y_integral != current_frame_y) {
+        if(!is_in_buffer(frame_x_integral, frame_y_integral, current_frame_x, current_frame_y)) {
 
             // target_frame_ = frame_integral;
 
-            if(frame_y_integral == buffered_frame_y && frame_x_integral == buffered_frame_x) {
-                int16_t * temp_buffer = front_buffer_1;
-                front_buffer_1 = back_buffer_1;
-                back_buffer_1 = temp_buffer;
+            if(is_in_buffer(frame_x_integral, frame_y_integral, buffered_frame_x, buffered_frame_y)) {
+                swap_buffers(&matrix_front_buffer_1, &matrix_back_buffer_1);
+                swap_buffers(&matrix_front_buffer_2, &matrix_back_buffer_2);
+                swap_buffers(&matrix_front_buffer_3, &matrix_back_buffer_3);
 
-                temp_buffer = front_buffer_2;
-                front_buffer_2 = back_buffer_2;
-                back_buffer_2 = temp_buffer;
-
-                int temp_frame = current_frame_x;
-                current_frame_x = buffered_frame_x;
-                buffered_frame_x = temp_frame;
-
-                temp_frame = current_frame_y;
-                current_frame_y = buffered_frame_y;
-                buffered_frame_y = temp_frame;
-            } else {
-                target_frame_x = frame_x_integral;
-                target_frame_y = frame_y_integral;
-                // flash.StopDMA(true);
-                flash.StartFrameDMARead((uint32_t*)back_buffer_1, 8192, (target_frame_y) * 65536 + (target_frame_x) * 4096, MatrixEngine::on_load_1_finished);
+                swap_int(&current_frame_x, &buffered_frame_x);
+                swap_int(&current_frame_y, &buffered_frame_y);
             }
         }
         /* check fractional */
         // >= 0.5 is closer to 1. < 0.5 is closer to 0
         // check first which is closer to 0/1, x or y fractional.
-        else if(abs(0.5 - frame_x_fractional) > abs(0.5 - frame_y_fractional)) {
-            // frame x buffer
-            if(frame_x_fractional >= 0.5 && \
-                    (buffered_frame_x != current_frame_x + 1 || buffered_frame_y != current_frame_y) && \
-                    current_frame_x != GetX2() - 1) {
-                // buffer frame
-                target_frame_x = current_frame_x + 1;
-                target_frame_y = current_frame_y;
-                flash.StartFrameDMARead((uint32_t*)back_buffer_1, 8192, (target_frame_y) * 65536 + (target_frame_x) * 4096, MatrixEngine::on_load_1_finished);
+        // basically trigger dma if the back buffered frame doesn't match the calculated 
+        int8_t test_frame_x = round(frame_x) - 1;
+        int8_t test_frame_y = round(frame_y) - 1;
 
-            } else if (frame_x_fractional < 0.5 && \
-                    (buffered_frame_x != current_frame_x - 1 || buffered_frame_y != current_frame_y) && \
-                    current_frame_x != GetX1()) {
-                // buffer frame
-                target_frame_x = current_frame_x - 1;
-                target_frame_y = current_frame_y;
-                flash.StartFrameDMARead((uint32_t*)back_buffer_1, 8192, (target_frame_y) * 65536 + (target_frame_x) * 4096, MatrixEngine::on_load_1_finished);
+        test_frame_x = CLAMP<int8_t>(test_frame_x, GetX1(), GetX2() - 2);
+        test_frame_y = CLAMP<int8_t>(test_frame_y, GetY1(), GetY2() - 2);
 
-            }
-        } else {
-            // frame x buffer
-            if(frame_y_fractional >= 0.5 && \
-                    (buffered_frame_y != current_frame_y + 1 || buffered_frame_x != current_frame_x) && \
-                    current_frame_y != GetY2() - 1) {
-                // buffer frame
-                target_frame_y = current_frame_y + 1;
-                target_frame_x = current_frame_x;
-                flash.StartFrameDMARead((uint32_t*)back_buffer_1, 8192, (target_frame_y) * 65536 + (target_frame_x) * 4096, MatrixEngine::on_load_1_finished);
-
-            } else if (frame_y_fractional < 0.5 && \
-                    (buffered_frame_y != current_frame_y - 1 || buffered_frame_x != current_frame_x) && \
-                    current_frame_y != GetY1()) {
-                // buffer frame
-                target_frame_y = current_frame_y - 1;
-                target_frame_x = current_frame_x;
-                flash.StartFrameDMARead((uint32_t*)back_buffer_1, 8192, (target_frame_y) * 65536 + (target_frame_x) * 4096, MatrixEngine::on_load_1_finished);
-
-            }            
+        if((test_frame_x != buffered_frame_x || test_frame_y != buffered_frame_y) \
+            && (test_frame_x != current_frame_x || test_frame_y != current_frame_y)) {
+            target_frame_x = test_frame_x;
+            // loading = test_frame_y;
+            target_frame_y = test_frame_y;
+            flash.StartFrameDMARead((uint32_t*)matrix_back_buffer_1, 12288, (target_frame_y) * 65536 + (target_frame_x) * 4096, MatrixEngine::on_triple_load_1_finished);
         }
     }
-    // if((frame_y_integral != current_frame_y || frame_x_integral != current_frame_x) && !GetFlag(&_EREG_, _BUSY_) && !GetFlag(&_EREG_, _RXNE_)) {
-    //     target_frame_y = frame_y_integral;
-    //     target_frame_x = frame_x_integral;
-    //     // flash.StopDMA(true);
-    //     flash.StartFrameDMARead((uint32_t*)back_buffer_1, 8192, (target_frame_y) * 65536 + (target_frame_x) * 4096, MatrixEngine::on_load_1_finished);
-    // }    
+
+    if(frame_y_integral <= current_frame_y) {
+        if(frame_x_integral <= current_frame_x) {
+            front_buffer_1 = &matrix_front_buffer_1[0];
+            front_buffer_2 = &matrix_front_buffer_2[0];
+        } else {
+            front_buffer_1 = &matrix_front_buffer_1[2048];
+            front_buffer_2 = &matrix_front_buffer_2[2048];
+        }
+    } else {
+        if(frame_x_integral <= current_frame_x) {
+            front_buffer_1 = &matrix_front_buffer_2[0];
+            front_buffer_2 = &matrix_front_buffer_3[0];
+        } else {
+            front_buffer_1 = &matrix_front_buffer_2[2048];
+            front_buffer_2 = &matrix_front_buffer_3[2048];
+        }
+    }
 
     // TODO: get sample across 4 frames
     float frame_x1y1_sample = GetSample(0, 0, phase);
@@ -200,25 +283,25 @@ float MatrixEngine::GetSampleBetweenFrames(float phase, float morph_x, float mor
     float lower_sample;
     float sample;
     
-    if(frame_x_integral > current_frame_x)
-        upper_sample = frame_x2y1_sample;
-    else if(frame_x_integral < current_frame_x)
-        upper_sample = frame_x1y1_sample;
-    else
+    // if(frame_x_integral > current_frame_x)
+        // upper_sample = frame_x2y1_sample;
+    // else if(frame_x_integral < current_frame_x)
+        // upper_sample = frame_x1y1_sample;
+    // else
         upper_sample = frame_x1y1_sample * (1 - frame_x_fractional) + frame_x2y1_sample * frame_x_fractional;
 
-    if(frame_x_integral > current_frame_x)
-        lower_sample = frame_x2y2_sample;
-    else if(frame_x_integral < current_frame_x)
-        lower_sample = frame_x1y2_sample;
-    else
+    // if(frame_x_integral > current_frame_x)
+    //     lower_sample = frame_x2y2_sample;
+    // else if(frame_x_integral < current_frame_x)
+    //     lower_sample = frame_x1y2_sample;
+    // else
         lower_sample = frame_x1y2_sample * (1 - frame_x_fractional) + frame_x2y2_sample * frame_x_fractional;
 
-    if(frame_y_integral > current_frame_y)
-        sample = lower_sample;
-    else if(frame_y_integral < current_frame_y)
-        sample = upper_sample;
-    else
+    // if(frame_y_integral > current_frame_y)
+    //     sample = lower_sample;
+    // else if(frame_y_integral < current_frame_y)
+    //     sample = upper_sample;
+    // else
         sample = upper_sample * (1.0f - frame_y_fractional) + lower_sample * frame_y_fractional;
 
     return sample;
@@ -264,7 +347,8 @@ void MatrixEngine::triggerUpdate() {
     target_frame_y = 0;
     target_frame_x = 0;
     flash.StopDMA(true);
-    flash.StartFrameDMARead((uint32_t*)back_buffer_1, 8192, (target_frame_y) * 65536 + (target_frame_x) * 4096, MatrixEngine::on_load_1_finished);
+    flash.StartFrameDMARead((uint32_t*)matrix_back_buffer_1, 12288, (target_frame_y) * 65536 + (target_frame_x) * 4096, MatrixEngine::on_triple_load_1_finished);
+    // flash.StartFrameDMARead((uint32_t*)back_buffer_1, 8192, (target_frame_y) * 65536 + (target_frame_x) * 4096, MatrixEngine::on_load_1_finished);
 
     // current_frame_ = 0;
     // target_frame_ = 0;
