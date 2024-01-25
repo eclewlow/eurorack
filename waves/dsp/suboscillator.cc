@@ -62,12 +62,12 @@ void Suboscillator::Render(AudioDac::Frame* output, size_t size, uint16_t tune, 
     Downsampler carrier_downsampler(&carrier_fir_);
 
    // float note = (120.0f * tune_interpolator.Next()) / 4095.0;
-    float note = tune_interpolator.Next() * settings_.calibration_x + settings_.calibration_y;
+    float note = tuneTarget * calibration_x_ + calibration_y_;
     note = CLAMP<float>(note, 0.0f, 120.0f);
 
     note = quantizer.Quantize(note);
 
-    if(settings_.engine == ENGINE_TYPE_DRUM) {
+    if(engine_ == ENGINE_TYPE_DRUM) {
         note += 12 * drumEngine.GetY(drumEngine.GetFMDecayTrigger()) * (drumEngine.GetFMDepth() * 2.0f - 1.0f);
         note = CLAMP<float>(note, 0.0f, 120.0f);
     }
@@ -77,7 +77,7 @@ void Suboscillator::Render(AudioDac::Frame* output, size_t size, uint16_t tune, 
     float frequency; // = (a / 32) * pow(2, ((note - 9) / 12.0));
     float phaseIncrement; // = frequency / 48000.0f;
     
-    frequency = (a / 32) * pow(2, (((note + settings_.subosc_detune / 100.0f + settings_.subosc_offset) - 9) / 12.0));
+    frequency = (a / 32) * pow(2, (((note + subosc_detune_ / 100.0f + subosc_offset_) - 9) / 12.0));
     phaseIncrement = frequency / 48000.0f;
 
     ParameterInterpolator phase_increment_interpolator(&phase_increment_, phaseIncrement, size);
@@ -94,26 +94,26 @@ void Suboscillator::Render(AudioDac::Frame* output, size_t size, uint16_t tune, 
 
         for (size_t j = 0; j < kOversampling; ++j) {
             float sample = 0.0f;
-            if(settings_.subosc_wave == SUBOSC_WAVE_SINE) {
+            if(subosc_wave_ == SUBOSC_WAVE_SINE) {
                 sample = GetSine(phase_);
             }
-            else if(settings_.subosc_wave == SUBOSC_WAVE_TRIANGLE) {
+            else if(subosc_wave_ == SUBOSC_WAVE_TRIANGLE) {
                 sample = GetTriangle(phase_);
             }
-            else if(settings_.subosc_wave == SUBOSC_WAVE_SAWTOOTH) {
+            else if(subosc_wave_ == SUBOSC_WAVE_SAWTOOTH) {
                 sample = GetSawtooth(phase_, phase_increment);
             }
-            else if(settings_.subosc_wave == SUBOSC_WAVE_RAMP) {
+            else if(subosc_wave_ == SUBOSC_WAVE_RAMP) {
                 sample = GetRamp(phase_, phase_increment);
             }
-            else if(settings_.subosc_wave == SUBOSC_WAVE_SQUARE) {
+            else if(subosc_wave_ == SUBOSC_WAVE_SQUARE) {
                 sample = GetSquare(phase_, phase_increment);
             }
-            else if(settings_.subosc_wave == SUBOSC_WAVE_COPY) {
+            else if(subosc_wave_ == SUBOSC_WAVE_COPY) {
                 sample = context.getEngine()->GetSampleNoFX(phase_, interpolated_fx, interpolated_morph);
             }
 
-            if(settings_.engine == ENGINE_TYPE_DRUM) {
+            if(engine_ == ENGINE_TYPE_DRUM) {
                 sample = (1 - drumEngine.GetAmpDecayTrigger()) * sample;
             }
 

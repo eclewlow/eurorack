@@ -36,7 +36,6 @@
 #include "waves/drivers/audio_dac.h"
 // #include "waves/drivers/flash.h"
 #include "waves/drivers/lcd.h"
-#include "waves/drivers/4x_downsampler.h"
 #include "waves/drivers/ParameterInterpolator.h"
 #include "waves/defines.h"
 #include "waves/Globals.h"
@@ -335,13 +334,15 @@ int16_t GetSample(int16_t wavetable, int16_t frame, float phase) {
     return 0;
 }
 
-float carrier_fir_;
+// float carrier_fir_;
 
 float morph_;
 
 float swap_counter = 0.0f;
 float swap_increment = 1.0f / 10000.0f;
 float phase_increment = (440.0f) / 47992.0f;
+
+SNAPSHOT settings_;
 
 void FillBuffer(AudioDac::Frame* output, size_t size) {
 
@@ -458,22 +459,23 @@ void FillBuffer(AudioDac::Frame* output, size_t size) {
   uint16_t morph = adc.getChannel(3);
 
   // loading = 23;
-  switch(settings_.engine) {
-    case ENGINE_TYPE_NONE:
-      break;
-    case ENGINE_TYPE_AB:
       abEngine.Render((AudioDac::Frame*)(output), size, tune, fx_amount, fx, morph);
-      break;
-    case ENGINE_TYPE_WAVETABLE:
-      wavetableEngine.Render((AudioDac::Frame*)(output), size, tune, fx_amount, fx, morph);
-      break;
-    case ENGINE_TYPE_MATRIX:
-      matrixEngine.Render((AudioDac::Frame*)(output), size, tune, fx_amount, fx, morph);
-      break;
-    case ENGINE_TYPE_DRUM:
-      drumEngine.Render((AudioDac::Frame*)(output), size, tune, fx_amount, fx, morph);
-      break;
-  }
+  // switch(settings_.engine) {
+  //   case ENGINE_TYPE_NONE:
+  //     break;
+  //   case ENGINE_TYPE_AB:
+  //     abEngine.Render((AudioDac::Frame*)(output), size, tune, fx_amount, fx, morph, EFFECT_TYPE_FM, SUBOSC_WAVE_RAMP);
+  //     break;
+  //   case ENGINE_TYPE_WAVETABLE:
+  //     wavetableEngine.Render((AudioDac::Frame*)(output), size, tune, fx_amount, fx, morph);
+  //     break;
+  //   case ENGINE_TYPE_MATRIX:
+  //     matrixEngine.Render((AudioDac::Frame*)(output), size, tune, fx_amount, fx, morph);
+  //     break;
+  //   case ENGINE_TYPE_DRUM:
+  //     drumEngine.Render((AudioDac::Frame*)(output), size, tune, fx_amount, fx, morph);
+  //     break;
+  // }
     // if(context.getLastEngine()) {
     //     float last_engine_out[size];
     //     context.getLastEngine()->Render(last_engine_out, last_engine_out, size, tune, fx_amount, fx, morph);
@@ -806,67 +808,67 @@ void FillBuffer(AudioDac::Frame* output, size_t size) {
 //   }
 // }
 
-void ResetSettings() {
-      settings_.brightness = 100;
-    settings_.contrast = 100;
-    settings_.invert = false;
-    settings_.scope_setting = SETTING_SCOPE_LINE;
-    settings_.morph_setting = SETTING_MORPH_SMOOTH;
+void ResetSettings(SNAPSHOT* snapshot) {
+      snapshot->brightness = 100;
+    snapshot->contrast = 100;
+    snapshot->invert = false;
+    snapshot->scope_setting = SETTING_SCOPE_LINE;
+    snapshot->morph_setting = SETTING_MORPH_SMOOTH;
     // sub osc parameters
-    settings_.subosc_offset = -24;
-    settings_.subosc_detune = 0;
-    settings_.subosc_mix = 0.0f;
-    settings_.subosc_wave = 0;
+    snapshot->subosc_offset = -24;
+    snapshot->subosc_detune = 0;
+    snapshot->subosc_mix = 0.0f;
+    snapshot->subosc_wave = 0;
     
-    settings_.fx_depth = 1.0f;
-    settings_.fx_sync = false;
-    settings_.fx_scale = 0;
-    settings_.fx_range = 1;
-    settings_.fx_oscillator_shape = SINE_SHAPE;
-    settings_.fx_control_type = INTERNAL_MODULATOR;
-    settings_.fx_effect = 0;//EffectManager::EFFECT_TYPE_FM;
+    snapshot->fx_depth = 1.0f;
+    snapshot->fx_sync = false;
+    snapshot->fx_scale = 0;
+    snapshot->fx_range = 1;
+    snapshot->fx_oscillator_shape = SINE_SHAPE;
+    snapshot->fx_control_type = INTERNAL_MODULATOR;
+    snapshot->fx_effect = 0;//EffectManager::EFFECT_TYPE_FM;
 
-    settings_.engine = ENGINE_TYPE_AB;
+    snapshot->engine = ENGINE_TYPE_AB;
     // ab engine parameters
-    settings_.ab_engine_left_wavetable = 0;
-    settings_.ab_engine_left_frame = 0;
-    settings_.ab_engine_right_wavetable = 0;
-    settings_.ab_engine_right_frame = 0;
-    settings_.ab_engine_is_editing_left = false;
-    settings_.ab_engine_is_editing_right = false;
+    snapshot->ab_engine_left_wavetable = 0;
+    snapshot->ab_engine_left_frame = 0;
+    snapshot->ab_engine_right_wavetable = 0;
+    snapshot->ab_engine_right_frame = 0;
+    snapshot->ab_engine_is_editing_left = false;
+    snapshot->ab_engine_is_editing_right = false;
 
     // wavetable engine parameters
-    settings_.wavetable_engine_wavetable = 0;
+    snapshot->wavetable_engine_wavetable = 0;
     
     // matrix engine parameters
-    settings_.matrix_engine_x1 = 0;
-    settings_.matrix_engine_x2 = 15;
-    settings_.matrix_engine_y1 = 0;
-    settings_.matrix_engine_y2 = 15;
-    settings_.matrix_engine_wavelist_offset = 0;
+    snapshot->matrix_engine_x1 = 0;
+    snapshot->matrix_engine_x2 = 15;
+    snapshot->matrix_engine_y1 = 0;
+    snapshot->matrix_engine_y2 = 15;
+    snapshot->matrix_engine_wavelist_offset = 0;
     
     // drum engine parameters
-    settings_.drum_engine_amp_decay = 1.0f;
-    settings_.drum_engine_fm_decay = 1.0f;
-    settings_.drum_engine_fm_shape = 0.5f;
-    settings_.drum_engine_fm_depth = 0.5f;
-    settings_.drum_engine_wavetable = 0;
+    snapshot->drum_engine_amp_decay = 1.0f;
+    snapshot->drum_engine_fm_decay = 1.0f;
+    snapshot->drum_engine_fm_shape = 0.5f;
+    snapshot->drum_engine_fm_depth = 0.5f;
+    snapshot->drum_engine_wavetable = 0;
 
     // pot settings
-    settings_.pot_fx_amount = 0;//adc.getChannel(1);
-    settings_.pot_fx = 0;//adc.getChannel(2);
-    settings_.pot_morph = 0;//adc.getChannel(3);
+    snapshot->pot_fx_amount = 0;//adc.getChannel(1);
+    snapshot->pot_fx = 0;//adc.getChannel(2);
+    snapshot->pot_morph = 0;//adc.getChannel(3);
     
     // calibration settings
     for(int i = 0; i < 4; i++) {
-        settings_.io_gain[i] = 1.0f;   // don't randomize this, but save in snapshot
-        settings_.io_bias[i] = 0.0f;   // don't randomize this, but save in snapshot
+        snapshot->io_gain[i] = 1.0f;   // don't randomize this, but save in snapshot
+        snapshot->io_bias[i] = 0.0f;   // don't randomize this, but save in snapshot
     }
 
-//    settings_.calibration_x = 0.029304029304029;
-//    settings_.calibration_y = 0;
-    settings_.calibration_x = 0.001475852597848;    // don't randomize this, but save in snapshot
-    settings_.calibration_y = 12.0f;    // don't randomize this, but save in snapshot
+//    snapshot->calibration_x = 0.029304029304029;
+//    snapshot->calibration_y = 0;
+    snapshot->calibration_x = 0.001475852597848;    // don't randomize this, but save in snapshot
+    snapshot->calibration_y = 12.0f;    // don't randomize this, but save in snapshot
     
 }
 
@@ -891,7 +893,7 @@ void Init() {
   matrixEngine.Init();
   drumEngine.Init();
 
-  effect_manager.Init();
+  // effect_manager.Init();
 
   bypass.Init();
   fm.Init();
@@ -908,7 +910,7 @@ void Init() {
   // lcd.Draw();
   // logger.Init(9600);
   // dac.Start(&FillBuffer);
-  ResetSettings();
+  // ResetSettings(&settings_);
 
   // EFFECT_TYPE_BYPASS          
   // EFFECT_TYPE_FM
@@ -918,7 +920,7 @@ void Init() {
   // EFFECT_TYPE_WAVEWRAPPER       
   // EFFECT_TYPE_BITCRUSH          
   // EFFECT_TYPE_DRIVE             
-  settings_.fx_effect = EFFECT_TYPE_BYPASS;
+  // settings_.fx_effect = EFFECT_TYPE_FM;
 
   // ENGINE_TYPE_NONE
   // ENGINE_TYPE_AB
@@ -927,11 +929,11 @@ void Init() {
   // ENGINE_TYPE_DRUM
   // context.setEngine(ENGINE_TYPE_WAVETABLE);
   // settings_.engine = ENGINE_TYPE_AB;
-  settings_.engine = ENGINE_TYPE_MATRIX;
-
-  // abEngine.triggerUpdate();
+  // settings_.engine = ENGINE_TYPE_AB;
+  // settings_.subosc_wave = SUBOSC_WAVE_SINE;
+  abEngine.triggerUpdate();
   // wavetableEngine.triggerUpdate();
-  matrixEngine.triggerUpdate();
+  // matrixEngine.triggerUpdate();
 
   audio_dac.Init(48000, kBlockSize);
   audio_dac.Start(&FillBuffer);

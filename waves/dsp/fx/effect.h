@@ -29,7 +29,17 @@ public:
 protected:
     float phase_;
     float oscilloscope_phase_;
+
+    float fx_depth_;                        // (0.0f, 1.0f)
+    bool fx_sync_;                           // (false, true)
+    int8_t fx_scale_;                        // (0, 100)
+    int8_t fx_range_;                        // (1, 10)
+    int8_t fx_oscillator_shape_;             // (0, 5)
+    int8_t fx_control_type_;                 // (0, 2)
+    int8_t fx_effect_;                       // (0, 8)
+
 private:
+
     // Effect(const Effect&);
     // Effect& operator=(Effect const&);
     // DISALLOW_COPY_AND_ASSIGN (Effect);

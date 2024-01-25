@@ -28,11 +28,11 @@ float Wavefolder::RenderSampleEffect(float sample, float input_phase, float phas
 
 float Wavefolder::RenderPhaseEffect(float input_phase, float phase_increment, uint16_t fx_amount, uint16_t fx, bool isOscilloscope) {
 
-    float amount = settings_.fx_depth * ((float)fx_amount) / 65535.0f;
+    float amount = fx_depth_ * ((float)fx_amount) / 65535.0f;
 
     float adjusted_phase = 0.0f;
     
-    if(!settings_.fx_sync){
+    if(!fx_sync_){
         float index = (fx / 65535.0f) * kSineLUTSize;
         MAKE_INTEGRAL_FRACTIONAL(index)
         float a = lut_fx_pow[index_integral];
@@ -58,7 +58,7 @@ float Wavefolder::RenderPhaseEffect(float input_phase, float phase_increment, ui
     
     // float oscillator = 0.0f; // unused
     
-    switch(settings_.fx_control_type) {
+    switch(fx_control_type_) {
         case INTERNAL_MODULATOR: {
             
             

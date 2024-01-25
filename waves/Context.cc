@@ -43,15 +43,15 @@ void Context::paint() {
 
 void Context::setEngine(int8_t engine) { 
     // loading=41;
-    if(engine == settings_.engine)
-        return;
+    // if(engine == settings_.engine)
+    //     return;
     
-    last_engine_ = settings_.engine;
-    // loading=42;
+    // last_engine_ = settings_.engine;
+    // // loading=42;
 
-    settings_.engine = engine;
+    // settings_.engine = engine;
 
-    switch(settings_.engine) {
+    switch(ENGINE_TYPE_AB) {
         case ENGINE_TYPE_AB:
             abEngine.triggerUpdate();
             break;
@@ -69,7 +69,7 @@ void Context::setEngine(int8_t engine) {
 
 Engine* Context::getEngine() {
     Engine * engine = NULL;
-    switch(settings_.engine) {
+    switch(ENGINE_TYPE_AB) {
         case ENGINE_TYPE_AB:
             engine = &abEngine;
             break;

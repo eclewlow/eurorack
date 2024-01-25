@@ -54,7 +54,8 @@ extern int16_t pump_buffer[6144];
 extern float loading;
 extern uint8_t lcd_buffer[8][128];
 
-
+extern const float lut_4x_downsampler_fir[];
+// extern float lut_4x_downsampler_fir[];
 
 extern int16_t ROM[32768];
 
@@ -125,8 +126,10 @@ using namespace waves;
 
 extern Context context;
 // extern UserSettings user_settings;
-extern SNAPSHOT settings_;
+// extern SNAPSHOT settings_;
 // extern Storage storage;
+// extern uint8_t effect;
+// extern uint8_t sub_osc_shape;
 
 // extern MainMenu mainMenu;
 // extern ModeMenu modeMenu;
@@ -160,7 +163,7 @@ extern MatrixEngine matrixEngine;
 extern DrumEngine drumEngine;
 extern Suboscillator suboscillator;
 
-extern EffectManager effect_manager;
+// extern EffectManager effect_manager;
 extern FM fm;
 extern PhaseDistortion phase_distortion;
 extern RingModulator ring_modulator;

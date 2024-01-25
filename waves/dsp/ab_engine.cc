@@ -12,7 +12,6 @@
 #include "waves/wavetables.h"
 // #include "waves/dsp/ParameterInterpolator.h"
 #include "waves/Globals.h"
-#include "waves/dsp/downsampler/4x_downsampler.h"
 #include "math.h"
 #include "waves/dsp/dsp.h"
 
@@ -30,6 +29,32 @@ ABEngine::~ABEngine() {
 void ABEngine::Init() {
     phase_ = 0.0f;
     sub_phase_ = 0;
+    calibration_x_ = 0.001475852597848;    // don't randomize this, but save in snapshot
+    calibration_y_ = 12.0f;    // don't randomize this, but save in snapshot
+    left_wavetable_ = 0;
+    left_frame_ = 0;
+    right_wavetable_ = 0;
+    right_frame_ = 0;
+    is_editing_left_ = false;
+    is_editing_right_ = false;
+    subosc_offset_ = -24;
+    subosc_detune_ = 0;
+    subosc_mix_ = 0.0f;
+
+    // SUBOSC_WAVE_SINE
+    // SUBOSC_WAVE_TRIANGLE
+    // SUBOSC_WAVE_SAWTOOTH
+    // SUBOSC_WAVE_RAMP
+    // SUBOSC_WAVE_SQUARE
+    // SUBOSC_WAVE_COPY
+    subosc_wave_ = SUBOSC_WAVE_TRIANGLE;
+    fx_depth_ = 1.0f;
+    fx_sync_ = false;
+    fx_scale_ = 0;
+    fx_range_ = 1;
+    fx_oscillator_shape_ = SINE_SHAPE;
+    fx_control_type_ = INTERNAL_MODULATOR;
+    fx_effect_ = EFFECT_TYPE_FM;
 }
 
 float ABEngine::GetSample(int16_t wavetable, int16_t frame, float phase, bool isLeft) {
@@ -88,35 +113,35 @@ float ABEngine::GetSampleBetweenFrames(float phase, float morph) {
 }
 
 void ABEngine::FillWaveform(int16_t * waveform, uint16_t tune, uint16_t fx_amount, uint16_t fx, uint16_t morph, bool withFx) {
-    float frequency = 23.4375;
+    // float frequency = 23.4375;
 
-    float phaseIncrement = frequency / 48000.0f;
+    // float phaseIncrement = frequency / 48000.0f;
     
-    float temp_phase = 0.0f;
+    // float temp_phase = 0.0f;
     
-    if(withFx)
-        effect_manager.getEffect()->Sync_phases();
+    // if(withFx)
+    //     effect_manager.getEffect()->Sync_phases();
 
-    for(int i = 0; i < 2048; i++) {
-        float thisX = morph_;
-        thisX = CLAMP<float>(thisX, 0.0, 1.0);
+    // for(int i = 0; i < 2048; i++) {
+    //     float thisX = morph_;
+    //     thisX = CLAMP<float>(thisX, 0.0, 1.0);
         
-        float calculated_phase = temp_phase;
-        if(withFx)
-            calculated_phase = effect_manager.RenderPhaseEffect(temp_phase, frequency, fx_amount, fx, true);
+    //     float calculated_phase = temp_phase;
+    //     if(withFx)
+    //         calculated_phase = effect_manager.RenderPhaseEffect(temp_phase, frequency, fx_amount, fx, true);
         
-        float sample = GetSampleBetweenFrames(calculated_phase, thisX);
+    //     float sample = GetSampleBetweenFrames(calculated_phase, thisX);
         
-        if(withFx)
-            sample = effect_manager.RenderSampleEffect(sample, temp_phase, frequency, fx_amount, fx, true);
+    //     if(withFx)
+    //         sample = effect_manager.RenderSampleEffect(sample, temp_phase, frequency, fx_amount, fx, true);
         
-        temp_phase += phaseIncrement;
+    //     temp_phase += phaseIncrement;
         
-        if(temp_phase >= 1.0f)
-            temp_phase -= 1.0f;
+    //     if(temp_phase >= 1.0f)
+    //         temp_phase -= 1.0f;
         
-        waveform[i] = static_cast<int16_t>(sample * 32767.0f);
-    }
+    //     waveform[i] = static_cast<int16_t>(sample * 32767.0f);
+    // }
 }
 
 void ABEngine::FillWaveform(int16_t * waveform, bool is_left) {
@@ -181,12 +206,12 @@ void ABEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, uint1
 
     // TODO:  interpolate phase_increment instead of tune.  pass in phase increment to effects-functions instead of frequency.
     // float note = (120.0f * tuneTarget) / 65535.0;
-    float note = tuneTarget * settings_.calibration_x + settings_.calibration_y;
+    float note = tuneTarget * calibration_x_ + calibration_y_;
     note = CLAMP<float>(note, 0.0f, 120.0f);
 
     note = quantizer.Quantize(note);
 
-    // note = note - 24.0f;
+    note = note - 24.0f;
     // Effect * effect;
     // switch(settings_.fx_effect) {
     // case 0:
@@ -214,16 +239,21 @@ void ABEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, uint1
     //     effect = &drive;
     //     break;
     // }
+    float head = head_;
+    float tail = 0.0f;
+    float sub_head = sub_head_;
+    float sub_tail = 0.0f;
 
     ParameterInterpolator phase_increment_interpolator(&phase_increment_, NoteToFrequency(note), size);
-    ParameterInterpolator sub_phase_increment_interpolator(&sub_phase_increment_, NoteToFrequency((note + settings_.subosc_detune / 100.0f + settings_.subosc_offset)), size);
+    ParameterInterpolator sub_phase_increment_interpolator(&sub_phase_increment_, NoteToFrequency((note + subosc_detune_ / 100.0f + subosc_offset_)), size);
 
-    float phase = 0;
-    float sample = 0;
     float sub_sample = 0;
     bool isOscilloscope = false;
 
     while (size--) {
+
+        float phase = 0;
+        float sample = 0;
         
         float interpolated_morph = morph_interpolator.Next();
         interpolated_morph = CLAMP<float>(interpolated_morph, 0.0, 0.9999);
@@ -233,16 +263,9 @@ void ABEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, uint1
         float sub_phase_increment = sub_phase_increment_interpolator.Next();
         sub_phase_increment = CLAMP<float>(sub_phase_increment, 0.0f, 1.0f);
 
-        // for (size_t j = 0; j < kOversampling; ++j) {
+        for (uint8_t j = 0; j < kOversampling; ++j) {
 
-            // float phase = fm.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false, true);
-
-            // float sample = GetSampleBetweenFrames(phase, interpolated_morph);
-            // float sub_sample = GetSampleBetweenFrames(sub_phase_, interpolated_morph);
-
-
-            // sample = fm.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope);
-            switch(settings_.fx_effect) {
+            switch(fx_effect_) {//settings_.fx_effect) {
                 case EFFECT_TYPE_BYPASS:
                     phase = bypass.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false);
 
@@ -301,26 +324,47 @@ void ABEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, uint1
                     break;
             }
 
-            if(settings_.subosc_wave == SUBOSC_WAVE_SINE) {
-                sub_sample = GetSine(sub_phase_);
+            switch(subosc_wave_){//settings_.subosc_wave) {
+                case SUBOSC_WAVE_SINE:
+                    sub_sample = GetSine(sub_phase_);
+                    break;
+                case SUBOSC_WAVE_TRIANGLE:
+                    sub_sample = GetTriangle(sub_phase_);
+                    break;
+                case SUBOSC_WAVE_SAWTOOTH:
+                    sub_sample = GetSawtooth(sub_phase_, sub_phase_increment);
+                    break;
+                case SUBOSC_WAVE_RAMP:
+                    sub_sample = GetRamp(sub_phase_, sub_phase_increment);
+                    break;
+                case SUBOSC_WAVE_SQUARE:
+                    sub_sample = GetSquare(sub_phase_, sub_phase_increment);
+                    break;
+                case SUBOSC_WAVE_COPY:
+                    sub_sample = GetSampleBetweenFrames(sub_phase_, interpolated_morph);
+                    break;
             }
-            else if(settings_.subosc_wave == SUBOSC_WAVE_TRIANGLE) {
-                sub_sample = GetTriangle(sub_phase_);
-            }
-            else if(settings_.subosc_wave == SUBOSC_WAVE_SAWTOOTH) {
-                sub_sample = GetSawtooth(sub_phase_, sub_phase_increment);
-            }
-            else if(settings_.subosc_wave == SUBOSC_WAVE_RAMP) {
-                sub_sample = GetRamp(sub_phase_, sub_phase_increment);
-            }
-            else if(settings_.subosc_wave == SUBOSC_WAVE_SQUARE) {
-                sub_sample = GetSquare(sub_phase_, sub_phase_increment);
-            }
-            else if(settings_.subosc_wave == SUBOSC_WAVE_COPY) {
-                sub_sample = GetSampleBetweenFrames(sub_phase_, interpolated_morph);
-            }            
 
-            sub_sample = settings_.subosc_mix * sample + (1.0f - settings_.subosc_mix) * sub_sample;
+            // if(settings_.subosc_wave == SUBOSC_WAVE_SINE) {
+            //     sub_sample = GetSine(sub_phase_);
+            // }
+            // else if(settings_.subosc_wave == SUBOSC_WAVE_TRIANGLE) {
+            //     sub_sample = GetTriangle(sub_phase_);
+            // }
+            // else if(settings_.subosc_wave == SUBOSC_WAVE_SAWTOOTH) {
+            //     sub_sample = GetSawtooth(sub_phase_, sub_phase_increment);
+            // }
+            // else if(settings_.subosc_wave == SUBOSC_WAVE_RAMP) {
+            //     sub_sample = GetRamp(sub_phase_, sub_phase_increment);
+            // }
+            // else if(settings_.subosc_wave == SUBOSC_WAVE_SQUARE) {
+            //     sub_sample = GetSquare(sub_phase_, sub_phase_increment);
+            // }
+            // else if(settings_.subosc_wave == SUBOSC_WAVE_COPY) {
+            //     sub_sample = GetSampleBetweenFrames(sub_phase_, interpolated_morph);
+            // }            
+
+            // sub_sample = settings_.subosc_mix * sample + (1.0f - settings_.subosc_mix) * sub_sample;
 
             phase_ += phase_increment;
             sub_phase_ += sub_phase_increment;
@@ -331,18 +375,49 @@ void ABEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, uint1
             if(sub_phase_ >= 1.0f)
                 sub_phase_ -= 1.0f;
             
+            // Accumulate(j, sample);
+            // float test[4] = {
+            //   0.02442415000,  0.09297315000,  0.1671293800,  0.2154733200,
+            // };
+            // const float lut_4x_downsampler_fir[] = {
+            //    2.442415000e-02,  9.297315000e-02,  1.671293800e-01,  2.154733200e-01,
+            // };
+
+            head += sample * lut_4x_downsampler_fir[3 - (j & 3)];
+            tail += sample * lut_4x_downsampler_fir[j & 3];
+            // head += 0.0f;
+            // tail += 0.0f;
+            sub_head += sub_sample * lut_4x_downsampler_fir[3 - (j & 3)];
+            sub_tail += sub_sample * lut_4x_downsampler_fir[j & 3];
+
             // carrier_downsampler.Accumulate(j, sample);
             // sub_carrier_downsampler.Accumulate(j, sub_sample);
-        // }
+            // sub_sample += 0;
+        }
         
-        // float sample = carrier_downsampler.Read();
-        // float sub_sample = sub_carrier_downsampler.Read();
-
+        // float test = head;
+        // sample = head;
+        // float test = sub_carrier_downsampler.Read();
+        // test += 0.0f;
         // loading = front_buffer_1[3];
-        output->l = sample * 26000.0f;
-        output->r = sub_sample * 26000.0f;
+        float carrier_output = head; //carrier_downsampler.Read();
+        float sub_output = sub_head; //sub_carrier_downsampler.Read();
+        sub_output += 0;
+        carrier_output += 0;
+        // loading = carrier_output;
+        output->l = static_cast<int16_t>(carrier_output * 26000.0f);
+        output->r = static_cast<int16_t>(sub_output * 26000.0f);
+        // output->r = static_cast<int16_t>(sub_carrier_downsampler.Read() * 26000.0f);
+        // sub_sample * 26000.0f
         ++output;
+
+        head = tail;
+        tail = 0.0f;
+        sub_head = sub_tail;
+        sub_tail = 0.0f;
     }
+    head_ = head;
+    sub_head_ = sub_head;
 }
 
 bool ABEngine::SetLeftWave(int table, int frame) {
@@ -359,23 +434,23 @@ bool ABEngine::SetRightWave(int table, int frame) {
 
 void ABEngine::SetLeftWavetable(int left_wavetable)
 { 
-    settings_.ab_engine_left_wavetable = CLAMP(left_wavetable, 0, USER_WAVETABLE_COUNT + FACTORY_WAVETABLE_COUNT - 1);
+    left_wavetable_ = CLAMP(left_wavetable, 0, USER_WAVETABLE_COUNT + FACTORY_WAVETABLE_COUNT - 1);
 }
 void ABEngine::SetLeftFrame(int left_frame) {
-    settings_.ab_engine_left_frame = CLAMP(left_frame, 0, 15);
+    left_frame_ = CLAMP(left_frame, 0, 15);
 }
-int ABEngine::GetLeftWavetable() { return settings_.ab_engine_left_wavetable; }
-int ABEngine::GetLeftFrame() { return settings_.ab_engine_left_frame; }
+int ABEngine::GetLeftWavetable() { return left_wavetable_; }
+int ABEngine::GetLeftFrame() { return left_frame_; }
 void ABEngine::SetRightWavetable(int right_wavetable)
 {
-    settings_.ab_engine_right_wavetable = CLAMP(right_wavetable, 0, USER_WAVETABLE_COUNT + FACTORY_WAVETABLE_COUNT - 1);
+    right_wavetable_ = CLAMP(right_wavetable, 0, USER_WAVETABLE_COUNT + FACTORY_WAVETABLE_COUNT - 1);
 }
-void ABEngine::SetRightFrame(int right_frame) { settings_.ab_engine_right_frame = CLAMP(right_frame, 0, 15); }
-int ABEngine::GetRightWavetable() { return settings_.ab_engine_right_wavetable; }
-int ABEngine::GetRightFrame() { return settings_.ab_engine_right_frame; }
-bool ABEngine::IsEditingLeft() { return settings_.ab_engine_is_editing_left; }
-bool ABEngine::IsEditingRight() { return settings_.ab_engine_is_editing_right; }
-void ABEngine::SetIsEditingLeft(bool is_editing_left) { settings_.ab_engine_is_editing_left = is_editing_left; }
-void ABEngine::SetIsEditingRight(bool is_editing_right) { settings_.ab_engine_is_editing_right = is_editing_right; }
+void ABEngine::SetRightFrame(int right_frame) { right_frame_ = CLAMP(right_frame, 0, 15); }
+int ABEngine::GetRightWavetable() { return right_wavetable_; }
+int ABEngine::GetRightFrame() { return right_frame_; }
+bool ABEngine::IsEditingLeft() { return is_editing_left_; }
+bool ABEngine::IsEditingRight() { return is_editing_right_; }
+void ABEngine::SetIsEditingLeft(bool is_editing_left) { is_editing_left_ = is_editing_left; }
+void ABEngine::SetIsEditingRight(bool is_editing_right) { is_editing_right_ = is_editing_right; }
 
 }

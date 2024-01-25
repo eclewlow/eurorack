@@ -56,11 +56,9 @@ protected:
     float fx_;
     float tune_;
     float phase_increment_;
-    float carrier_fir_;
 
     float sub_phase_increment_;
     float sub_phase_;
-    float sub_carrier_fir_;
 
     bool started_;
     LoadingState loading_state_;

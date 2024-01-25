@@ -50,5 +50,22 @@ private:
     // shape -50 to 50
     float amp_decay_trigger_;
     float fm_decay_trigger_;
+    float carrier_fir_;
+    float sub_carrier_fir_;
+
+    float amp_decay_;            // (0.0, 1.0)
+    float fm_decay_;             // (0.0, 1.0)
+    float fm_shape_;             // (0.0, 1.0)
+    float fm_depth_;             // (0.0, 1.0)
+    int8_t wavetable_;           // (0, USER_WAVETABLE_COUNT + FACTORY_WAVETABLE_COUNT - 1)
+
+    int8_t subosc_offset_;                    // (-24, 24)
+    int8_t subosc_detune_;                    // (-50, 50)
+    float subosc_mix_;                        // (0.0f, 1.0f)
+    int8_t subosc_wave_;                      // (0, 5)
+    float calibration_x_;                   // ()  // don't randomize this, but save in snapshot
+    float calibration_y_;                   // ()  // don't randomize this, but save in snapshot
+
+
     DISALLOW_COPY_AND_ASSIGN (DrumEngine);
 };

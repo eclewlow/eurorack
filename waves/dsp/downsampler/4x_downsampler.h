@@ -11,9 +11,6 @@
 #pragma once
 
 const size_t kOversampling = 4;
-const float lut_4x_downsampler_fir[] = {
-   2.442415000e-02,  9.297315000e-02,  1.671293800e-01,  2.154733200e-01,
-};
 
 class Downsampler {
 public:
@@ -25,6 +22,7 @@ public:
     ~Downsampler() {
         *state_ = head_;
     }
+
     inline void Accumulate(int i, float sample) {
         head_ += sample * lut_4x_downsampler_fir[3 - (i & 3)];
         tail_ += sample * lut_4x_downsampler_fir[i & 3];

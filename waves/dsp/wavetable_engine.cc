@@ -122,8 +122,8 @@ void WavetableEngine::FillWaveform(int16_t * waveform, uint16_t tune, uint16_t f
     
     float temp_phase = 0.0f;
     
-    if(withFx)
-        effect_manager.getEffect()->Sync_phases();
+    // if(withFx)
+    //     effect_manager.getEffect()->Sync_phases();
 
     float morph_float = morph / 65535.0f;
     morph_float = CLAMP<float>(morph_float, 0.0, 0.9999);
@@ -135,13 +135,13 @@ void WavetableEngine::FillWaveform(int16_t * waveform, uint16_t tune, uint16_t f
     for(int i = 0; i < 2048; i++) {
         
         float calculated_phase = temp_phase;
-        if(withFx)
-            calculated_phase = effect_manager.RenderPhaseEffect(temp_phase, frequency, fx_amount, fx, true);
+        // if(withFx)
+        //     calculated_phase = effect_manager.RenderPhaseEffect(temp_phase, frequency, fx_amount, fx, true);
         
         float sample = GetSampleBetweenFrames(calculated_phase, morph_float);
         
-        if(withFx)
-            sample = effect_manager.RenderSampleEffect(sample, temp_phase, frequency, fx_amount, fx, true);
+        // if(withFx)
+        //     sample = effect_manager.RenderSampleEffect(sample, temp_phase, frequency, fx_amount, fx, true);
         
         temp_phase += phaseIncrement;
         
@@ -227,14 +227,14 @@ void WavetableEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune
     // float swap_increment = 1.0f / 10000.0f;
 
     // float note = (120.0f * tuneTarget) / 65535.0;
-    float note = tuneTarget * settings_.calibration_x + settings_.calibration_y;
+    float note = tuneTarget * calibration_x_ + calibration_y_;
     note = CLAMP<float>(note, 0.0f, 120.0f);
 
     note = quantizer.Quantize(note);
 
     // note = note - 24.0f;
     ParameterInterpolator phase_increment_interpolator(&phase_increment_, NoteToFrequency(note), size);
-    ParameterInterpolator sub_phase_increment_interpolator(&sub_phase_increment_, NoteToFrequency((note + settings_.subosc_detune / 100.0f + settings_.subosc_offset)), size);
+    ParameterInterpolator sub_phase_increment_interpolator(&sub_phase_increment_, NoteToFrequency((note + subosc_detune_ / 100.0f + subosc_offset_)), size);
 
     float phase = 0;
     float sample = 0;
@@ -311,7 +311,7 @@ void WavetableEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune
 
             // sample = effect_manager.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, false, true);
             
-            switch(settings_.fx_effect) {
+            switch(fx_effect_) {
                 case EFFECT_TYPE_BYPASS:
                     phase = bypass.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false);
 
@@ -386,26 +386,26 @@ void WavetableEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune
                     break;
             }
 
-            if(settings_.subosc_wave == SUBOSC_WAVE_SINE) {
+            if(subosc_wave_ == SUBOSC_WAVE_SINE) {
                 sub_sample = GetSine(sub_phase_);
             }
-            else if(settings_.subosc_wave == SUBOSC_WAVE_TRIANGLE) {
+            else if(subosc_wave_ == SUBOSC_WAVE_TRIANGLE) {
                 sub_sample = GetTriangle(sub_phase_);
             }
-            else if(settings_.subosc_wave == SUBOSC_WAVE_SAWTOOTH) {
+            else if(subosc_wave_ == SUBOSC_WAVE_SAWTOOTH) {
                 sub_sample = GetSawtooth(sub_phase_, sub_phase_increment);
             }
-            else if(settings_.subosc_wave == SUBOSC_WAVE_RAMP) {
+            else if(subosc_wave_ == SUBOSC_WAVE_RAMP) {
                 sub_sample = GetRamp(sub_phase_, sub_phase_increment);
             }
-            else if(settings_.subosc_wave == SUBOSC_WAVE_SQUARE) {
+            else if(subosc_wave_ == SUBOSC_WAVE_SQUARE) {
                 sub_sample = GetSquare(sub_phase_, sub_phase_increment);
             }
-            else if(settings_.subosc_wave == SUBOSC_WAVE_COPY) {
+            else if(subosc_wave_ == SUBOSC_WAVE_COPY) {
                 sub_sample = GetSampleBetweenFrames(sub_phase_, interpolated_morph);
             }
 
-            sub_sample = settings_.subosc_mix * sample + (1.0f - settings_.subosc_mix) * sub_sample;
+            sub_sample = subosc_mix_ * sample + (1.0f - subosc_mix_) * sub_sample;
 
 
     // int16_t * temp_buffer = front_buffer_1;
@@ -458,6 +458,6 @@ void WavetableEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune
 }
 
 void WavetableEngine::SetWavetable(int wavetable) {
-    settings_.wavetable_engine_wavetable = CLAMP(wavetable, 0, USER_WAVETABLE_COUNT + FACTORY_WAVETABLE_COUNT - 1);
+    wavetable_ = CLAMP(wavetable, 0, USER_WAVETABLE_COUNT + FACTORY_WAVETABLE_COUNT - 1);
 }
-int WavetableEngine::GetWavetable() { return settings_.wavetable_engine_wavetable; }
+int WavetableEngine::GetWavetable() { return wavetable_; }

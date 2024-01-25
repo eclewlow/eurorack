@@ -314,8 +314,8 @@ void MatrixEngine::FillWaveform(int16_t * waveform, uint16_t tune, uint16_t fx_a
     
     float temp_phase = 0.0f;
     
-    if(withFx)
-        effect_manager.getEffect()->Sync_phases();
+    // if(withFx)
+    //     effect_manager.getEffect()->Sync_phases();
 
     for(int i = 0; i < 2048; i++) {
         float morph_y = morph_;
@@ -378,7 +378,7 @@ void MatrixEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, u
     Downsampler carrier_downsampler(&carrier_fir_);
 
     // float note = (120.0f * tune_interpolator.Next()) / 4095.0;
-    float note = tuneTarget * settings_.calibration_x + settings_.calibration_y;
+    float note = tuneTarget * calibration_x_ + calibration_y_;
     note = CLAMP<float>(note, 0.0f, 120.0f);
 
     note = quantizer.Quantize(note);
@@ -386,7 +386,7 @@ void MatrixEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, u
     // note = note - 24.0f;
 
     ParameterInterpolator phase_increment_interpolator(&phase_increment_, NoteToFrequency(note), size);
-    ParameterInterpolator sub_phase_increment_interpolator(&sub_phase_increment_, NoteToFrequency((note + settings_.subosc_detune / 100.0f + settings_.subosc_offset)), size);
+    ParameterInterpolator sub_phase_increment_interpolator(&sub_phase_increment_, NoteToFrequency((note + subosc_detune_ / 100.0f + subosc_offset_)), size);
     
     // float phase = 0;
     float sample = 0;
@@ -411,26 +411,26 @@ void MatrixEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, u
             // float sample = GetSampleBetweenFrames(phase_, interpolated_fx, interpolated_morph);
             sample = GetSampleBetweenFrames(phase_, interpolated_fx, interpolated_morph);
 
-            if(settings_.subosc_wave == SUBOSC_WAVE_SINE) {
+            if(subosc_wave_ == SUBOSC_WAVE_SINE) {
                 sub_sample = GetSine(sub_phase_);
             }
-            else if(settings_.subosc_wave == SUBOSC_WAVE_TRIANGLE) {
+            else if(subosc_wave_ == SUBOSC_WAVE_TRIANGLE) {
                 sub_sample = GetTriangle(sub_phase_);
             }
-            else if(settings_.subosc_wave == SUBOSC_WAVE_SAWTOOTH) {
+            else if(subosc_wave_ == SUBOSC_WAVE_SAWTOOTH) {
                 sub_sample = GetSawtooth(sub_phase_, sub_phase_increment);
             }
-            else if(settings_.subosc_wave == SUBOSC_WAVE_RAMP) {
+            else if(subosc_wave_ == SUBOSC_WAVE_RAMP) {
                 sub_sample = GetRamp(sub_phase_, sub_phase_increment);
             }
-            else if(settings_.subosc_wave == SUBOSC_WAVE_SQUARE) {
+            else if(subosc_wave_ == SUBOSC_WAVE_SQUARE) {
                 sub_sample = GetSquare(sub_phase_, sub_phase_increment);
             }
-            else if(settings_.subosc_wave == SUBOSC_WAVE_COPY) {
+            else if(subosc_wave_ == SUBOSC_WAVE_COPY) {
                 sub_sample = GetSampleBetweenFrames(sub_phase_, interpolated_fx, interpolated_morph);
             }
 
-            sub_sample = settings_.subosc_mix * sample + (1.0f - settings_.subosc_mix) * sub_sample;
+            sub_sample = subosc_mix_ * sample + (1.0f - subosc_mix_) * sub_sample;
 
             phase_ += phase_increment;
             sub_phase_ += sub_phase_increment;
@@ -452,26 +452,26 @@ void MatrixEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, u
     }
 }
 
-void MatrixEngine::SetX1(int8_t x1) { settings_.matrix_engine_x1 = x1; }
-void MatrixEngine::SetY1(int8_t y1) { settings_.matrix_engine_y1 = y1; }
-void MatrixEngine::SetX2(int8_t x2) { settings_.matrix_engine_x2 = x2; }
-void MatrixEngine::SetY2(int8_t y2) { settings_.matrix_engine_y2 = y2; }
+void MatrixEngine::SetX1(int8_t x1) { x1_ = x1; }
+void MatrixEngine::SetY1(int8_t y1) { y1_ = y1; }
+void MatrixEngine::SetX2(int8_t x2) { x2_ = x2; }
+void MatrixEngine::SetY2(int8_t y2) { y2_ = y2; }
 void MatrixEngine::IncrementX1(int8_t dx) {
-    settings_.matrix_engine_x1 = CLAMP<int8_t>(settings_.matrix_engine_x1 + dx, 0, settings_.matrix_engine_x2);
+    x1_ = CLAMP<int8_t>(x1_ + dx, 0, x2_);
 }
 void MatrixEngine::IncrementY1(int8_t dy) {
-    settings_.matrix_engine_y1 = CLAMP<int8_t>(settings_.matrix_engine_y1 + dy, 0, settings_.matrix_engine_y2);
+    y1_ = CLAMP<int8_t>(y1_ + dy, 0, y2_);
 }
 void MatrixEngine::IncrementX2(int8_t dx) {
-    settings_.matrix_engine_x2 = CLAMP<int8_t>(settings_.matrix_engine_x2 + dx, settings_.matrix_engine_x1, 15);
+    x2_ = CLAMP<int8_t>(x2_ + dx, x1_, 15);
 }
 void MatrixEngine::IncrementY2(int8_t dy) {
-    settings_.matrix_engine_y2 = CLAMP<int8_t>(settings_.matrix_engine_y2 + dy, settings_.matrix_engine_y1, 15);
+    y2_ = CLAMP<int8_t>(y2_ + dy, y1_, 15);
 }
-int8_t MatrixEngine::GetX1() { return settings_.matrix_engine_x1; }
-int8_t MatrixEngine::GetY1() { return settings_.matrix_engine_y1; }
-int8_t MatrixEngine::GetX2() { return settings_.matrix_engine_x2; }
-int8_t MatrixEngine::GetY2() { return settings_.matrix_engine_y2; }
+int8_t MatrixEngine::GetX1() { return x1_; }
+int8_t MatrixEngine::GetY1() { return y1_; }
+int8_t MatrixEngine::GetX2() { return x2_; }
+int8_t MatrixEngine::GetY2() { return y2_; }
 
-void MatrixEngine::SetWavelistOffset(int8_t offset) { settings_.matrix_engine_wavelist_offset = offset; }
-int8_t MatrixEngine::GetWavelistOffset() { return settings_.matrix_engine_wavelist_offset; }
+void MatrixEngine::SetWavelistOffset(int8_t offset) { wavelist_offset_ = offset; }
+int8_t MatrixEngine::GetWavelistOffset() { return wavelist_offset_; }

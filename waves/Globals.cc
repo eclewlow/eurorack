@@ -14,7 +14,11 @@ using namespace waves;
 
 Context context;
 // UserSettings user_settings;
-SNAPSHOT settings_;
+// SNAPSHOT settings_;
+
+// uint8_t effect = EFFECT_TYPE_FM;
+// uint8_t sub_osc_shape = SUBOSC_WAVE_RAMP;
+
 // Storage storage;
 
 // MainMenu mainMenu;
@@ -49,7 +53,7 @@ MatrixEngine matrixEngine;
 DrumEngine drumEngine;
 Suboscillator suboscillator;
 
-EffectManager effect_manager;
+// EffectManager effect_manager;
 FM fm;
 PhaseDistortion phase_distortion;
 RingModulator ring_modulator;
@@ -141,6 +145,14 @@ void SetFlag(uint32_t* __registry, uint8_t __flag, FlagStateTypeDef __state)
     // Error_Handler("Flag Error!");
   }
 }
+
+// float lut_4x_downsampler_fir[] = {
+//    2.442415000e-02,  9.297315000e-02,  1.671293800e-01,  2.154733200e-01,
+// };
+const float lut_4x_downsampler_fir[] = {
+   2.442415000e-02,  9.297315000e-02,  1.671293800e-01,  2.154733200e-01,
+};
+
 
 
 

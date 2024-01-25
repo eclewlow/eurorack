@@ -24,9 +24,9 @@ void RingModulator::Reset() {
 
 float RingModulator::RenderSampleEffect(float sample, float input_phase, float phase_increment, uint16_t fx_amount, uint16_t fx, bool isOscilloscope) {
 
-    float amount = settings_.fx_depth * ((float)fx_amount) / 65535.0f;
+    float amount = fx_depth_ * ((float)fx_amount) / 65535.0f;
     
-    if(!settings_.fx_sync){
+    if(!fx_sync_){
         float index = (fx / 65535.0f) * kSineLUTSize;
         MAKE_INTEGRAL_FRACTIONAL(index)
         float a = lut_fx_pow[index_integral];
@@ -51,7 +51,7 @@ float RingModulator::RenderSampleEffect(float sample, float input_phase, float p
         target_phase = &phase_;
     
     
-    switch(settings_.fx_control_type) {
+    switch(fx_control_type_) {
         case INTERNAL_MODULATOR: {
             
             float modulator_sample = 0.0f;

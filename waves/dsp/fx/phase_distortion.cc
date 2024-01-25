@@ -28,7 +28,7 @@ float PhaseDistortion::RenderSampleEffect(float sample, float input_phase, float
 
 float PhaseDistortion::RenderPhaseEffect(float input_phase, float phase_increment, uint16_t fx_amount, uint16_t fx, bool isOscilloscope) {
 
-    float amount = settings_.fx_depth * ((float)fx_amount) / 65535.0f;
+    float amount = fx_depth_ * ((float)fx_amount) / 65535.0f;
 
     float adjusted_phase = 0.0f;
     
@@ -36,7 +36,7 @@ float PhaseDistortion::RenderPhaseEffect(float input_phase, float phase_incremen
     float m1, m2, b2;
     float x1 = 0.2;
     
-    if(!settings_.fx_sync){
+    if(!fx_sync_){
         float index = (fx / 65535.0f) * kSineLUTSize;
         MAKE_INTEGRAL_FRACTIONAL(index)
         float a = lut_fx_pow[index_integral];
@@ -60,7 +60,7 @@ float PhaseDistortion::RenderPhaseEffect(float input_phase, float phase_incremen
         target_phase = &phase_;
     
     
-    switch(settings_.fx_control_type) {
+    switch(fx_control_type_) {
         case INTERNAL_MODULATOR: {
             
             float oscillator_sample = GetOscillatorSample(*target_phase, phase_increment);
