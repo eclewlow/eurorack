@@ -103,9 +103,9 @@ inline float GetTriangle(float phase) {
     // value = 2.0 * ((value > 0 ? value : -value) - 0.5);
     float value;
     if(phase < 0.5)
-        value = phase;
+        value = 4 * phase - 1;
     else
-        value = 1 - phase;
+        value = 4 - 4 * phase - 1;
     return value;
 }
 

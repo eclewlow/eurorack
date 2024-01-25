@@ -37,7 +37,7 @@ void ABEngine::Init() {
     right_frame_ = 0;
     is_editing_left_ = false;
     is_editing_right_ = false;
-    subosc_offset_ = -24;
+    subosc_offset_ = -12;
     subosc_detune_ = 0;
     subosc_mix_ = 0.0f;
 
@@ -47,7 +47,7 @@ void ABEngine::Init() {
     // SUBOSC_WAVE_RAMP
     // SUBOSC_WAVE_SQUARE
     // SUBOSC_WAVE_COPY
-    subosc_wave_ = SUBOSC_WAVE_TRIANGLE;
+    subosc_wave_ = SUBOSC_WAVE_SQUARE;
     fx_depth_ = 1.0f;
     fx_sync_ = false;
     fx_scale_ = 0;
@@ -390,8 +390,8 @@ void ABEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, uint1
             sub_head += sub_sample * lut_4x_downsampler_fir[3 - (j & 3)];
             sub_tail += sub_sample * lut_4x_downsampler_fir[j & 3];
 
-            // carrier_downsampler.Accumulate(j, sample);
-            // sub_carrier_downsampler.Accumulate(j, sub_sample);
+            carrier_downsampler.Accumulate(j, sample);
+            sub_carrier_downsampler.Accumulate(j, sub_sample);
             // sub_sample += 0;
         }
         
@@ -400,8 +400,10 @@ void ABEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, uint1
         // float test = sub_carrier_downsampler.Read();
         // test += 0.0f;
         // loading = front_buffer_1[3];
-        float carrier_output = head; //carrier_downsampler.Read();
-        float sub_output = sub_head; //sub_carrier_downsampler.Read();
+        // float carrier_output = head; //carrier_downsampler.Read();
+        // float sub_output = sub_head; //sub_carrier_downsampler.Read();
+        float carrier_output = carrier_downsampler.Read(); //;
+        float sub_output = sub_carrier_downsampler.Read(); //;
         sub_output += 0;
         carrier_output += 0;
         // loading = carrier_output;
