@@ -37,6 +37,27 @@ void MatrixEngine::Init() {
     target_frame_x = 0;
     current_frame_y = 0;
     target_frame_y = 0;
+
+    calibration_x_ = 0.001475852597848;    // don't randomize this, but save in snapshot
+    calibration_y_ = 12.0f;    // don't randomize this, but save in snapshot
+
+    subosc_offset_ = -12;
+    subosc_detune_ = 0;
+    subosc_mix_ = 0.0f;
+
+    x1_ = 0;
+    x2_ = 15;
+    y1_ = 0;
+    y2_ = 15;
+    wavelist_offset_ = 0;
+
+    // SUBOSC_WAVE_SINE
+    // SUBOSC_WAVE_TRIANGLE
+    // SUBOSC_WAVE_SAWTOOTH
+    // SUBOSC_WAVE_RAMP
+    // SUBOSC_WAVE_SQUARE
+    // SUBOSC_WAVE_COPY
+    subosc_wave_ = SUBOSC_WAVE_COPY;
 }
 
 float MatrixEngine::GetSample(int16_t wavetable, int16_t frame, float phase) {
@@ -376,6 +397,7 @@ void MatrixEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, u
     ParameterInterpolator fx_interpolator(&fx_, fxTarget, size);
     // ParameterInterpolator tune_interpolator(&tune_, tuneTarget, size);
     Downsampler carrier_downsampler(&carrier_fir_);
+    Downsampler sub_carrier_downsampler(&sub_carrier_fir_);
 
     // float note = (120.0f * tune_interpolator.Next()) / 4095.0;
     float note = tuneTarget * calibration_x_ + calibration_y_;
@@ -383,17 +405,18 @@ void MatrixEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, u
 
     note = quantizer.Quantize(note);
 
-    // note = note - 24.0f;
+    note = note - 24.0f;
 
     ParameterInterpolator phase_increment_interpolator(&phase_increment_, NoteToFrequency(note), size);
     ParameterInterpolator sub_phase_increment_interpolator(&sub_phase_increment_, NoteToFrequency((note + subosc_detune_ / 100.0f + subosc_offset_)), size);
     
     // float phase = 0;
-    float sample = 0;
-    float sub_sample = 0;
     // bool isOscilloscope = false;
 
     while (size--) {
+
+        float sample = 0;
+        float sub_sample = 0;
         
         float interpolated_morph = morph_interpolator.Next();
         interpolated_morph = CLAMP<float>(interpolated_morph, 0.0, 0.9999);
@@ -408,26 +431,28 @@ void MatrixEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, u
 
 
         // for (size_t j = 0; j < kOversampling; ++j) {
-            // float sample = GetSampleBetweenFrames(phase_, interpolated_fx, interpolated_morph);
+
             sample = GetSampleBetweenFrames(phase_, interpolated_fx, interpolated_morph);
 
-            if(subosc_wave_ == SUBOSC_WAVE_SINE) {
-                sub_sample = GetSine(sub_phase_);
-            }
-            else if(subosc_wave_ == SUBOSC_WAVE_TRIANGLE) {
-                sub_sample = GetTriangle(sub_phase_);
-            }
-            else if(subosc_wave_ == SUBOSC_WAVE_SAWTOOTH) {
-                sub_sample = GetSawtooth(sub_phase_, sub_phase_increment);
-            }
-            else if(subosc_wave_ == SUBOSC_WAVE_RAMP) {
-                sub_sample = GetRamp(sub_phase_, sub_phase_increment);
-            }
-            else if(subosc_wave_ == SUBOSC_WAVE_SQUARE) {
-                sub_sample = GetSquare(sub_phase_, sub_phase_increment);
-            }
-            else if(subosc_wave_ == SUBOSC_WAVE_COPY) {
-                sub_sample = GetSampleBetweenFrames(sub_phase_, interpolated_fx, interpolated_morph);
+            switch(subosc_wave_){
+                case SUBOSC_WAVE_SINE:
+                    sub_sample = GetSine(sub_phase_);
+                    break;
+                case SUBOSC_WAVE_TRIANGLE:
+                    sub_sample = GetTriangle(sub_phase_);
+                    break;
+                case SUBOSC_WAVE_SAWTOOTH:
+                    sub_sample = GetSawtooth(sub_phase_, sub_phase_increment);
+                    break;
+                case SUBOSC_WAVE_RAMP:
+                    sub_sample = GetRamp(sub_phase_, sub_phase_increment);
+                    break;
+                case SUBOSC_WAVE_SQUARE:
+                    sub_sample = GetSquare(sub_phase_, sub_phase_increment);
+                    break;
+                case SUBOSC_WAVE_COPY:
+                    sub_sample =  GetSampleBetweenFrames(sub_phase_, interpolated_fx, interpolated_morph);
+                    break;
             }
 
             sub_sample = subosc_mix_ * sample + (1.0f - subosc_mix_) * sub_sample;
@@ -441,13 +466,15 @@ void MatrixEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, u
             if(sub_phase_ >= 1.0f)
                 sub_phase_ -= 1.0f;
             
-            // carrier_downsampler.Accumulate(j, sample);
+        //     carrier_downsampler.Accumulate(j, sample);
+        //     sub_carrier_downsampler.Accumulate(j, sub_sample);
         // }
+
+        // sample = carrier_downsampler.Read();
+        // sub_sample = sub_carrier_downsampler.Read();
         
-        // float sample = carrier_downsampler.Read();
-        
-        output->l = sample * 26000.0f;
-        output->r = sub_sample * 26000.0f;
+        output->l = static_cast<int16_t>(sample * 26000.0f);
+        output->r = static_cast<int16_t>(sub_sample * 26000.0f);
         ++output;
     }
 }

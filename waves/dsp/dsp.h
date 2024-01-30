@@ -109,8 +109,8 @@ inline float GetTriangle(float phase) {
     return value;
 }
 
-inline float GetOscillatorSample(float phase, float phase_increment) {
-	switch(SINE_SHAPE) {
+inline float GetOscillatorSample(float phase, float phase_increment, int8_t fx_oscillator_shape) {
+	switch(fx_oscillator_shape) {
 		case SINE_SHAPE:
 			return GetSine(phase);
 			break;

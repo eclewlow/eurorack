@@ -15,6 +15,7 @@ using namespace waves;
 Context context;
 // UserSettings user_settings;
 // SNAPSHOT settings_;
+int8_t engine;
 
 // uint8_t effect = EFFECT_TYPE_FM;
 // uint8_t sub_osc_shape = SUBOSC_WAVE_RAMP;

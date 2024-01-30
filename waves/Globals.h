@@ -130,6 +130,7 @@ extern Context context;
 // extern Storage storage;
 // extern uint8_t effect;
 // extern uint8_t sub_osc_shape;
+extern int8_t engine;
 
 // extern MainMenu mainMenu;
 // extern ModeMenu modeMenu;

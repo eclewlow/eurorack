@@ -73,18 +73,14 @@ public:
     // }
 
 private:
-    float head_;
-    float tail_;
-    float sub_head_;
-    float sub_tail_;
-   int left_wavetable_;
-   int left_frame_;
-//    
-   int right_wavetable_;
-   int right_frame_;
-//    
-   bool is_editing_left_;
-   bool is_editing_right_;
+    int left_wavetable_;
+    int left_frame_;
+    //    
+    int right_wavetable_;
+    int right_frame_;
+    //    
+    bool is_editing_left_;
+    bool is_editing_right_;
 
     float carrier_fir_;
     float sub_carrier_fir_;

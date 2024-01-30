@@ -36,6 +36,7 @@
 #include "waves/drivers/audio_dac.h"
 // #include "waves/drivers/flash.h"
 #include "waves/drivers/lcd.h"
+#include "waves/drivers/switches.h"
 #include "waves/drivers/ParameterInterpolator.h"
 #include "waves/defines.h"
 #include "waves/Globals.h"
@@ -60,27 +61,8 @@ const size_t kMaxBlockSize = 24;
 const size_t kBlockSize = 12;
 
 AudioDac audio_dac;
-
-// ClockInputs clock_inputs;
-// ClockSelfPatchingDetector self_patching_detector[kNumGateOutputs];
-// CvReader cv_reader;
-// Dac dac;
-// DebugPort debug_port;
-// GateOutputs gate_outputs;
-// HysteresisQuantizer2 deja_vu_length_quantizer;
-// IOBuffer io_buffer;
-// NoteFilter note_filter;
-// Rng rng;
-// ScaleRecorder scale_recorder;
-// Settings settings;
-// Ui ui;
-// UartLogger logger;
-// Flash flash;
+Switches switches;
 LCD lcd;
-// RandomGenerator random_generator;
-// RandomStream random_stream;
-// TGenerator t_generator;
-// XYGenerator xy_generator;
 
 // Default interrupt handlers.
 
@@ -459,23 +441,23 @@ void FillBuffer(AudioDac::Frame* output, size_t size) {
   uint16_t morph = adc.getChannel(3);
 
   // loading = 23;
+      // abEngine.Render((AudioDac::Frame*)(output), size, tune, fx_amount, fx, morph);
+  switch(engine) {
+    case ENGINE_TYPE_NONE:
+      break;
+    case ENGINE_TYPE_AB:
       abEngine.Render((AudioDac::Frame*)(output), size, tune, fx_amount, fx, morph);
-  // switch(settings_.engine) {
-  //   case ENGINE_TYPE_NONE:
-  //     break;
-  //   case ENGINE_TYPE_AB:
-  //     abEngine.Render((AudioDac::Frame*)(output), size, tune, fx_amount, fx, morph, EFFECT_TYPE_FM, SUBOSC_WAVE_RAMP);
-  //     break;
-  //   case ENGINE_TYPE_WAVETABLE:
-  //     wavetableEngine.Render((AudioDac::Frame*)(output), size, tune, fx_amount, fx, morph);
-  //     break;
-  //   case ENGINE_TYPE_MATRIX:
-  //     matrixEngine.Render((AudioDac::Frame*)(output), size, tune, fx_amount, fx, morph);
-  //     break;
-  //   case ENGINE_TYPE_DRUM:
-  //     drumEngine.Render((AudioDac::Frame*)(output), size, tune, fx_amount, fx, morph);
-  //     break;
-  // }
+      break;
+    case ENGINE_TYPE_WAVETABLE:
+      wavetableEngine.Render((AudioDac::Frame*)(output), size, tune, fx_amount, fx, morph);
+      break;
+    case ENGINE_TYPE_MATRIX:
+      matrixEngine.Render((AudioDac::Frame*)(output), size, tune, fx_amount, fx, morph);
+      break;
+    case ENGINE_TYPE_DRUM:
+      drumEngine.Render((AudioDac::Frame*)(output), size, tune, fx_amount, fx, morph);
+      break;
+  }
     // if(context.getLastEngine()) {
     //     float last_engine_out[size];
     //     context.getLastEngine()->Render(last_engine_out, last_engine_out, size, tune, fx_amount, fx, morph);
@@ -904,6 +886,7 @@ void Init() {
   bitcrush.Init();
   drive.Init();
   
+  switches.Init();
   // lcd.Initial();
   // lcd.Draw();
   // lcd.DisplayOff();
@@ -931,9 +914,11 @@ void Init() {
   // settings_.engine = ENGINE_TYPE_AB;
   // settings_.engine = ENGINE_TYPE_AB;
   // settings_.subosc_wave = SUBOSC_WAVE_SINE;
-  abEngine.triggerUpdate();
+  // abEngine.triggerUpdate();
+  engine = ENGINE_TYPE_MATRIX;
+
   // wavetableEngine.triggerUpdate();
-  // matrixEngine.triggerUpdate();
+  matrixEngine.triggerUpdate();
 
   audio_dac.Init(48000, kBlockSize);
   audio_dac.Start(&FillBuffer);

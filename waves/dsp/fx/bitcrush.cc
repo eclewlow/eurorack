@@ -54,7 +54,7 @@ float Bitcrush::RenderSampleEffect(float sample, float input_phase, float phase_
             
             float modulator_sample = 0.0f;
             
-            modulator_sample = GetOscillatorSample(*target_phase, phase_increment);
+            modulator_sample = GetOscillatorSample(*target_phase, phase_increment, fx_oscillator_shape_);
             
             *target_phase += phase_increment;
             if(*target_phase >= 1.0)

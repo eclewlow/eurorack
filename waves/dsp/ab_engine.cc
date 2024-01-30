@@ -29,6 +29,7 @@ ABEngine::~ABEngine() {
 void ABEngine::Init() {
     phase_ = 0.0f;
     sub_phase_ = 0;
+    
     calibration_x_ = 0.001475852597848;    // don't randomize this, but save in snapshot
     calibration_y_ = 12.0f;    // don't randomize this, but save in snapshot
     left_wavetable_ = 0;
@@ -47,7 +48,7 @@ void ABEngine::Init() {
     // SUBOSC_WAVE_RAMP
     // SUBOSC_WAVE_SQUARE
     // SUBOSC_WAVE_COPY
-    subosc_wave_ = SUBOSC_WAVE_SQUARE;
+    subosc_wave_ = SUBOSC_WAVE_SINE;
     fx_depth_ = 1.0f;
     fx_sync_ = false;
     fx_scale_ = 0;
@@ -184,12 +185,7 @@ void ABEngine::triggerUpdate() {
 
 void ABEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, uint16_t fx_amount, uint16_t fx, uint16_t morph)
 {
-    // if(GetFlag(&_EREG_, _BUSY_)) {
-    //     return;
-    // }
-    // convert 12 bit uint 0-4095 to 0...15 float
     float morphTarget = morph / 65535.0f;
-    //    float interpolatedFloat = interpolated16 / 32768.0f;
     float tuneTarget = static_cast<float>(tune);
     
     if(!started_) {
@@ -212,38 +208,7 @@ void ABEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, uint1
     note = quantizer.Quantize(note);
 
     note = note - 24.0f;
-    // Effect * effect;
-    // switch(settings_.fx_effect) {
-    // case 0:
-    //     effect = &bypass;
-    //     break;
-    // case 1:
-    //     effect = &fm;
-    //     break;
-    // case 2:
-    //     effect = &ring_modulator;
-    //     break;
-    // case 3:
-    //     effect = &phase_distortion;
-    //     break;
-    // case 4:
-    //     effect = &wavefolder;
-    //     break;
-    // case 5:
-    //     effect = &wavewrapper;
-    //     break;
-    // case 6:
-    //     effect = &bitcrush;
-    //     break;
-    // case 7:
-    //     effect = &drive;
-    //     break;
-    // }
-    float head = head_;
-    float tail = 0.0f;
-    float sub_head = sub_head_;
-    float sub_tail = 0.0f;
-
+   
     ParameterInterpolator phase_increment_interpolator(&phase_increment_, NoteToFrequency(note), size);
     ParameterInterpolator sub_phase_increment_interpolator(&sub_phase_increment_, NoteToFrequency((note + subosc_detune_ / 100.0f + subosc_offset_)), size);
 
@@ -263,9 +228,9 @@ void ABEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, uint1
         float sub_phase_increment = sub_phase_increment_interpolator.Next();
         sub_phase_increment = CLAMP<float>(sub_phase_increment, 0.0f, 1.0f);
 
-        for (uint8_t j = 0; j < kOversampling; ++j) {
+        for (size_t j = 0; j < kOversampling; ++j) {
 
-            switch(fx_effect_) {//settings_.fx_effect) {
+            switch(fx_effect_) {
                 case EFFECT_TYPE_BYPASS:
                     phase = bypass.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false);
 
@@ -324,7 +289,7 @@ void ABEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, uint1
                     break;
             }
 
-            switch(subosc_wave_){//settings_.subosc_wave) {
+            switch(subosc_wave_){
                 case SUBOSC_WAVE_SINE:
                     sub_sample = GetSine(sub_phase_);
                     break;
@@ -345,26 +310,7 @@ void ABEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, uint1
                     break;
             }
 
-            // if(settings_.subosc_wave == SUBOSC_WAVE_SINE) {
-            //     sub_sample = GetSine(sub_phase_);
-            // }
-            // else if(settings_.subosc_wave == SUBOSC_WAVE_TRIANGLE) {
-            //     sub_sample = GetTriangle(sub_phase_);
-            // }
-            // else if(settings_.subosc_wave == SUBOSC_WAVE_SAWTOOTH) {
-            //     sub_sample = GetSawtooth(sub_phase_, sub_phase_increment);
-            // }
-            // else if(settings_.subosc_wave == SUBOSC_WAVE_RAMP) {
-            //     sub_sample = GetRamp(sub_phase_, sub_phase_increment);
-            // }
-            // else if(settings_.subosc_wave == SUBOSC_WAVE_SQUARE) {
-            //     sub_sample = GetSquare(sub_phase_, sub_phase_increment);
-            // }
-            // else if(settings_.subosc_wave == SUBOSC_WAVE_COPY) {
-            //     sub_sample = GetSampleBetweenFrames(sub_phase_, interpolated_morph);
-            // }            
-
-            // sub_sample = settings_.subosc_mix * sample + (1.0f - settings_.subosc_mix) * sub_sample;
+            sub_sample = subosc_mix_ * sample + (1.0f - subosc_mix_) * sub_sample;
 
             phase_ += phase_increment;
             sub_phase_ += sub_phase_increment;
@@ -375,51 +321,14 @@ void ABEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, uint1
             if(sub_phase_ >= 1.0f)
                 sub_phase_ -= 1.0f;
             
-            // Accumulate(j, sample);
-            // float test[4] = {
-            //   0.02442415000,  0.09297315000,  0.1671293800,  0.2154733200,
-            // };
-            // const float lut_4x_downsampler_fir[] = {
-            //    2.442415000e-02,  9.297315000e-02,  1.671293800e-01,  2.154733200e-01,
-            // };
-
-            head += sample * lut_4x_downsampler_fir[3 - (j & 3)];
-            tail += sample * lut_4x_downsampler_fir[j & 3];
-            // head += 0.0f;
-            // tail += 0.0f;
-            sub_head += sub_sample * lut_4x_downsampler_fir[3 - (j & 3)];
-            sub_tail += sub_sample * lut_4x_downsampler_fir[j & 3];
-
             carrier_downsampler.Accumulate(j, sample);
             sub_carrier_downsampler.Accumulate(j, sub_sample);
-            // sub_sample += 0;
         }
         
-        // float test = head;
-        // sample = head;
-        // float test = sub_carrier_downsampler.Read();
-        // test += 0.0f;
-        // loading = front_buffer_1[3];
-        // float carrier_output = head; //carrier_downsampler.Read();
-        // float sub_output = sub_head; //sub_carrier_downsampler.Read();
-        float carrier_output = carrier_downsampler.Read(); //;
-        float sub_output = sub_carrier_downsampler.Read(); //;
-        sub_output += 0;
-        carrier_output += 0;
-        // loading = carrier_output;
-        output->l = static_cast<int16_t>(carrier_output * 26000.0f);
-        output->r = static_cast<int16_t>(sub_output * 26000.0f);
-        // output->r = static_cast<int16_t>(sub_carrier_downsampler.Read() * 26000.0f);
-        // sub_sample * 26000.0f
+        output->l = static_cast<int16_t>(carrier_downsampler.Read() * 26000.0f);
+        output->r = static_cast<int16_t>(sub_carrier_downsampler.Read() * 26000.0f);
         ++output;
-
-        head = tail;
-        tail = 0.0f;
-        sub_head = sub_tail;
-        sub_tail = 0.0f;
     }
-    head_ = head;
-    sub_head_ = sub_head;
 }
 
 bool ABEngine::SetLeftWave(int table, int frame) {

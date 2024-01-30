@@ -36,13 +36,14 @@
 namespace waves {
   
 enum Switch {
-  SWITCH_T_DEJA_VU,
-  SWITCH_T_MODEL,
-  SWITCH_T_RANGE,
-  SWITCH_X_DEJA_VU,
-  SWITCH_X_MODE,
-  SWITCH_X_RANGE,
-  SWITCH_X_EXT,
+  // SWITCH_T_DEJA_VU,
+  // SWITCH_T_MODEL,
+  // SWITCH_T_RANGE,
+  // SWITCH_X_DEJA_VU,
+  // SWITCH_X_MODE,
+  // SWITCH_X_RANGE,
+  // SWITCH_X_EXT,
+  SWITCH,
   SWITCH_LAST
 };
 
@@ -67,12 +68,12 @@ class Switches {
   }
   
   inline bool pressed_immediate(Switch s) const {
-    if (s == SWITCH_T_DEJA_VU) {
-      return !GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_11);
-    } else if (s == SWITCH_X_MODE) {
-      return !GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_13);
-    } else if (s == SWITCH_X_DEJA_VU) {
-      return !GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_15);
+    // if (s == SWITCH_T_DEJA_VU) {
+    //   return !GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_11);
+    // } else if (s == SWITCH_X_MODE) {
+    //   return !GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_13);
+    if (s == SWITCH) {
+      return !GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_7);
     } else {
       return false;
     }

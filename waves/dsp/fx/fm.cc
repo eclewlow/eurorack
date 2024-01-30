@@ -43,7 +43,6 @@ float FM::RenderPhaseEffect(float input_phase, float phase_increment, uint16_t f
         MAKE_INTEGRAL_FRACTIONAL(index)
         float a = lut_fx_pow[index_integral];
         float b = lut_fx_pow[index_integral + 1];
-
         phase_increment = a + (b - a) * index_fractional;
     }
     else {
@@ -66,7 +65,7 @@ float FM::RenderPhaseEffect(float input_phase, float phase_increment, uint16_t f
         {
             float sample = 0.0f;
 
-            sample = GetOscillatorSample(*target_phase, phase_increment);
+            sample = GetOscillatorSample(*target_phase, phase_increment, fx_oscillator_shape_);
             
             *target_phase += phase_increment;
             if(*target_phase >= 1.0)

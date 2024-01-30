@@ -23,6 +23,7 @@ public:
     void Reset();
     float RenderSampleEffect(float sample, float input_phase, float phase_increment, uint16_t fx_amount, uint16_t fx, bool isOscilloscope);
     float RenderPhaseEffect(float input_phase, float phase_increment, uint16_t fx_amount, uint16_t fx, bool isOscilloscope);
+    float RenderPhaseEffect2(float input_phase, float phase_increment, uint16_t fx_amount, uint16_t fx, bool isOscilloscope);
 protected:
 private:
     DISALLOW_COPY_AND_ASSIGN (FM);

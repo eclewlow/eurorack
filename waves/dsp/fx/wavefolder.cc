@@ -62,7 +62,7 @@ float Wavefolder::RenderPhaseEffect(float input_phase, float phase_increment, ui
         case INTERNAL_MODULATOR: {
             
             
-            float oscillator_sample = GetOscillatorSample(*target_phase, phase_increment);
+            float oscillator_sample = GetOscillatorSample(*target_phase, phase_increment, fx_oscillator_shape_);
 
             amount = amount * oscillator_sample;
             

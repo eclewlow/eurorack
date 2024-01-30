@@ -63,7 +63,7 @@ float PhaseDistortion::RenderPhaseEffect(float input_phase, float phase_incremen
     switch(fx_control_type_) {
         case INTERNAL_MODULATOR: {
             
-            float oscillator_sample = GetOscillatorSample(*target_phase, phase_increment);
+            float oscillator_sample = GetOscillatorSample(*target_phase, phase_increment, fx_oscillator_shape_);
 
             x1 = (amount * oscillator_sample + 1.0f) / 2.0f;
             

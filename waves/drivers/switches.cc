@@ -40,19 +40,20 @@ struct SwitchDefinition {
 };
 
 const SwitchDefinition switch_definitions[] = {
-  { GPIOB, GPIO_Pin_11 },  // SWITCH_T_DEJA_VU,
-  { GPIOB, GPIO_Pin_14 },  // SWITCH_T_MODE
-  { GPIOB, GPIO_Pin_15 },  // SWITCH_T_RANGE
-  { GPIOC, GPIO_Pin_15 },  // SWITCH_X_DEJA_VU,
-  { GPIOC, GPIO_Pin_13 },  // SWITCH_X_MODE,
-  { GPIOB, GPIO_Pin_6 },  // SWITCH_X_RANGE
-  { GPIOD, GPIO_Pin_2 }  // SWITCH_X_EXT
+  { GPIOC, GPIO_Pin_7 },  // SWITCH,
+  // { GPIOB, GPIO_Pin_11 },  // SWITCH_T_DEJA_VU,
+  // { GPIOB, GPIO_Pin_14 },  // SWITCH_T_MODE
+  // { GPIOB, GPIO_Pin_15 },  // SWITCH_T_RANGE
+  // { GPIOC, GPIO_Pin_15 },  // SWITCH_X_DEJA_VU,
+  // { GPIOC, GPIO_Pin_13 },  // SWITCH_X_MODE,
+  // { GPIOB, GPIO_Pin_6 },  // SWITCH_X_RANGE
+  // { GPIOD, GPIO_Pin_2 }  // SWITCH_X_EXT
 };
 
 void Switches::Init() {
-  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
+  // RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
-  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
+  // RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
   
   GPIO_InitTypeDef gpio_init;
   gpio_init.GPIO_Mode = GPIO_Mode_IN;

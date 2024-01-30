@@ -38,8 +38,7 @@ private:
     int current_frame_;
     int target_frame_;
     int buffered_frame_;
-    float swap_counter_;
-    bool swap_;
+
     float carrier_fir_;
     float sub_carrier_fir_;
 
@@ -51,7 +50,14 @@ private:
     float calibration_y_;                   // ()  // don't randomize this, but save in snapshot
 
     int8_t wavetable_;      // (0, USER_WAVETABLE_COUNT + FACTORY_WAVETABLE_COUNT - 1)
-    int8_t fx_effect_;                       // (0, 8)
+
+    float fx_depth_;                       
+    bool fx_sync_;                         
+    int8_t fx_scale_;                      
+    int8_t fx_range_;                      
+    int8_t fx_oscillator_shape_;           
+    int8_t fx_control_type_;               
+    int8_t fx_effect_;                     
 
     DISALLOW_COPY_AND_ASSIGN (WavetableEngine);
 };
