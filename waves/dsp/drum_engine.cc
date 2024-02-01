@@ -13,11 +13,14 @@
 // #include "waves/dsp/ParameterInterpolator.h"
 #include "waves/Globals.h"
 #include "waves/dsp/downsampler/4x_downsampler.h"
+#include "waves/dsp/dsp.h"
 
 DrumEngine::DrumEngine() {
     phase_ = 0.0f;
     amp_decay_trigger_ = 1.0f;
     fm_decay_trigger_ = 1.0f;
+    current_frame_ = 0;
+    target_frame_ = 0;
 }
 
 DrumEngine::~DrumEngine() {
@@ -26,26 +29,111 @@ DrumEngine::~DrumEngine() {
 
 void DrumEngine::Init() {
     phase_ = 0.0f;
+    sub_phase_ = 0;
+
     amp_decay_trigger_ = 1.0f;
     fm_decay_trigger_ = 1.0f;
-}
 
-float DrumEngine::GetSample(int16_t wavetable, int16_t frame, float phase) {
-    return 0.0f;
+    current_frame_ = 0;
+    target_frame_ = 0;
+
+    wavetable_ = 0;
+
+    calibration_x_ = 0.001475852597848;    // don't randomize this, but save in snapshot
+    calibration_y_ = 12.0f;    // don't randomize this, but save in snapshot
+
+    subosc_offset_ = -12;
+    subosc_detune_ = 0;
+    subosc_mix_ = 0.0f;
+
+    // SUBOSC_WAVE_SINE
+    // SUBOSC_WAVE_TRIANGLE
+    // SUBOSC_WAVE_SAWTOOTH
+    // SUBOSC_WAVE_RAMP
+    // SUBOSC_WAVE_SQUARE
+    // SUBOSC_WAVE_COPY
+    subosc_wave_ = SUBOSC_WAVE_COPY;
+    fx_depth_ = 1.0f;
+    fx_sync_ = false;
+    fx_scale_ = 0;
+    fx_range_ = 1;
+    fx_oscillator_shape_ = SINE_SHAPE;
+    fx_control_type_ = INTERNAL_MODULATOR;
+    fx_effect_ = EFFECT_TYPE_FM;
+
 }
 
 float DrumEngine::GetSampleBetweenFrames(float phase, float morph) {
+    float sample = 0.0f;
+
+    int16_t sample1 = 0;
+    int16_t sample2 = 0;
+
+    float index = phase * 2048.0;
+    uint16_t integral = floor(index);
+    float fractional = index - integral;
+    uint16_t nextIntegral = (integral + 1) % 2048;
+
     float frame = morph * 15.0f;
-    uint16_t frame_integral = floor(frame);
+    int frame_integral = floor(frame);
     float frame_fractional = frame - frame_integral;
     
-    uint16_t next_frame_integral = (frame_integral + 1) % 16;
+    if(!GetFlag(&_EREG_, _BUSY_) && !GetFlag(&_EREG_, _RXNE_)) {
 
-    float frame1sample = GetSample(GetWavetable(), frame_integral, phase);
-    float frame2sample = GetSample(GetWavetable(), next_frame_integral, phase);
-    
-    float sample = frame1sample * (1.0f - frame_fractional) + frame2sample * frame_fractional;
+        if(frame_integral != current_frame_) {
+
+            // target_frame_ = frame_integral;
+
+            if(frame_integral == buffered_frame_) {
+                int16_t * temp_buffer = front_buffer_1;
+                front_buffer_1 = back_buffer_1;
+                back_buffer_1 = temp_buffer;
+
+                int temp_frame = current_frame_;
+                current_frame_ = buffered_frame_;
+                buffered_frame_= temp_frame;
+            } else {
+                target_frame_ = frame_integral;
+                // flash.StopDMA(true);
+                flash.StartFrameDMARead((uint32_t*)back_buffer_1, 8192, target_frame_ * 4096, DrumEngine::on_load_finished);
+            }
+        }
+        /* check fractional */
+        // >= 0.5 is closer to 1. < 0.5 is closer to 0
+        else if(frame_fractional >= 0.5 && buffered_frame_ != current_frame_ + 1 && current_frame_ != 14) {
+            // buffer frame
+            target_frame_ = current_frame_ + 1;
+            flash.StartFrameDMARead((uint32_t*)back_buffer_1, 8192, target_frame_ * 4096, DrumEngine::on_load_finished);
+
+        } else if (frame_fractional < 0.5 && buffered_frame_ != current_frame_ - 1 && current_frame_ != 0) {
+            // buffer frame
+            target_frame_ = current_frame_ - 1;
+            flash.StartFrameDMARead((uint32_t*)back_buffer_1, 8192, target_frame_ * 4096, DrumEngine::on_load_finished);
+        }
+    }
+
+    int16_t * buf = front_buffer_1;
+    sample1 = buf[integral] + (buf[nextIntegral] - buf[integral]) * fractional;
+    sample2 = buf[2048 + integral] + (buf[2048 + nextIntegral] - buf[2048 + integral]) * fractional;
+
+    if(frame_integral > current_frame_)
+        sample = sample2;
+    else if(frame_integral < current_frame_)
+        sample = sample1;
+    else
+        sample = sample1 * (1.0f - frame_fractional) + sample2 * frame_fractional;
+
+    sample = sample / 32768.0f;
+
     return sample;
+}
+
+void DrumEngine::on_load_finished() {
+
+    drumEngine.buffered_frame_ = drumEngine.target_frame_;
+
+    SetFlag(&_EREG_, _RXNE_, FLAG_CLEAR);
+    SetFlag(&_EREG_, _BUSY_, FLAG_CLEAR);
 }
 
 void DrumEngine::FillWaveform(int16_t * waveform, uint16_t tune, uint16_t fx_amount, uint16_t fx, uint16_t morph, bool withFx) {
@@ -89,6 +177,12 @@ float DrumEngine::GetSampleNoFX(float phase, float fx, float morph) {
 
 void DrumEngine::triggerUpdate() {
     phase_ = 0.0f;
+
+    current_frame_ = 1;
+    target_frame_ = 0;
+
+    flash.StopDMA(true);
+    flash.StartFrameDMARead((uint32_t*)back_buffer_1, 8192, target_frame_ * 4096, DrumEngine::on_load_finished);
 }
 
 float DrumEngine::GetY(float x) {
@@ -141,12 +235,7 @@ float DrumEngine::GetY(float x) {
 
 void DrumEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, uint16_t fx_amount, uint16_t fx, uint16_t morph)
 {
-        loading = 56;
-
-    //    float target = morph;
-    // convert 12 bit uint 0-4095 to 0...15 float
-    float morphTarget = morph * 1.0 / 4095.0;
-    //    float interpolatedFloat = interpolated16 / 32768.0f;
+    float morphTarget = morph / 65535.0;
     float tuneTarget = static_cast<float>(tune);
     
     uint16_t fx_amount_cv = adc.getChannel(Adc::ADC_CHANNEL_FX_AMOUNT_CV);
@@ -167,59 +256,156 @@ void DrumEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, uin
     ParameterInterpolator morph_interpolator(&morph_, morphTarget, size);
     // ParameterInterpolator tune_interpolator(&tune_, tuneTarget, size);
     Downsampler carrier_downsampler(&carrier_fir_);
-    
-    while (size--) {
-        float amp_decay_trigger_increment = (1.0f / (6.0f * (GetAmpDecay() + 0.001f))) / 48000.0f;
-        float fm_decay_trigger_increment = (1.0f / (6.0f * (GetFMDecay() + 0.001f))) / 48000.0f;
+    Downsampler sub_carrier_downsampler(&sub_carrier_fir_);
 
-        float note = tuneTarget * calibration_x_ + calibration_y_;
-        // float note = tune_interpolator.Next() * settings_.calibration_x + settings_.calibration_y;
-        note = CLAMP<float>(note, 0.0f, 120.0f);
+    float amp_decay_trigger_increment = (1.0f / (6.0f * (GetAmpDecay() + 0.001f))) / kCorrectedSampleRate;
+    float fm_decay_trigger_increment = (1.0f / (6.0f * (GetFMDecay() + 0.001f))) / kCorrectedSampleRate;
 
-        note = quantizer.Quantize(note);
+    float note = tuneTarget * calibration_x_ + calibration_y_;
+    note = CLAMP<float>(note, 0.0f, 120.0f);
 
-        note += 12 * GetY(GetFMDecayTrigger()) * (GetFMDepth() * 2.0f - 1.0f);
-        note = CLAMP<float>(note, 0.0f, 120.0f);
+    note = quantizer.Quantize(note);
 
+    note += 12 * GetY(GetFMDecayTrigger()) * (GetFMDepth() * 2.0f - 1.0f);
+    note = CLAMP<float>(note, 0.0f, 120.0f);
 
-        note = note - 24.0f;
-        float a = 440; //frequency of A (coomon value is 440Hz)
-        float frequency = (a / 32) * pow(2, ((note - 9) / 12.0));
-        
-        float phaseIncrement = frequency / 48000.0f;
-        
+    // note = note - 24.0f;
+
+    ParameterInterpolator phase_increment_interpolator(&phase_increment_, NoteToFrequency(note), size);
+    ParameterInterpolator sub_phase_increment_interpolator(&sub_phase_increment_, NoteToFrequency((note + subosc_detune_ / 100.0f + subosc_offset_)), size);
+
+    while (size--) {       
+        float phase = 0;
+        bool isOscilloscope = false;
+        float sample = 0;
+        float sub_sample = 0;
 
         float interpolated_morph = morph_interpolator.Next();
-        interpolated_morph = CLAMP<float>(interpolated_morph, 0.0, 1.0);
+        interpolated_morph = CLAMP<float>(interpolated_morph, 0.0f, 0.9999f);
+
+        float phase_increment = phase_increment_interpolator.Next();
+        phase_increment = CLAMP<float>(phase_increment, 0.0f, 1.0f);
+        float sub_phase_increment = sub_phase_increment_interpolator.Next();
+        sub_phase_increment = CLAMP<float>(sub_phase_increment, 0.0f, 1.0f);
+
         
-        for (size_t j = 0; j < kOversampling; ++j) {
-            float sample = 0;//GetSampleBetweenFrames(effect_manager.RenderPhaseEffect(phase_, frequency, fx_amount, fx, false), interpolated_morph);
+        // for (size_t j = 0; j < kOversampling; ++j) {
+            // float sample = 0;//GetSampleBetweenFrames(effect_manager.RenderPhaseEffect(phase_, frequency, fx_amount, fx, false), interpolated_morph);
             
             // sample = effect_manager.RenderSampleEffect(sample, phase_, frequency, fx_amount, fx, false);
             
+            switch(fx_effect_) {
+                case EFFECT_TYPE_BYPASS:
+                    phase = bypass.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false);
+
+                    sample = GetSampleBetweenFrames(phase, interpolated_morph);
+
+                    sample = bypass.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope);
+                    break;
+                case EFFECT_TYPE_FM:
+                    phase = fm.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false);
+
+                    sample = GetSampleBetweenFrames(phase, interpolated_morph);
+
+                    sample = fm.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope);
+                    break;
+                case EFFECT_TYPE_RING_MODULATOR:
+                    phase = ring_modulator.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false);
+
+                    sample = GetSampleBetweenFrames(phase, interpolated_morph);
+
+                    sample = ring_modulator.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope);
+                    break;
+                case EFFECT_TYPE_PHASE_DISTORTION:
+                    phase = phase_distortion.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false);
+
+                    sample = GetSampleBetweenFrames(phase, interpolated_morph);
+
+                    sample = phase_distortion.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope);
+                    break;
+                case EFFECT_TYPE_WAVEFOLDER:
+                    phase = wavefolder.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false);
+
+                    sample = GetSampleBetweenFrames(phase, interpolated_morph);
+
+                    sample = wavefolder.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope);
+                    break;
+                case EFFECT_TYPE_WAVEWRAPPER:
+                    phase = wavewrapper.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false);
+
+                    sample = GetSampleBetweenFrames(phase, interpolated_morph);
+
+                    sample = wavewrapper.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope);
+                    break;
+                case EFFECT_TYPE_BITCRUSH:
+                    phase = bitcrush.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false);
+
+                    sample = GetSampleBetweenFrames(phase, interpolated_morph);
+
+                    sample = bitcrush.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope);
+                    break;
+                case EFFECT_TYPE_DRIVE:
+                    phase = drive.RenderPhaseEffect(phase_, phase_increment, fx_amount, fx, false);
+
+                    sample = GetSampleBetweenFrames(phase, interpolated_morph);
+
+                    sample = drive.RenderSampleEffect(sample, phase_, phase_increment, fx_amount, fx, isOscilloscope);
+                    break;
+            }
+
+            switch(subosc_wave_){
+                case SUBOSC_WAVE_SINE:
+                    sub_sample = GetSine(sub_phase_);
+                    break;
+                case SUBOSC_WAVE_TRIANGLE:
+                    sub_sample = GetTriangle(sub_phase_);
+                    break;
+                case SUBOSC_WAVE_SAWTOOTH:
+                    sub_sample = GetSawtooth(sub_phase_, sub_phase_increment);
+                    break;
+                case SUBOSC_WAVE_RAMP:
+                    sub_sample = GetRamp(sub_phase_, sub_phase_increment);
+                    break;
+                case SUBOSC_WAVE_SQUARE:
+                    sub_sample = GetSquare(sub_phase_, sub_phase_increment);
+                    break;
+                case SUBOSC_WAVE_COPY:
+                    sub_sample = GetSampleBetweenFrames(sub_phase_, interpolated_morph);
+                    break;
+            }
+
+
             sample = (1 - amp_decay_trigger_) * sample;
-            
+
+            sub_sample = subosc_mix_ * sample + (1.0f - subosc_mix_) * sub_sample;
+
+
+            phase_ += phase_increment;
+            sub_phase_ += sub_phase_increment;
             amp_decay_trigger_ += amp_decay_trigger_increment;
-            
-            if(amp_decay_trigger_ >= 1.0f)
-                amp_decay_trigger_ = 1.0f;
-
             fm_decay_trigger_ += fm_decay_trigger_increment;
-            
-            if(fm_decay_trigger_ >= 1.0f)
-                fm_decay_trigger_ = 1.0f;
-
-            phase_ += phaseIncrement;
             
             if(phase_ >= 1.0f)
                 phase_ -= 1.0f;
+
+            if(sub_phase_ >= 1.0f)
+                sub_phase_ -= 1.0f;            
             
-            carrier_downsampler.Accumulate(j, sample);
-        }
+            if(amp_decay_trigger_ >= 1.0f)
+                amp_decay_trigger_ = 1.0f;
+            
+            if(fm_decay_trigger_ >= 1.0f)
+                fm_decay_trigger_ = 1.0f;
+            
+        //     carrier_downsampler.Accumulate(j, sample);
+        //     sub_carrier_downsampler.Accumulate(j, sub_sample);
+        // }
         
-        float sample = carrier_downsampler.Read();
-        
-        output->l = static_cast<int32_t>(26000.0f * sample);
+        // sample = carrier_downsampler.Read();
+        // sub_sample = sub_carrier_downsampler.Read();
+
+        output->l = static_cast<int16_t>(sample * 26000.0f);
+        output->r = static_cast<int16_t>(sub_sample * 26000.0f);
         ++output;
     }
 }

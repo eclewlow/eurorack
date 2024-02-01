@@ -43,7 +43,8 @@ enum Switch {
   // SWITCH_X_MODE,
   // SWITCH_X_RANGE,
   // SWITCH_X_EXT,
-  SWITCH,
+  SWITCH_1,
+  SWITCH_2,
   SWITCH_LAST
 };
 
@@ -72,8 +73,10 @@ class Switches {
     //   return !GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_11);
     // } else if (s == SWITCH_X_MODE) {
     //   return !GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_13);
-    if (s == SWITCH) {
+    if (s == SWITCH_1) {
       return !GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_7);
+    } else if (s == SWITCH_2) {
+      return !GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_6);
     } else {
       return false;
     }

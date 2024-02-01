@@ -405,7 +405,7 @@ void MatrixEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, u
 
     note = quantizer.Quantize(note);
 
-    note = note - 24.0f;
+    // note = note - 24.0f;
 
     ParameterInterpolator phase_increment_interpolator(&phase_increment_, NoteToFrequency(note), size);
     ParameterInterpolator sub_phase_increment_interpolator(&sub_phase_increment_, NoteToFrequency((note + subosc_detune_ / 100.0f + subosc_offset_)), size);

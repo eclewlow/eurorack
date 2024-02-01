@@ -29,7 +29,7 @@ ABEngine::~ABEngine() {
 void ABEngine::Init() {
     phase_ = 0.0f;
     sub_phase_ = 0;
-    
+
     calibration_x_ = 0.001475852597848;    // don't randomize this, but save in snapshot
     calibration_y_ = 12.0f;    // don't randomize this, but save in snapshot
     left_wavetable_ = 0;
@@ -207,18 +207,16 @@ void ABEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, uint1
 
     note = quantizer.Quantize(note);
 
-    note = note - 24.0f;
+    // note = note - 24.0f;
    
     ParameterInterpolator phase_increment_interpolator(&phase_increment_, NoteToFrequency(note), size);
     ParameterInterpolator sub_phase_increment_interpolator(&sub_phase_increment_, NoteToFrequency((note + subosc_detune_ / 100.0f + subosc_offset_)), size);
 
-    float sub_sample = 0;
-    bool isOscilloscope = false;
-
     while (size--) {
-
         float phase = 0;
+        bool isOscilloscope = false;
         float sample = 0;
+        float sub_sample = 0;
         
         float interpolated_morph = morph_interpolator.Next();
         interpolated_morph = CLAMP<float>(interpolated_morph, 0.0, 0.9999);
@@ -228,7 +226,7 @@ void ABEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, uint1
         float sub_phase_increment = sub_phase_increment_interpolator.Next();
         sub_phase_increment = CLAMP<float>(sub_phase_increment, 0.0f, 1.0f);
 
-        for (size_t j = 0; j < kOversampling; ++j) {
+        // for (size_t j = 0; j < kOversampling; ++j) {
 
             switch(fx_effect_) {
                 case EFFECT_TYPE_BYPASS:
@@ -321,12 +319,15 @@ void ABEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, uint1
             if(sub_phase_ >= 1.0f)
                 sub_phase_ -= 1.0f;
             
-            carrier_downsampler.Accumulate(j, sample);
-            sub_carrier_downsampler.Accumulate(j, sub_sample);
-        }
+        //     carrier_downsampler.Accumulate(j, sample);
+        //     sub_carrier_downsampler.Accumulate(j, sub_sample);
+        // }
         
-        output->l = static_cast<int16_t>(carrier_downsampler.Read() * 26000.0f);
-        output->r = static_cast<int16_t>(sub_carrier_downsampler.Read() * 26000.0f);
+        // sample = carrier_downsampler.Read();
+        // sub_sample = sub_carrier_downsampler.Read();
+
+        output->l = static_cast<int16_t>(sample * 26000.0f);
+        output->r = static_cast<int16_t>(sub_sample * 26000.0f);
         ++output;
     }
 }

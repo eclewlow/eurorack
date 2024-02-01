@@ -237,7 +237,7 @@ void TIM1_UP_TIM10_IRQHandler(void) {
   // memcpy(&result, dataBuffer, 2);
   // loading = front_buffer_1[counter % 10];
   // snprintf(value, 80, "c=%d, s=%d, frame=%d, %d\n", counter, loading, frame_integral, front_buffer[(2048 - 20) + counter%20]);
-  snprintf(value, 80, "l=%ld, busy=%d, rxne=%d, %d\n", (int32_t)loading, GetFlag(&_EREG_, _BUSY_), GetFlag(&_EREG_, _RXNE_), front_buffer[(2048 - 20) + counter%20]);
+  snprintf(value, 80, "l=%ld, busy=%d, rxne=%d, %d\n", (int32_t)switch_1_test, GetFlag(&_EREG_, _BUSY_), GetFlag(&_EREG_, _RXNE_), front_buffer[(2048 - 20) + counter%20]);
   // snprintf(value, 80, "%08lx\n", dataBuffer[0]);
   // snprintf(value, 80, "buf=%04x, db=%08lx\n, %08lx", buffer[0], dataBuffer[0], flash.w25qxx.ID);
   // snprintf(value, 40, "f=%d\n", static_cast<int>(phase*100.0f));
@@ -435,6 +435,48 @@ void FillBuffer(AudioDac::Frame* output, size_t size) {
 
 // AudioDac::Frame
 // voice.Render(patch, modulations, (AudioDac::Frame*)(output), size);
+  switches.Debounce();
+
+  if (switches.just_pressed(Switch(0))) {
+    // 24 combinations
+    switch_1_test = (switch_1_test + 1) % 4;
+    engine = switch_1_test;
+
+    switch(engine) {
+      case ENGINE_TYPE_AB:
+        abEngine.triggerUpdate();
+        break;
+      case ENGINE_TYPE_WAVETABLE:
+        wavetableEngine.triggerUpdate();
+        break;
+      case ENGINE_TYPE_MATRIX:
+        matrixEngine.triggerUpdate();
+        break;
+      case ENGINE_TYPE_DRUM:
+        drumEngine.triggerUpdate();
+        break;
+    }
+  }
+  if (switches.just_pressed(Switch(1))) {
+    // 24 combinations
+    switch_2_test = (switch_2_test + 1) % 6;
+
+    switch(engine) {
+      case ENGINE_TYPE_AB:
+        abEngine.set_subosc_wave(switch_2_test);
+        break;
+      case ENGINE_TYPE_WAVETABLE:
+        wavetableEngine.set_subosc_wave(switch_2_test);
+        break;
+      case ENGINE_TYPE_MATRIX:
+        matrixEngine.set_subosc_wave(switch_2_test);
+        break;
+      case ENGINE_TYPE_DRUM:
+        drumEngine.set_subosc_wave(switch_2_test);
+        break;
+    }
+  }  
+
   uint16_t tune = adc.getChannel(0);
   uint16_t fx_amount = adc.getChannel(1);
   uint16_t fx = adc.getChannel(2);
@@ -914,11 +956,12 @@ void Init() {
   // settings_.engine = ENGINE_TYPE_AB;
   // settings_.engine = ENGINE_TYPE_AB;
   // settings_.subosc_wave = SUBOSC_WAVE_SINE;
-  // abEngine.triggerUpdate();
-  engine = ENGINE_TYPE_MATRIX;
+  engine = ENGINE_TYPE_DRUM;
 
+  // abEngine.triggerUpdate();
   // wavetableEngine.triggerUpdate();
-  matrixEngine.triggerUpdate();
+  // matrixEngine.triggerUpdate();
+  drumEngine.triggerUpdate();
 
   audio_dac.Init(48000, kBlockSize);
   audio_dac.Start(&FillBuffer);

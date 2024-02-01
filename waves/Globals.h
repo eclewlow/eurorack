@@ -131,7 +131,8 @@ extern Context context;
 // extern uint8_t effect;
 // extern uint8_t sub_osc_shape;
 extern int8_t engine;
-
+extern int8_t switch_1_test;
+extern int8_t switch_2_test;
 // extern MainMenu mainMenu;
 // extern ModeMenu modeMenu;
 // extern FxMenu fxMenu;

@@ -16,6 +16,8 @@ Context context;
 // UserSettings user_settings;
 // SNAPSHOT settings_;
 int8_t engine;
+int8_t switch_1_test;
+int8_t switch_2_test;
 
 // uint8_t effect = EFFECT_TYPE_FM;
 // uint8_t sub_osc_shape = SUBOSC_WAVE_RAMP;

@@ -29,15 +29,7 @@ public:
     void FillWaveform(int16_t * waveform, uint16_t tune, uint16_t fx_amount, uint16_t fx, uint16_t morph, bool withFx);
     void triggerUpdate();
 private:
-    float carrier_fir_;
-    float sub_carrier_fir_;
 
-    int8_t subosc_offset_;                    // (-24, 24)
-    int8_t subosc_detune_;                    // (-50, 50)
-    float subosc_mix_;                        // (0.0f, 1.0f)
-    int8_t subosc_wave_;                      // (0, 5)
-    float calibration_x_;                   // ()  // don't randomize this, but save in snapshot
-    float calibration_y_;                   // ()  // don't randomize this, but save in snapshot
     int8_t engine_;                          // (0, 3)
 
     DISALLOW_COPY_AND_ASSIGN (Suboscillator);

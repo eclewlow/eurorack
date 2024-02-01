@@ -40,7 +40,8 @@ struct SwitchDefinition {
 };
 
 const SwitchDefinition switch_definitions[] = {
-  { GPIOC, GPIO_Pin_7 },  // SWITCH,
+  { GPIOC, GPIO_Pin_7 },  // SWITCH-1,
+  { GPIOB, GPIO_Pin_6 },  // SWITCH-2,
   // { GPIOB, GPIO_Pin_11 },  // SWITCH_T_DEJA_VU,
   // { GPIOB, GPIO_Pin_14 },  // SWITCH_T_MODE
   // { GPIOB, GPIO_Pin_15 },  // SWITCH_T_RANGE
@@ -51,7 +52,7 @@ const SwitchDefinition switch_definitions[] = {
 };
 
 void Switches::Init() {
-  // RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
+  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
   // RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
   

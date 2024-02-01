@@ -49,6 +49,10 @@ public:
       return stmlib::InterpolateWrap(lut_sine, phase, kSineLUTSize);
     }
 
+    inline void set_subosc_wave(int8_t subosc_wave) { subosc_wave_ = subosc_wave; }
+
+    inline int8_t get_subosc_wave() { return subosc_wave_; }
+
 protected:
     float phase_;
     float morph_;
@@ -59,6 +63,24 @@ protected:
 
     float sub_phase_increment_;
     float sub_phase_;
+
+    int8_t subosc_offset_;                    // (-24, 24)
+    int8_t subosc_detune_;                    // (-50, 50)
+    float subosc_mix_;                        // (0.0f, 1.0f)
+    int8_t subosc_wave_;                      // (0, 5)
+    float calibration_x_;                   // ()  // don't randomize this, but save in snapshot
+    float calibration_y_;                   // ()  // don't randomize this, but save in snapshot
+
+    float fx_depth_;                       
+    bool fx_sync_;                         
+    int8_t fx_scale_;                      
+    int8_t fx_range_;                      
+    int8_t fx_oscillator_shape_;           
+    int8_t fx_control_type_;               
+    int8_t fx_effect_;                     
+
+    float carrier_fir_;
+    float sub_carrier_fir_;
 
     bool started_;
     LoadingState loading_state_;
