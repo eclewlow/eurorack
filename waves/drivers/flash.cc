@@ -55,7 +55,7 @@ void Flash::Init() {
   GPIO_InitTypeDef gpio_init;
   gpio_init.GPIO_Mode = GPIO_Mode_OUT;
   gpio_init.GPIO_OType = GPIO_OType_PP;
-  gpio_init.GPIO_Speed = GPIO_Speed_50MHz;
+  gpio_init.GPIO_Speed = GPIO_Speed_2MHz;
   gpio_init.GPIO_PuPd = GPIO_PuPd_NOPULL;
   gpio_init.GPIO_Pin = eeprom[EEPROM_FACTORY_SS].pin;
   GPIO_Init(eeprom[EEPROM_FACTORY_SS].gpio, &gpio_init);
@@ -63,7 +63,7 @@ void Flash::Init() {
   // miso
   gpio_init.GPIO_Mode = GPIO_Mode_AF;
   gpio_init.GPIO_OType = GPIO_OType_PP;
-  gpio_init.GPIO_Speed = GPIO_Speed_50MHz;
+  gpio_init.GPIO_Speed = GPIO_Speed_2MHz;
   gpio_init.GPIO_PuPd = GPIO_PuPd_NOPULL;
   gpio_init.GPIO_Pin = eeprom[EEPROM_MISO].pin;
   GPIO_Init(eeprom[EEPROM_MISO].gpio, &gpio_init);
@@ -71,7 +71,7 @@ void Flash::Init() {
   // mosi
   gpio_init.GPIO_Mode = GPIO_Mode_AF;
   gpio_init.GPIO_OType = GPIO_OType_PP;
-  gpio_init.GPIO_Speed = GPIO_Speed_50MHz;
+  gpio_init.GPIO_Speed = GPIO_Speed_2MHz;
   gpio_init.GPIO_PuPd = GPIO_PuPd_NOPULL;
   gpio_init.GPIO_Pin = eeprom[EEPROM_MOSI].pin;
   GPIO_Init(eeprom[EEPROM_MOSI].gpio, &gpio_init);
@@ -79,7 +79,7 @@ void Flash::Init() {
   // clock
   gpio_init.GPIO_Mode = GPIO_Mode_AF;
   gpio_init.GPIO_OType = GPIO_OType_PP;
-  gpio_init.GPIO_Speed = GPIO_Speed_50MHz;
+  gpio_init.GPIO_Speed = GPIO_Speed_2MHz;
   gpio_init.GPIO_PuPd = GPIO_PuPd_NOPULL;
   gpio_init.GPIO_Pin = eeprom[EEPROM_CLOCK].pin;
   GPIO_Init(eeprom[EEPROM_CLOCK].gpio, &gpio_init);
@@ -112,7 +112,7 @@ void Flash::Init() {
   // SPI RX
   dma_init.DMA_Channel = DMA_Channel_3;
   dma_init.DMA_PeripheralBaseAddr = (uint32_t)&(SPI1->DR);
-  dma_init.DMA_Memory0BaseAddr = (uint32_t)(dataBuffer);
+  dma_init.DMA_Memory0BaseAddr = (uint32_t)(0);
   dma_init.DMA_DIR = DMA_DIR_PeripheralToMemory;
   dma_init.DMA_BufferSize = 0;
   dma_init.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
@@ -138,7 +138,7 @@ void Flash::Init() {
   // SPI TX
   dma_init.DMA_Channel = DMA_Channel_3;
   dma_init.DMA_PeripheralBaseAddr = (uint32_t)&(SPI1->DR);
-  dma_init.DMA_Memory0BaseAddr = (uint32_t)(dataBuffer);
+  dma_init.DMA_Memory0BaseAddr = (uint32_t)(0);
   dma_init.DMA_DIR = DMA_DIR_MemoryToPeripheral;
   dma_init.DMA_BufferSize = 0;
   dma_init.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
@@ -162,23 +162,23 @@ void Flash::Init() {
 
 }
 
-void Flash::StartDMARead(uint16_t __bytes) {
-  uint8_t pump = 0;
+// void Flash::StartDMARead(uint16_t __bytes) {
+//   uint8_t pump = 0;
 
-  // loading = 33;
-  DMA_SetCurrDataCounter(DMA2_Stream3, __bytes);
-  DMA_SetCurrDataCounter(DMA2_Stream0, __bytes);
-  DMA2_Stream3->M0AR = (int)&pump;
-  DMA2_Stream0->M0AR = (int)dataBuffer;
-  DMA_Cmd(DMA2_Stream3, ENABLE);
-  DMA_Cmd(DMA2_Stream0, ENABLE);
-  SPI_I2S_DMACmd(SPI1, SPI_I2S_DMAReq_Tx, ENABLE);
-  SPI_I2S_DMACmd(SPI1, SPI_I2S_DMAReq_Rx, ENABLE);
+//   // loading = 33;
+//   DMA_SetCurrDataCounter(DMA2_Stream3, __bytes);
+//   DMA_SetCurrDataCounter(DMA2_Stream0, __bytes);
+//   DMA2_Stream3->M0AR = (int)&pump;
+//   DMA2_Stream0->M0AR = (int)dataBuffer;
+//   DMA_Cmd(DMA2_Stream3, ENABLE);
+//   DMA_Cmd(DMA2_Stream0, ENABLE);
+//   SPI_I2S_DMACmd(SPI1, SPI_I2S_DMAReq_Tx, ENABLE);
+//   SPI_I2S_DMACmd(SPI1, SPI_I2S_DMAReq_Rx, ENABLE);
 
-  SetFlag(&_EREG_, _RXTC_, FLAG_CLEAR);
-  SetFlag(&_EREG_, _TXTC_, FLAG_CLEAR);
-  SetFlag(&_EREG_, _BUSY_, FLAG_SET);
-}
+//   SetFlag(&_EREG_, _RXTC_, FLAG_CLEAR);
+//   SetFlag(&_EREG_, _TXTC_, FLAG_CLEAR);
+//   SetFlag(&_EREG_, _BUSY_, FLAG_SET);
+// }
 
 void Flash::StartFrameDMARead(uint32_t * buffer, uint32_t __bytes, uint32_t address, void (* func)()) {
   // if(GetFlag(&_EREG_, _BUSY_)) return;
@@ -236,16 +236,16 @@ void Flash::StartFrameDMARead(uint32_t * buffer, uint32_t __bytes, uint32_t addr
   // loading++;
 }
 
-void Flash::StartDMAWrite(uint16_t __bytes) {
-  DMA_SetCurrDataCounter(DMA2_Stream3, __bytes);
-  DMA2_Stream3->M0AR = (int)dataBuffer;
-  DMA_Cmd(DMA2_Stream3, ENABLE);
-  SPI_I2S_DMACmd(SPI1, SPI_I2S_DMAReq_Tx, ENABLE);
+// void Flash::StartDMAWrite(uint16_t __bytes) {
+//   DMA_SetCurrDataCounter(DMA2_Stream3, __bytes);
+//   DMA2_Stream3->M0AR = (int)dataBuffer;
+//   DMA_Cmd(DMA2_Stream3, ENABLE);
+//   SPI_I2S_DMACmd(SPI1, SPI_I2S_DMAReq_Tx, ENABLE);
 
-  SetFlag(&_EREG_, _RXTC_, FLAG_CLEAR);
-  SetFlag(&_EREG_, _TXTC_, FLAG_CLEAR);
-  SetFlag(&_EREG_, _BUSY_, FLAG_SET);
-}
+//   SetFlag(&_EREG_, _RXTC_, FLAG_CLEAR);
+//   SetFlag(&_EREG_, _TXTC_, FLAG_CLEAR);
+//   SetFlag(&_EREG_, _BUSY_, FLAG_SET);
+// }
 
 void Flash::StopDMA(bool bypass) {
   // loading = 2;

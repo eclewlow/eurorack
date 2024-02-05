@@ -9,8 +9,13 @@
  */
 
 #pragma once
+#include "waves/resources.h"
 
 const size_t kOversampling = 4;
+
+const float lut_4x_downsampler_fir[] = {
+   2.442415000e-02,  9.297315000e-02,  1.671293800e-01,  2.154733200e-01,
+};
 
 class Downsampler {
 public:

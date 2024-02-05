@@ -53,6 +53,10 @@ public:
 
     inline int8_t get_subosc_wave() { return subosc_wave_; }
 
+    inline void set_fx_effect(int8_t fx_effect) { fx_effect_ = fx_effect; }
+
+    inline int8_t get_fx_effect() { return fx_effect_; }
+
 protected:
     float phase_;
     float morph_;

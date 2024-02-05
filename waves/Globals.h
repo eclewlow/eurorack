@@ -24,11 +24,11 @@ extern void SetFlag(uint32_t*, uint8_t, FlagStateTypeDef);
 
 extern EEPROM_PIN eeprom[11];
 
-extern int16_t dataBuffer[2048];
-extern int16_t double_waveframe_buffer_1[4096];
-extern int16_t double_waveframe_buffer_2[4096];
-extern int16_t double_waveframe_buffer_3[4096];
-extern int16_t double_waveframe_buffer_4[4096];
+// extern int16_t dataBuffer[2048];
+// extern int16_t double_waveframe_buffer_1[4096];
+// extern int16_t double_waveframe_buffer_2[4096];
+// extern int16_t double_waveframe_buffer_3[4096];
+// extern int16_t double_waveframe_buffer_4[4096];
 
 extern int16_t triple_waveframe_buffer_1[6144];
 extern int16_t triple_waveframe_buffer_2[6144];
@@ -53,9 +53,6 @@ extern int16_t * back_buffer_2;
 extern int16_t pump_buffer[6144];
 extern float loading;
 extern uint8_t lcd_buffer[8][128];
-
-extern const float lut_4x_downsampler_fir[];
-// extern float lut_4x_downsampler_fir[];
 
 extern int16_t ROM[32768];
 
@@ -181,9 +178,9 @@ extern Quantizer quantizer;
 // extern SystemClock system_clock;
 extern Flash flash;
 
-extern int16_t BUF1[2048];
-extern int16_t BUF2[2048];
-extern int16_t BUF3[2048];
-extern int16_t BUF4[2048];
-extern int16_t BUF5[2048];
+// extern int16_t BUF1[2048];
+// extern int16_t BUF2[2048];
+// extern int16_t BUF3[2048];
+// extern int16_t BUF4[2048];
+// extern int16_t BUF5[2048];
 

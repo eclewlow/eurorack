@@ -535,154 +535,154 @@ bool InitMemory() {
 
 
 // -------------------------------------------------------------  
-void W25Qxx_TransferDMASPI (uint32_t __bytes, DataDirectionTypeDef __dir, uint32_t __offset){
-  // SetFlag(&_EREG_, _DBLF_, FLAG_SET);
+// void W25Qxx_TransferDMASPI (uint32_t __bytes, DataDirectionTypeDef __dir, uint32_t __offset){
+//   // SetFlag(&_EREG_, _DBLF_, FLAG_SET);
  
-  uint8_t pump = 0;
-  if (__dir == DIR_WRITE)
-  {
-    DMA_SetCurrDataCounter(DMA2_Stream3, __bytes);
-    DMA2_Stream3->M0AR = ((int)&dataBuffer) + (__offset * 256);
-    DMA_Cmd(DMA2_Stream3, ENABLE);
-    SPI_I2S_DMACmd(SPI1, SPI_I2S_DMAReq_Tx, ENABLE);
-  }
-  else
-  {
-    DMA_SetCurrDataCounter(DMA2_Stream3, __bytes);
-    DMA_SetCurrDataCounter(DMA2_Stream0, __bytes);
-    DMA2_Stream3->M0AR = (int)&pump;
-    DMA2_Stream0->M0AR = (int)&dataBuffer;
-    DMA_Cmd(DMA2_Stream3, ENABLE);
-    DMA_Cmd(DMA2_Stream0, ENABLE);
-    SPI_I2S_DMACmd(SPI1, SPI_I2S_DMAReq_Tx, ENABLE);
-    SPI_I2S_DMACmd(SPI1, SPI_I2S_DMAReq_Rx, ENABLE);
-  }
+//   uint8_t pump = 0;
+//   if (__dir == DIR_WRITE)
+//   {
+//     DMA_SetCurrDataCounter(DMA2_Stream3, __bytes);
+//     DMA2_Stream3->M0AR = ((int)&dataBuffer) + (__offset * 256);
+//     DMA_Cmd(DMA2_Stream3, ENABLE);
+//     SPI_I2S_DMACmd(SPI1, SPI_I2S_DMAReq_Tx, ENABLE);
+//   }
+//   else
+//   {
+//     DMA_SetCurrDataCounter(DMA2_Stream3, __bytes);
+//     DMA_SetCurrDataCounter(DMA2_Stream0, __bytes);
+//     DMA2_Stream3->M0AR = (int)&pump;
+//     DMA2_Stream0->M0AR = (int)&dataBuffer;
+//     DMA_Cmd(DMA2_Stream3, ENABLE);
+//     DMA_Cmd(DMA2_Stream0, ENABLE);
+//     SPI_I2S_DMACmd(SPI1, SPI_I2S_DMAReq_Tx, ENABLE);
+//     SPI_I2S_DMACmd(SPI1, SPI_I2S_DMAReq_Rx, ENABLE);
+//   }
 
-  while (!DMA_GetFlagStatus(DMA2_Stream3, DMA_FLAG_TCIF3));
-  DMA_ClearFlag(DMA2_Stream3, DMA_FLAG_TCIF3 | DMA_FLAG_HTIF3);
+//   while (!DMA_GetFlagStatus(DMA2_Stream3, DMA_FLAG_TCIF3));
+//   DMA_ClearFlag(DMA2_Stream3, DMA_FLAG_TCIF3 | DMA_FLAG_HTIF3);
 
-  while (!DMA_GetFlagStatus(DMA2_Stream0, DMA_FLAG_TCIF0));
-  DMA_ClearFlag(DMA2_Stream0, DMA_FLAG_TCIF0 | DMA_FLAG_HTIF0);
-  // Wait<500>();
+//   while (!DMA_GetFlagStatus(DMA2_Stream0, DMA_FLAG_TCIF0));
+//   DMA_ClearFlag(DMA2_Stream0, DMA_FLAG_TCIF0 | DMA_FLAG_HTIF0);
+//   // Wait<500>();
   
-  if (__dir == DIR_WRITE)
-  {
-    while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
-    DMA_Cmd(DMA2_Stream3, DISABLE);
-    SPI_I2S_DMACmd(SPI1, SPI_I2S_DMAReq_Tx, DISABLE);
-  }
-  else
-  {
-    while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
-    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
-    DMA_Cmd(DMA2_Stream3, DISABLE);
-    DMA_Cmd(DMA2_Stream0, DISABLE);
-    SPI_I2S_DMACmd(SPI1, SPI_I2S_DMAReq_Tx, DISABLE);
-    SPI_I2S_DMACmd(SPI1, SPI_I2S_DMAReq_Rx, DISABLE);
-  }
+//   if (__dir == DIR_WRITE)
+//   {
+//     while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
+//     DMA_Cmd(DMA2_Stream3, DISABLE);
+//     SPI_I2S_DMACmd(SPI1, SPI_I2S_DMAReq_Tx, DISABLE);
+//   }
+//   else
+//   {
+//     while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
+//     while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
+//     DMA_Cmd(DMA2_Stream3, DISABLE);
+//     DMA_Cmd(DMA2_Stream0, DISABLE);
+//     SPI_I2S_DMACmd(SPI1, SPI_I2S_DMAReq_Tx, DISABLE);
+//     SPI_I2S_DMACmd(SPI1, SPI_I2S_DMAReq_Rx, DISABLE);
+//   }
 
-  // SetFlag(&_EREG_, _DBLF_, FLAG_SET);
-}
+//   // SetFlag(&_EREG_, _DBLF_, FLAG_SET);
+// }
 
 
 
 
 // -------------------------------------------------------------  
-bool W25Qxx_TransferSPI (uint8_t __command, int32_t __address, uint16_t __bytes, DataDirectionTypeDef __dir, uint32_t __offset)
-{
-  GPIO_WriteBit(GPIOA, GPIO_Pin_4, Bit_RESET);
+// bool W25Qxx_TransferSPI (uint8_t __command, int32_t __address, uint16_t __bytes, DataDirectionTypeDef __dir, uint32_t __offset)
+// {
+//   GPIO_WriteBit(GPIOA, GPIO_Pin_4, Bit_RESET);
   
-  // SPI_Cmd(SPI1, ENABLE);
+//   // SPI_Cmd(SPI1, ENABLE);
 
-  SPI_I2S_SendData(SPI1, __command);
-  while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
-  SPI_I2S_ReceiveData(SPI1);
-  while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
+//   SPI_I2S_SendData(SPI1, __command);
+//   while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
+//   SPI_I2S_ReceiveData(SPI1);
+//   while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
 
-  if (__address >= 0)
-  {
-    int i = 4;
-    while (--i)
-    {
-      SPI_I2S_SendData(SPI1, __address >> 8 * i);
-      while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
-      SPI_I2S_ReceiveData(SPI1);
-      while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
-    }
-  }
+//   if (__address >= 0)
+//   {
+//     int i = 4;
+//     while (--i)
+//     {
+//       SPI_I2S_SendData(SPI1, __address >> 8 * i);
+//       while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
+//       SPI_I2S_ReceiveData(SPI1);
+//       while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
+//     }
+//   }
   
-  if (__command == FastRead)
-  {
-    SPI_I2S_SendData(SPI1, 0);
-    while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
-    SPI_I2S_ReceiveData(SPI1);
-    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
-  }
+//   if (__command == FastRead)
+//   {
+//     SPI_I2S_SendData(SPI1, 0);
+//     while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
+//     SPI_I2S_ReceiveData(SPI1);
+//     while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
+//   }
 
-  if(__command==Read_JedecID) {
-    // SPI_I2S_SendData(SPI1, 0);
-    // while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
-    // SPI_I2S_ReceiveData(SPI1);
-    // while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));    
-  }
+//   if(__command==Read_JedecID) {
+//     // SPI_I2S_SendData(SPI1, 0);
+//     // while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
+//     // SPI_I2S_ReceiveData(SPI1);
+//     // while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));    
+//   }
 
-  if (__command == 0xab)
-  {
-    SPI_I2S_SendData(SPI1, 0);
-    while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
-    SPI_I2S_ReceiveData(SPI1);
-    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
+//   if (__command == 0xab)
+//   {
+//     SPI_I2S_SendData(SPI1, 0);
+//     while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
+//     SPI_I2S_ReceiveData(SPI1);
+//     while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
 
-    SPI_I2S_SendData(SPI1, 0);
-    while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
-    SPI_I2S_ReceiveData(SPI1);
-    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
+//     SPI_I2S_SendData(SPI1, 0);
+//     while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
+//     SPI_I2S_ReceiveData(SPI1);
+//     while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
 
-    SPI_I2S_SendData(SPI1, 0);
-    while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
-    SPI_I2S_ReceiveData(SPI1);
-    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
+//     SPI_I2S_SendData(SPI1, 0);
+//     while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
+//     SPI_I2S_ReceiveData(SPI1);
+//     while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
 
-    SPI_I2S_SendData(SPI1, 0);
-    while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
-    SPI_I2S_ReceiveData(SPI1);
-    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
-  }
+//     SPI_I2S_SendData(SPI1, 0);
+//     while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
+//     SPI_I2S_ReceiveData(SPI1);
+//     while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
+//   }
   
-    if (__command == WRITE_STATUS_REGISTER)
-  {
-    SPI_I2S_SendData(SPI1, 0x0c);
-    while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
-    SPI_I2S_ReceiveData(SPI1);
-    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
+//     if (__command == WRITE_STATUS_REGISTER)
+//   {
+//     SPI_I2S_SendData(SPI1, 0x0c);
+//     while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
+//     SPI_I2S_ReceiveData(SPI1);
+//     while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
 
-    // SPI_I2S_SendData(SPI1, 1);
-    // while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
-    // SPI_I2S_ReceiveData(SPI1);
-    // while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
-  }
+//     // SPI_I2S_SendData(SPI1, 1);
+//     // while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
+//     // SPI_I2S_ReceiveData(SPI1);
+//     // while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
+//   }
 
 
-    if (__command == READ_STATUS_REGISTER)
-  {
-    SPI_I2S_SendData(SPI1, 0);
-    while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
-    SPI_I2S_ReceiveData(SPI1);
-    while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
-  }
+//     if (__command == READ_STATUS_REGISTER)
+//   {
+//     SPI_I2S_SendData(SPI1, 0);
+//     while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
+//     SPI_I2S_ReceiveData(SPI1);
+//     while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE));
+//   }
 
-  if (__bytes)
-  {
-    W25Qxx_TransferDMASPI(__bytes, __dir, __offset);
-  }
+//   if (__bytes)
+//   {
+//     W25Qxx_TransferDMASPI(__bytes, __dir, __offset);
+//   }
 
-  // SPI_Cmd(SPI1, ENABLE);
-  while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_BSY));
+//   // SPI_Cmd(SPI1, ENABLE);
+//   while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_BSY));
     
-  GPIO_WriteBit(GPIOA, GPIO_Pin_4, Bit_SET);
+//   GPIO_WriteBit(GPIOA, GPIO_Pin_4, Bit_SET);
 
-  return true;
-}
+//   return true;
+// }
 
 bool ReadWaveframe(int32_t __address, uint8_t pin) {
 
@@ -1006,15 +1006,70 @@ bool AAI_Word_Program(uint8_t * buffer, uint32_t size, uint32_t address, uint8_t
     return true;
 }
 
+bool Page_Program_Repeat(uint8_t * buffer, uint32_t size, uint32_t address, uint8_t pin) {
+    if(size < 2) return false;
+    if(size % 2 != 0) return false;
+
+    WriteStatusRegister(0x00, EEPROM_FACTORY_SS);
+      system_clock.Delay(25);
+
+    for (int j = 0; j < 16; j++) {
+
+      CMD(WRITE_ENABLE, pin);
+
+      system_clock.Delay(25);
+
+      LOW(pin);
+
+      system_clock.Delay(25);
+
+      uint8_t send_buf[256 + 4];
+      send_buf[0] = 0x02;
+      send_buf[1] = ((address >> 16) & 0xFF);
+      send_buf[2] = ((address >> 8) & 0xFF);
+      send_buf[3] = ((address) & 0xFF);
+
+      for(int i = 0; i < 256; i++) {
+        send_buf[4 + i] = buffer[i + j * 256];
+      }
+      // memcpy(send_buf + 4, buffer + j * 256, 256);
+
+      // int16_t *test = (int16_t *)send_buf;
+      // test[2] = 50;
+
+      Write(send_buf, 256 + 4);
+
+      system_clock.Delay(25);
+
+      while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_BSY));
+
+      HIGH(pin);
+
+      system_clock.Delay(25);
+      // while(ReadStatusRegister(pin) & 0x01) {}
+      // system_clock.Delay(50);
+      // for(int16_t t = 0; t < 4000; t++) { __asm__("nop"); }
+
+      address += 256;
+    }
+
+    return true;
+}
+
 bool SectorErase4K(uint32_t address, uint8_t pin) {
 
     WriteStatusRegister(0x00, EEPROM_FACTORY_SS);
+      system_clock.Delay(25);
 
     // loading = 22;
     // SET WREN first
     CMD(WRITE_ENABLE, pin);
 
+    // NEED THIS!
+      system_clock.Delay(25);
+
     LOW(pin);
+      system_clock.Delay(25);
 
     uint8_t buf[4];
 
@@ -1025,6 +1080,8 @@ bool SectorErase4K(uint32_t address, uint8_t pin) {
 
     // loading = 23;
     Write(buf, 4);
+    // for(int16_t t = 0; t < 4000; t++) { __asm__("nop"); }
+      system_clock.Delay(25);
 
     // SPI_I2S_SendData(SPI1, 0);
     // while (!SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE));
@@ -1038,14 +1095,16 @@ bool SectorErase4K(uint32_t address, uint8_t pin) {
 
     // loading = 28;
     // loading = ReadStatusRegister(pin);
-    // while(ReadStatusRegister(pin) & 0x01) {
+    // while(ReadStatusRegister(pin) & 0x01) {}
+    // for(int16_t t = 0; t < 4000; t++) { __asm__("nop"); }
+
       // loading = ReadStatusRegister(pin);
     // }  // BUSY
-    system_clock.Delay(25);
+    system_clock.Delay(50);
 
 
     // loading = 26;
-    CMD(WRITE_DISABLE, pin);
+    // CMD(WRITE_DISABLE, pin);
 
     return true;
 }
@@ -1073,18 +1132,19 @@ void W25qxx_Init (void)
     loading = 0;
     // loading = 45;
     for(int i = 0; i < 16; i++) {
-    loading++;
         // system_clock.Delay(10);
     // int i = 0;
       SectorErase4K(wavetable * 65536 + 4096 * i, EEPROM_FACTORY_SS);
-      // system_clock.Delay(25);
+      system_clock.Delay(25);
     // loading++;
       // for(int j = 0; j < 4096; j++) {
         // loading++;
         // Program(0x2, 4096 * i + j, EEPROM_FACTORY_SS);
       // }
-      AAI_Word_Program((uint8_t *)&ROM[2048*i], 4096, wavetable * 65536 + 4096 * i, EEPROM_FACTORY_SS);
-      // system_clock.Delay(25);
+      Page_Program_Repeat((uint8_t *)&ROM[2048*i], 4096, wavetable * 65536 + 4096 * i, EEPROM_FACTORY_SS);
+      // AAI_Word_Program((uint8_t *)&ROM[2048*i], 4096, wavetable * 65536 + 4096 * i, EEPROM_FACTORY_SS);
+      system_clock.Delay(25);
+    loading++;
     }
     // system_clock.Delay(25);
 

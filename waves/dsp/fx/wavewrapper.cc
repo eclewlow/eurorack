@@ -16,6 +16,13 @@
 
 void Wavewrapper::Init() {
     phase_ = 0.0f;
+    fx_depth_ = 1.0f;
+    fx_sync_ = false;
+    fx_scale_ = 0;
+    fx_range_ = 1;
+    fx_oscillator_shape_ = SINE_SHAPE;
+    fx_control_type_ = INTERNAL_MODULATOR;
+    fx_effect_ = 0;//EffectManager::EFFECT_TYPE_FM;
 }
 
 void Wavewrapper::Reset() {

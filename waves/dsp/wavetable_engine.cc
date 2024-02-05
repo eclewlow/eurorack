@@ -49,7 +49,7 @@ void WavetableEngine::Init() {
     // SUBOSC_WAVE_RAMP
     // SUBOSC_WAVE_SQUARE
     // SUBOSC_WAVE_COPY
-    subosc_wave_ = SUBOSC_WAVE_COPY;
+    subosc_wave_ = SUBOSC_WAVE_SINE;
     fx_depth_ = 1.0f;
     fx_sync_ = false;
     fx_scale_ = 0;
