@@ -73,10 +73,9 @@ public:
     
     static void put_image_16bit(int16_t x, int16_t y, const uint8_t image[][2], uint8_t width);
     static void put_image_22x23(uint8_t x, uint8_t y, const uint8_t image[3][23]);
-
-private:
     static uint8_t framebuffer[8][128];
 
+private:
     Display(const Display&);
     Display& operator=(Display const&);
     // DISALLOW_COPY_AND_ASSIGN (Display);

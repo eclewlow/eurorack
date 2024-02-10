@@ -40,6 +40,7 @@
 #include "waves/drivers/ParameterInterpolator.h"
 #include "waves/defines.h"
 #include "waves/Globals.h"
+#include "waves/Display.h"
 
 // #include "stmlib/dsp/dsp.h"
 // #include "stmlib/dsp/hysteresis_quantizer.h"
@@ -129,7 +130,7 @@ void SysTick_Handler() {
 
 int counter = 0;
 // float phase = 0.0f;
-
+float radians = 0;
 
 void TIM1_UP_TIM10_IRQHandler(void) {
   if (!(TIM1->SR & TIM_IT_Update)) {
@@ -244,7 +245,15 @@ void TIM1_UP_TIM10_IRQHandler(void) {
   // sample += 1;
   _write(0, (char*)value, 80);
 
+  Display::clear_screen();
+  Display::LCD_Line(64, 32, 64 + 10*sin(radians), 32 + 10*cos(radians), true);
+  lcd.Display(Display::framebuffer);
 
+  radians += 2 * M_PI / 1200;
+  if(radians > 2 * M_PI)
+    radians -= 2 * M_PI;
+
+  // lcd.swap_picture();
       // GPIO_ResetBits(GPIOA, kPinFactorySS);
 
   // if(flash.trigger_load && !flash.loading) {

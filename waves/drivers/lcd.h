@@ -46,6 +46,7 @@ using namespace std;
 using namespace stmlib;
 
 extern uint8_t pic[];
+extern uint8_t pic1[];
 
 class LCD {
  public:
@@ -251,6 +252,7 @@ void Draw();
 void Initial();
 void Write_Instruction(uint8_t byte);
 void Display_Picture(uint8_t pic[]);
+void Display(uint8_t pic[8][128]);
 void Initial_Dispay_Line(uint8_t line);
 void Set_Page_Address(uint8_t add);
 void Set_Column_Address(uint8_t add);
@@ -259,10 +261,12 @@ void Write_Data(uint8_t byte);
 inline uint8_t get_page() { return page_; }
 inline void increment_page() { page_++ ; }
 inline void set_page(uint8_t page) { page_ = page; }
+inline void swap_picture() {  swap = !swap; Display_Picture(swap ? pic1 : pic); }
 
 static LCD* GetInstance() { return instance_; }
  private:
   uint8_t page_;
+  bool swap;
   static LCD* instance_;
   // NextSampleFn next_sample_fn_;
   // static FirmwareUpdateDac* instance_;
