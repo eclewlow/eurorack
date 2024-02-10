@@ -54,7 +54,7 @@ extern int16_t pump_buffer[6144];
 extern float loading;
 extern uint8_t lcd_buffer[8][128];
 
-extern int16_t ROM[32768];
+extern int16_t ROM[2048];
 
 // #include "waves/menu/MainMenu.h"
 // #include "waves/menu/ModeMenu.h"

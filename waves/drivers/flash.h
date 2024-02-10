@@ -1069,7 +1069,7 @@ bool SectorErase4K(uint32_t address, uint8_t pin) {
       system_clock.Delay(25);
 
     LOW(pin);
-      system_clock.Delay(25);
+      // system_clock.Delay(25);
 
     uint8_t buf[4];
 
@@ -1131,9 +1131,9 @@ void W25qxx_Init (void)
 
     loading = 0;
     // loading = 45;
-    for(int i = 0; i < 16; i++) {
+    // for(int i = 0; i < 1; i++) {
         // system_clock.Delay(10);
-    // int i = 0;
+    int i = 0;
       SectorErase4K(wavetable * 65536 + 4096 * i, EEPROM_FACTORY_SS);
       system_clock.Delay(25);
     // loading++;
@@ -1144,8 +1144,8 @@ void W25qxx_Init (void)
       Page_Program_Repeat((uint8_t *)&ROM[2048*i], 4096, wavetable * 65536 + 4096 * i, EEPROM_FACTORY_SS);
       // AAI_Word_Program((uint8_t *)&ROM[2048*i], 4096, wavetable * 65536 + 4096 * i, EEPROM_FACTORY_SS);
       system_clock.Delay(25);
-    loading++;
-    }
+    // loading++;
+    // }
     // system_clock.Delay(25);
 
     // SectorErase4K(0, EEPROM_FACTORY_SS);

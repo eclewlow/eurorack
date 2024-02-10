@@ -999,7 +999,7 @@ int main(void) {
       fresh_start = false;
       loading = 23;
       system_clock.Delay(2);
-      // flash.W25qxx_Init();
+      flash.W25qxx_Init();
       loading = 24;
 
       // system_clock.Delay(1000);
