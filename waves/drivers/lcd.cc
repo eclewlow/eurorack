@@ -222,58 +222,58 @@ void LCD::Init() {
   GPIO_Init(GPIOC, &gpio_init);
 
   // mosi
-  gpio_init.GPIO_Mode = GPIO_Mode_OUT;
+  // gpio_init.GPIO_Mode = GPIO_Mode_OUT;
+  // gpio_init.GPIO_OType = GPIO_OType_PP;
+  // gpio_init.GPIO_Speed = GPIO_Speed_2MHz;
+  // gpio_init.GPIO_PuPd = GPIO_PuPd_NOPULL;
+  // gpio_init.GPIO_Pin = GPIO_Pin_12;
+  // GPIO_Init(GPIOC, &gpio_init);
+
+  // clock
+  // gpio_init.GPIO_Mode = GPIO_Mode_OUT;
+  // gpio_init.GPIO_OType = GPIO_OType_PP;
+  // gpio_init.GPIO_Speed = GPIO_Speed_2MHz;
+  // gpio_init.GPIO_PuPd = GPIO_PuPd_NOPULL;
+  // gpio_init.GPIO_Pin = GPIO_Pin_10;
+  // GPIO_Init(GPIOC, &gpio_init);
+
+
+  // mosi
+  gpio_init.GPIO_Mode = GPIO_Mode_AF;
   gpio_init.GPIO_OType = GPIO_OType_PP;
   gpio_init.GPIO_Speed = GPIO_Speed_2MHz;
   gpio_init.GPIO_PuPd = GPIO_PuPd_NOPULL;
   gpio_init.GPIO_Pin = GPIO_Pin_12;
   GPIO_Init(GPIOC, &gpio_init);
 
-  // clock
-  gpio_init.GPIO_Mode = GPIO_Mode_OUT;
+  // // clock
+  gpio_init.GPIO_Mode = GPIO_Mode_AF;
   gpio_init.GPIO_OType = GPIO_OType_PP;
   gpio_init.GPIO_Speed = GPIO_Speed_2MHz;
   gpio_init.GPIO_PuPd = GPIO_PuPd_NOPULL;
   gpio_init.GPIO_Pin = GPIO_Pin_10;
   GPIO_Init(GPIOC, &gpio_init);
-
-
-  // mosi
-  // gpio_init.GPIO_Mode = GPIO_Mode_AF;
-  // gpio_init.GPIO_OType = GPIO_OType_PP;
-  // gpio_init.GPIO_Speed = GPIO_Speed_50MHz;
-  // gpio_init.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  // gpio_init.GPIO_Pin = GPIO_Pin_12;
-  // GPIO_Init(GPIOC, &gpio_init);
-
-  // // clock
-  // gpio_init.GPIO_Mode = GPIO_Mode_AF;
-  // gpio_init.GPIO_OType = GPIO_OType_PP;
-  // gpio_init.GPIO_Speed = GPIO_Speed_50MHz;
-  // gpio_init.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  // gpio_init.GPIO_Pin = GPIO_Pin_10;
-  // GPIO_Init(GPIOC, &gpio_init);
   
-  // GPIO_PinAFConfig(GPIOC, GPIO_PinSource10, GPIO_AF_SPI3);
-  // GPIO_PinAFConfig(GPIOC, GPIO_PinSource12, GPIO_AF_SPI3);
+  GPIO_PinAFConfig(GPIOC, GPIO_PinSource10, GPIO_AF_SPI3);
+  GPIO_PinAFConfig(GPIOC, GPIO_PinSource12, GPIO_AF_SPI3);
 
   HIGH(LCD_SS);
   HIGH(LCD_CMD);
   HIGH(LCD_RESET);
   // // Initialize SPI.
-  // SPI_InitTypeDef spi_init;
-  // spi_init.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
-  // spi_init.SPI_Mode = SPI_Mode_Master;
-  // spi_init.SPI_DataSize = SPI_DataSize_8b;
-  // spi_init.SPI_CPOL = SPI_CPOL_Low;
-  // spi_init.SPI_CPHA = SPI_CPHA_1Edge;
-  // spi_init.SPI_NSS = SPI_NSS_Soft;
-  // spi_init.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_8;
-  // spi_init.SPI_FirstBit = SPI_FirstBit_MSB;
-  // spi_init.SPI_CRCPolynomial = 7;
-  // SPI_Init(SPI3, &spi_init);
+  SPI_InitTypeDef spi_init;
+  spi_init.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
+  spi_init.SPI_Mode = SPI_Mode_Master;
+  spi_init.SPI_DataSize = SPI_DataSize_8b;
+  spi_init.SPI_CPOL = SPI_CPOL_Low;
+  spi_init.SPI_CPHA = SPI_CPHA_1Edge;
+  spi_init.SPI_NSS = SPI_NSS_Soft;
+  spi_init.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_256;
+  spi_init.SPI_FirstBit = SPI_FirstBit_MSB;
+  spi_init.SPI_CRCPolynomial = 7;
+  SPI_Init(SPI3, &spi_init);
 
-  // SPI_Cmd(SPI3, ENABLE);
+  SPI_Cmd(SPI3, ENABLE);
 
 
   // DMA_InitTypeDef dma_init;
@@ -391,23 +391,23 @@ void LCD::Write_Instruction(uint8_t byte) {
 
   LOW(LCD_SS);
 
-  __asm__("nop");
-  __asm__("nop");
-  __asm__("nop");
-  __asm__("nop");
-  __asm__("nop");
+  // __asm__("nop");
+  // __asm__("nop");
+  // __asm__("nop");
+  // __asm__("nop");
+  // __asm__("nop");
 
   Write(&byte, 1);
 
-  // while (SPI_I2S_GetFlagStatus(SPI3, SPI_I2S_FLAG_BSY));
+  while (SPI_I2S_GetFlagStatus(SPI3, SPI_I2S_FLAG_BSY));
 
   HIGH(LCD_SS);
 
-  __asm__("nop");
-  __asm__("nop");
-  __asm__("nop");
-  __asm__("nop");
-  __asm__("nop");
+  // __asm__("nop");
+  // __asm__("nop");
+  // __asm__("nop");
+  // __asm__("nop");
+  // __asm__("nop");
 
   return;
 }
@@ -421,23 +421,23 @@ void LCD::Write_Data(uint8_t byte)
 
   LOW(LCD_SS);
 
-  __asm__("nop");
-  __asm__("nop");
-  __asm__("nop");
-  __asm__("nop");
-  __asm__("nop");
+  // __asm__("nop");
+  // __asm__("nop");
+  // __asm__("nop");
+  // __asm__("nop");
+  // __asm__("nop");
 
   Write(&byte, 1);
 
-  // while (SPI_I2S_GetFlagStatus(SPI3, SPI_I2S_FLAG_BSY));
+  while (SPI_I2S_GetFlagStatus(SPI3, SPI_I2S_FLAG_BSY));
 
   HIGH(LCD_SS);
 
-  __asm__("nop");
-  __asm__("nop");
-  __asm__("nop");
-  __asm__("nop");
-  __asm__("nop");
+  // __asm__("nop");
+  // __asm__("nop");
+  // __asm__("nop");
+  // __asm__("nop");
+  // __asm__("nop");
 
   return;
 }
@@ -469,7 +469,7 @@ void LCD::Initial() {
   // referential c code
   Write_Instruction(0xa2); // set 1/9 bias
   Write_Instruction(0xa0); // seg normal direction
-  Write_Instruction(0xc0); // com normal direction
+  Write_Instruction(0xc8); // com normal direction
 
   Write_Instruction(0x20 | 0x4); // regulation ratio 5.0 (0x4)
 

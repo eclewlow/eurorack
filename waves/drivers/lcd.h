@@ -183,37 +183,37 @@ void Write(uint8_t * buf, uint32_t size) {
 
     for(uint32_t i = 0; i < size; i++) {
 
-      int8_t j = 7;
-      while(j >= 0) {
+      // int8_t j = 7;
+      // while(j >= 0) {
 
-        LOW(LCD_CLOCK);
+      //   LOW(LCD_CLOCK);
 
-        if((buf[i] >> j) & 0x1) {
-          HIGH(LCD_MOSI);
-        } else {
-          LOW(LCD_MOSI);
-        }
+      //   if((buf[i] >> j) & 0x1) {
+      //     HIGH(LCD_MOSI);
+      //   } else {
+      //     LOW(LCD_MOSI);
+      //   }
 
-        __asm__("nop");
-        __asm__("nop");
-        __asm__("nop");
-        __asm__("nop");
-        __asm__("nop");
+      //   __asm__("nop");
+      //   __asm__("nop");
+      //   __asm__("nop");
+      //   __asm__("nop");
+      //   __asm__("nop");
 
-        HIGH(LCD_CLOCK);
+      //   HIGH(LCD_CLOCK);
 
-        __asm__("nop");
-        __asm__("nop");
-        __asm__("nop");
-        __asm__("nop");
-        __asm__("nop");
+      //   __asm__("nop");
+      //   __asm__("nop");
+      //   __asm__("nop");
+      //   __asm__("nop");
+      //   __asm__("nop");
 
-        j--;
-      }
-        // SPI_I2S_SendData(SPI3, buf[i]);
-        // while (!SPI_I2S_GetFlagStatus(SPI3, SPI_I2S_FLAG_TXE));
-        // // SPI_I2S_ReceiveData(SPI3);
-        // // while (SPI_I2S_GetFlagStatus(SPI3, SPI_I2S_FLAG_RXNE));
+      //   j--;
+      // }
+        SPI_I2S_SendData(SPI3, buf[i]);
+        while (!SPI_I2S_GetFlagStatus(SPI3, SPI_I2S_FLAG_TXE));
+        SPI_I2S_ReceiveData(SPI3);
+        while (SPI_I2S_GetFlagStatus(SPI3, SPI_I2S_FLAG_RXNE));
         // while (SPI_I2S_GetFlagStatus(SPI3, SPI_I2S_FLAG_RXNE)) {
             // SPI_I2S_ReceiveData(SPI3);    
         // }
