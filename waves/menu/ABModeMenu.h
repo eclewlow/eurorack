@@ -55,6 +55,9 @@ public:
 //    inline int GetRightFrame() { return right_frame_; }
     void ResetTicker(int8_t side);
 
+    static void on_load_one_ab_left_finished();
+    static void on_load_one_ab_right_finished();
+
 private:
     int16_t left_wavetable_offset_;
     int16_t left_frame_offset_;

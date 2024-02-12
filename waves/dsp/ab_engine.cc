@@ -148,9 +148,9 @@ void ABEngine::FillWaveform(int16_t * waveform, uint16_t tune, uint16_t fx_amoun
 void ABEngine::FillWaveform(int16_t * waveform, bool is_left) {
     // storage.LoadWaveSample(waveform, wavetable, frame);
     if(is_left)
-        memcpy(waveform, front_buffer_1, 4096);
+        memcpy(waveform, &front_buffer_1[0], 4096);
     else
-        memcpy(waveform, front_buffer_2, 4096);
+        memcpy(waveform, &front_buffer_1[2048], 4096);
 }
 
 float ABEngine::GetSampleNoFX(float phase, float fx, float morph) {

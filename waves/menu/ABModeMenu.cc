@@ -26,7 +26,7 @@ ABModeMenu::ABModeMenu() {
     right_wavetable_offset_ = 0;
     right_frame_offset_ = 0;
     active_menu_ = LEFT;
-    
+
     left_ticker_timer_ = 0;
     right_ticker_timer_ = 0;
     left_ticker_ = 0;
@@ -50,6 +50,18 @@ void ABModeMenu::ResetTicker(int8_t side) {
         right_ticker_ = 0;
     }
 }
+
+void ABModeMenu::on_load_one_ab_left_finished() {
+    waveEditor.setWavedata(&front_buffer_2[0]);
+    SetFlag(&_EREG_, _RXNE_, FLAG_CLEAR);
+    SetFlag(&_EREG_, _BUSY_, FLAG_CLEAR);
+}
+void ABModeMenu::on_load_one_ab_right_finished() {
+    waveEditor.setWavedata(&front_buffer_2[2048]);
+    SetFlag(&_EREG_, _RXNE_, FLAG_CLEAR);
+    SetFlag(&_EREG_, _BUSY_, FLAG_CLEAR);
+}
+
 
 bool ABModeMenu::handleKeyRelease(int key) {
     if(key == LEFT_ENCODER_CCW) {
@@ -131,10 +143,12 @@ bool ABModeMenu::handleKeyRelease(int key) {
                 break;
             case AB_EDIT_HOVER:
                 if(!abEngine.IsEditingLeft()) {
-                    abEngine.FillWaveform(BUF3, abEngine.GetLeftWavetable(), abEngine.GetLeftFrame());
+                    flash.StopDMA(true);
+                    flash.StartFrameDMARead((uint32_t*)&front_buffer_2[0], 4096, abEngine.GetLeftWavetable() * 65536 + abEngine.GetLeftFrame() * 4096, ABModeMenu::on_load_one_ab_left_finished);
+                    // abEngine.FillWaveform(&front_buffer_2[0], abEngine.GetLeftWavetable(), abEngine.GetLeftFrame());
                     abEngine.SetIsEditingLeft(true);
                 }
-                waveEditor.setWavedata(BUF3);
+                waveEditor.setWavedata(&front_buffer_2[0]);
                 context.setState(&waveEditor);
                 break;
             case AB_SELECT_WAVETABLE:
@@ -239,10 +253,14 @@ bool ABModeMenu::handleKeyRelease(int key) {
                 break;
             case AB_EDIT_HOVER:
                 if(!abEngine.IsEditingRight()) {
-                    abEngine.FillWaveform(BUF4, abEngine.GetRightWavetable(), abEngine.GetRightFrame());
+
+                    flash.StopDMA(true);
+                    flash.StartFrameDMARead((uint32_t*)&front_buffer_2[2048], 4096, abEngine.GetRightWavetable() * 65536 + abEngine.GetRightFrame() * 4096, ABModeMenu::on_load_one_ab_right_finished);
+
+                    // abEngine.FillWaveform(&front_buffer_2[2048], abEngine.GetRightWavetable(), abEngine.GetRightFrame());
                     abEngine.SetIsEditingRight(true);
                 }
-                waveEditor.setWavedata(BUF4);
+                waveEditor.setWavedata(&front_buffer_2[2048]);
                 context.setState(&waveEditor);
                 break;
             case AB_SELECT_WAVETABLE:
@@ -328,8 +346,8 @@ void ABModeMenu::DrawSide(int side) {
     
     int x_offset = side == 0 ? 0 : graph_width + gap * 2;
     
-    int16_t* wavebuffer = side == 0 ? BUF1 : BUF2;
-    int16_t* alternate_wavebuffer = side == 0 ? BUF3 : BUF4;
+    int16_t* wavebuffer = side == 0 ? &front_buffer_1[0] : &front_buffer_1[2048];
+    int16_t* alternate_wavebuffer = side == 0 ? &front_buffer_2[0] : &front_buffer_2[2048];
     uint32_t* ticker_timer = side == 0 ? &left_ticker_timer_ : &right_ticker_timer_;
     uint8_t* ticker = side == 0 ? &left_ticker_ : &right_ticker_;
     int wavetable = side == 0 ? left_wavetable_ : right_wavetable_;
