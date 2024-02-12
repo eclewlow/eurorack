@@ -12,6 +12,8 @@
 #include "waves/graphics.h"
 #include "waves/Globals.h"
 
+namespace waves {
+
 FxMenu::FxMenu() {
     setLeftState(FX_MENU_LEFT_FX);
     setRightState(FX_MENU_RIGHT_MOD);
@@ -218,7 +220,7 @@ bool FxMenu::handleKeyRelease(int key) {
     return true;
 }
 
-void FxMenu::paint(juce::Graphics& g) {
+void FxMenu::paint() {
     Display::clear_screen();
     
     int y_offset = 4;
@@ -419,4 +421,6 @@ void FxMenu::UpdateWaveform() {
         wavedata_[i] = wavedata_[i+1];
     }
     wavedata_[58] = adc.getChannelProcessed(Adc::ADC_CHANNEL_FX_CV);
+}
+
 }

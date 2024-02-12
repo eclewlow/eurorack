@@ -15,6 +15,8 @@
 
 class State;
 
+namespace waves {
+
 class WaveEditor: public State
 {
 public:
@@ -54,7 +56,7 @@ public:
     virtual bool handleKeyPress(int key) { return false; }
     virtual bool handleKeyRelease(int key);
     virtual bool handleKeyLongPress(int key) { return false; }
-    virtual void paint(juce::Graphics& g);
+    virtual void paint();
     virtual void triggerUpdate(bool back_pressed);
     void CalculateFFT();
     void CalculateIFFT();
@@ -91,3 +93,5 @@ private:
     int16_t frame_;
     DISALLOW_COPY_AND_ASSIGN (WaveEditor);
 };
+
+}

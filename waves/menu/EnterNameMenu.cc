@@ -14,11 +14,15 @@
 #include "waves/graphics.h"
 #include "waves/Globals.h"
 
+namespace waves {
+
 EnterNameMenu::EnterNameMenu() {
     char_index = 0;
     name_index = 0;
     memset(name_chars,0,9);
 //    name_chars[name_index] = char_list[char_index];
+    clear_selected = false;
+    ok_selected = false;
 }
 
 EnterNameMenu::~EnterNameMenu() {
@@ -88,7 +92,7 @@ void EnterNameMenu::triggerUpdate(bool back_pressed) {
     memset(name_chars,0,9);
 }
 
-void EnterNameMenu::paint(juce::Graphics& g) {
+void EnterNameMenu::paint() {
     Display::clear_screen();
     
     int y_offset;
@@ -132,10 +136,12 @@ void EnterNameMenu::paint(juce::Graphics& g) {
         int row = i / 16;
         int col = i % 16;
         char theChar[2];
-        snprintf(theChar, 2, "%c", char_list[i]);
+        snprintf(theChar, 2, "%c", (char*)"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_- //"[i]);
         
         Display::put_string_5x5(x_offset + col * 7, y_offset + row * 8, 1, theChar, i == char_index);
     }
     Display::put_string_5x5(x_offset + 8 * 7, y_offset + 2 * 8, 3, "CLR", (num_of_chars - 2) == char_index);
     Display::put_string_5x5(x_offset + 8 * 7 + 5 * 5, y_offset + 2 * 8, 2, "OK", (num_of_chars - 1) == char_index);
+}
+
 }

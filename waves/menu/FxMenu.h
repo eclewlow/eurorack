@@ -14,6 +14,8 @@
 
 class State;
 
+namespace waves {
+
 class FxMenu: public State
 {
 public:
@@ -35,7 +37,7 @@ public:
     virtual bool handleKeyPress(int key) { return false; }
     virtual bool handleKeyRelease(int key);
     virtual bool handleKeyLongPress(int key) { return false; }
-    virtual void paint(juce::Graphics& g);
+    virtual void paint();
     void triggerUpdate(bool back_pressed);
     void UpdateWaveform();
     void ClearWaveform();
@@ -48,3 +50,5 @@ private:
     uint16_t wavedata_[59];
     DISALLOW_COPY_AND_ASSIGN (FxMenu);
 };
+
+}

@@ -14,6 +14,8 @@
 
 class State;
 
+namespace waves {
+
 class LoadWaveMenu: public State
 {
 public:
@@ -32,7 +34,7 @@ public:
     virtual bool handleKeyPress(int key) { return false; }
     virtual bool handleKeyRelease(int key);
     virtual bool handleKeyLongPress(int key) { return false; }
-    virtual void paint(juce::Graphics& g);
+    virtual void paint();
     void triggerUpdate(bool back_pressed);
     inline void setState(LoadWaveMenuState state) { state_ = state; }
     inline void setTarget(LoadWaveMenuTarget target) { target_ = target; }
@@ -46,8 +48,10 @@ private:
     int16_t frame_;
     float morph_;
     int8_t target_;
-    uint32_t ticker_timer_ = 0;
-    uint8_t ticker_ = 0;
+    uint32_t ticker_timer_;
+    uint8_t ticker_;
     
     DISALLOW_COPY_AND_ASSIGN (LoadWaveMenu);
 };
+
+}

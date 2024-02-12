@@ -12,6 +12,8 @@
 #include "waves/graphics.h"
 #include "waves/Globals.h"
 
+namespace waves {
+
 OscilloscopeConfigurationMenu::OscilloscopeConfigurationMenu() {
 }
 
@@ -36,7 +38,7 @@ bool OscilloscopeConfigurationMenu::handleKeyRelease(int key) {
     return true;
 }
 
-void OscilloscopeConfigurationMenu::paint(juce::Graphics& g) {
+void OscilloscopeConfigurationMenu::paint() {
     Display::clear_screen();
     
     int y_offset = 5;
@@ -56,4 +58,6 @@ void OscilloscopeConfigurationMenu::paint(juce::Graphics& g) {
     Display::put_string_5x5(center - strlen("MORPH") * 6, y_offset, strlen("MORPH"), "MORPH");
     snprintf(line, 20, "%s", user_settings.getMorphSetting() == UserSettings::SETTING_MORPH_SMOOTH ? "SMOOTH":"DISCRETE");
     Display::put_string_5x5(center + 6, y_offset, strlen(line), line, true);
+}
+
 }

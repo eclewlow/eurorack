@@ -12,11 +12,14 @@
 #include "waves/graphics.h"
 #include "waves/Globals.h"
 
+namespace waves {
+
 ManageMenu::ManageMenu() {
     setState(MANAGE_MENU_SELECT_WAVETABLE);
     wavetable_ = 0;
     frame_ = 0;
     ticker_timer_ = 0;
+    ticker_ = 0;
     absorb_keypress_ = false;
 }
 
@@ -570,7 +573,7 @@ void ManageMenu::SaveWave(char* param) {
 
 
 
-void ManageMenu::paint(juce::Graphics& g) {
+void ManageMenu::paint() {
     Display::clear_screen();
     if(state_ == MANAGE_MENU_WAVETABLE_OPTIONS) {
         char * title;
@@ -849,4 +852,6 @@ void ManageMenu::paint(juce::Graphics& g) {
 
         Display::Draw_Wave(64, y_offset - y_shift, 64, bar_height - 3, BUF1);
     }
+}
+
 }

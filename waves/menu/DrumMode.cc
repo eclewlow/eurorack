@@ -12,6 +12,8 @@
 #include "waves/graphics.h"
 #include "waves/Globals.h"
 
+namespace waves {
+
 DrumMode::DrumMode() {
     edit_state_ = DRUM_MODE_EDIT_WAVETABLE;
     setEditing(false);
@@ -112,7 +114,7 @@ bool DrumMode::handleKeyRelease(int key) {
     return true;
 }
 
-void DrumMode::paint(juce::Graphics& g) {
+void DrumMode::paint() {
     Display::clear_screen();
     
     uint16_t morph = adc.getChannelProcessed(3);
@@ -260,4 +262,6 @@ void DrumMode::paint(juce::Graphics& g) {
         Display::put_string_5x5(x_offset - strlen("FM") * 6 / 2, y_offset, strlen("FM"), "FM");
         Display::put_string_5x5(x_offset - strlen("DPTH") * 6 / 2, y_offset + 6, strlen("DPTH"), "DPTH");
     }
+}
+
 }

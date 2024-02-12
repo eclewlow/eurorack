@@ -56,38 +56,38 @@ extern uint8_t lcd_buffer[8][128];
 
 extern int16_t ROM[2048];
 
-// #include "waves/menu/MainMenu.h"
-// #include "waves/menu/ModeMenu.h"
-// #include "waves/menu/FxMenu.h"
-// #include "waves/menu/Oscilloscope.h"
-// #include "waves/menu/ControlStatusMenu.h"
-// #include "waves/menu/DeviceConfigurationMenu.h"
-// #include "waves/menu/InfoMenu.h"
-// #include "waves/menu/DisplayConfigurationMenu.h"
-// #include "waves/menu/OscilloscopeConfigurationMenu.h"
-// #include "waves/menu/SubOscillatorMenu.h"
-// #include "waves/menu/EnterNameMenu.h"
-// #include "waves/menu/WavetableModeMenu.h"
-// #include "waves/menu/ABModeMenu.h"
-// #include "waves/menu/WaveEditor.h"
-// #include "waves/menu/LoadWaveMenu.h"
-// #include "waves/menu/SaveWaveMenu.h"
-// #include "waves/menu/Popup.h"
-// #include "waves/menu/MatrixMode.h"
-// #include "waves/menu/DrumMode.h"
-// #include "waves/menu/IOConfigurationMenu.h"
-// #include "waves/menu/CalibrationMenu.h"
-// #include "waves/menu/QuantizerMenu.h"
-// #include "waves/menu/ManageMenu.h"
-// #include "waves/menu/SnapshotMenu.h"
-// #include "waves/menu/MemoryClearMenu.h"
-
 // #include "adc.h"
 #include "waves/drivers/wavetables.h"
 #include "stmlib/system/system_clock.h"
 #include "waves/drivers/adc.h"
 #include "waves/drivers/audio_dac.h"
 #include "waves/drivers/flash.h"
+
+#include "waves/menu/MainMenu.h"
+#include "waves/menu/ModeMenu.h"
+#include "waves/menu/FxMenu.h"
+#include "waves/menu/Oscilloscope.h"
+#include "waves/menu/ControlStatusMenu.h"
+#include "waves/menu/DeviceConfigurationMenu.h"
+#include "waves/menu/InfoMenu.h"
+#include "waves/menu/DisplayConfigurationMenu.h"
+#include "waves/menu/OscilloscopeConfigurationMenu.h"
+#include "waves/menu/SubOscillatorMenu.h"
+#include "waves/menu/EnterNameMenu.h"
+#include "waves/menu/WavetableModeMenu.h"
+#include "waves/menu/ABModeMenu.h"
+#include "waves/menu/WaveEditor.h"
+#include "waves/menu/LoadWaveMenu.h"
+#include "waves/menu/SaveWaveMenu.h"
+#include "waves/menu/Popup.h"
+#include "waves/menu/MatrixMode.h"
+#include "waves/menu/DrumMode.h"
+#include "waves/menu/IOConfigurationMenu.h"
+#include "waves/menu/CalibrationMenu.h"
+#include "waves/menu/QuantizerMenu.h"
+#include "waves/menu/ManageMenu.h"
+#include "waves/menu/SnapshotMenu.h"
+#include "waves/menu/MemoryClearMenu.h"
 
 #include "waves/dsp/Engine.h"
 
@@ -130,7 +130,7 @@ extern Context context;
 extern int8_t engine;
 extern int8_t switch_1_test;
 extern int8_t switch_2_test;
-// extern MainMenu mainMenu;
+extern MainMenu mainMenu;
 // extern ModeMenu modeMenu;
 // extern FxMenu fxMenu;
 // extern Oscilloscope oscilloscope;

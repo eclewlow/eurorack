@@ -12,11 +12,15 @@
 #include "waves/graphics.h"
 #include "waves/Globals.h"
 
+namespace waves {
+
 SnapshotMenu::SnapshotMenu() {
     setState(SNAPSHOT_MENU_NONE);
     snapshot_ = 0;
     snapshot_offset_ = 0;
     function_selected_ = SNAPSHOT_MENU_DICE;
+    ticker_timer_ = 0;
+    ticker_ = 0;
 }
 
 SnapshotMenu::~SnapshotMenu() {
@@ -284,7 +288,7 @@ bool SnapshotMenu::handleKeyRelease(int key) {
 //    storage.SaveWave(param, saveWaveMenu.wavedata_, saveWaveMenu.wavetable_, saveWaveMenu.frame_);
 //}
 
-void SnapshotMenu::paint(juce::Graphics& g) {
+void SnapshotMenu::paint() {
     Display::clear_screen();
     if(state_ == SNAPSHOT_MENU_NONE) {
 
@@ -515,4 +519,6 @@ void SnapshotMenu::SetLine(int line_no, char* str) {
     char* line = confirm_lines_[line_no];
     memset(line, 0, 20);
     strncpy(line, str, strlen(str));
+}
+
 }

@@ -12,6 +12,9 @@
 #include "waves/graphics.h"
 #include "waves/Globals.h"
 
+namespace waves {
+
+
 DisplayConfigurationMenu::DisplayConfigurationMenu() {
     setState(DISPLAY_MENU_BRIGHTNESS);
 }
@@ -86,7 +89,7 @@ bool DisplayConfigurationMenu::handleKeyRelease(int key) {
     return true;
 }
 
-void DisplayConfigurationMenu::paint(juce::Graphics& g) {
+void DisplayConfigurationMenu::paint() {
     Display::clear_screen();
     
     int y_offset = 5;
@@ -124,4 +127,6 @@ void DisplayConfigurationMenu::paint(juce::Graphics& g) {
     Display::put_string_5x5(center - strlen("SCOPE") * 6, y_offset, strlen("SCOPE"), "SCOPE");
     snprintf(line, 20, "%s", user_settings.getScopeSetting() == UserSettings::SETTING_SCOPE_LINE ? "LINE" : "FILL");
     Display::put_string_5x5(center + 6, y_offset, strlen(line), line, state_==DISPLAY_MENU_SCOPE);
+}
+
 }

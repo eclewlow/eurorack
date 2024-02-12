@@ -12,6 +12,8 @@
 #include "waves/graphics.h"
 #include "waves/Globals.h"
 
+namespace waves {
+
 WavetableModeMenu::WavetableModeMenu() {
     wavetable_ = 0;
     wavetable_offset_ = 0;
@@ -65,7 +67,7 @@ bool WavetableModeMenu::handleKeyRelease(int key) {
     return true;
 }
 
-void WavetableModeMenu::paint(juce::Graphics& g) {
+void WavetableModeMenu::paint() {
     Display::clear_screen();
 
     int y_offset = 5;
@@ -115,4 +117,6 @@ void WavetableModeMenu::paint(juce::Graphics& g) {
 
         Display::put_string_5x5(2 + 2 * 3 + 4, y_offset + i * 8, strlen(line2), line2, i+wavetable_offset_ == wavetable_);
     }
+}
+
 }

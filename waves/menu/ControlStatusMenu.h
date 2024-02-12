@@ -14,6 +14,8 @@
 
 class State;
 
+namespace waves {
+
 class ControlStatusMenu: public State
 {
 public:
@@ -25,7 +27,7 @@ public:
     virtual bool handleKeyPress(int key) { return false; }
     virtual bool handleKeyRelease(int key);
     virtual bool handleKeyLongPress(int key) { return false; }
-    virtual void paint(juce::Graphics& g);
+    virtual void paint();
     void triggerUpdate(bool back_pressed);
     void UpdateWaveform();
     void ClearWaveform();
@@ -39,3 +41,5 @@ private:
     uint16_t morph_wavedata_[20];
     DISALLOW_COPY_AND_ASSIGN (ControlStatusMenu);
 };
+
+}

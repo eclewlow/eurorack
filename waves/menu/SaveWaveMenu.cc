@@ -12,10 +12,14 @@
 #include "waves/graphics.h"
 #include "waves/Globals.h"
 
+namespace waves {
+
 SaveWaveMenu::SaveWaveMenu() {
     setState(SAVE_WAVE_MENU_SELECT_WAVETABLE);
     wavetable_ = 0;
     frame_ = 0;
+    ticker_timer_ = 0;
+    ticker_ = 0;
 }
 
 SaveWaveMenu::~SaveWaveMenu() {
@@ -199,7 +203,7 @@ void SaveWaveMenu::SaveWave(char* param) {
     storage.SaveWave(param, saveWaveMenu.wavedata_, saveWaveMenu.wavetable_, saveWaveMenu.frame_);
 }
 
-void SaveWaveMenu::paint(juce::Graphics& g) {
+void SaveWaveMenu::paint() {
     Display::clear_screen();
     if(state_ == SAVE_WAVE_MENU_SELECT_WAVETABLE) {
 
@@ -300,4 +304,6 @@ void SaveWaveMenu::paint(juce::Graphics& g) {
 
         Display::Draw_Wave(64, y_offset - y_shift, 64, bar_height - 3, BUF1);
     }
+}
+
 }

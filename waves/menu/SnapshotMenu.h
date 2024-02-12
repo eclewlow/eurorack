@@ -14,6 +14,8 @@
 
 class State;
 
+namespace waves {
+
 class SnapshotMenu: public State
 {
 public:
@@ -48,7 +50,7 @@ public:
     virtual bool handleKeyPress(int key);
     virtual bool handleKeyRelease(int key);
     virtual bool handleKeyLongPress(int key);
-    virtual void paint(juce::Graphics& g);
+    virtual void paint();
     void triggerUpdate(bool back_pressed);
     inline void setState(int8_t state) { state_ = state; }
     inline void setOptionSelected(int8_t option_selected) { option_selected_ = option_selected; }
@@ -84,8 +86,8 @@ private:
 
     int8_t function_selected_;
 
-    uint32_t ticker_timer_ = 0;
-    uint8_t ticker_ = 0;
+    uint32_t ticker_timer_;
+    uint8_t ticker_;
 
     int8_t copy_state_;
     uint32_t blink_timer_;
@@ -97,3 +99,5 @@ private:
     
     DISALLOW_COPY_AND_ASSIGN (SnapshotMenu);
 };
+
+}

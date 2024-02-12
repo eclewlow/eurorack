@@ -12,6 +12,8 @@
 #include "waves/graphics.h"
 #include "waves/Globals.h"
 
+namespace waves {
+
 SubOscillatorMenu::SubOscillatorMenu() {
     setState(SUB_OSC_MENU_OFFSET);
 }
@@ -106,7 +108,7 @@ bool SubOscillatorMenu::handleKeyRelease(int key) {
     return true;
 }
 
-void SubOscillatorMenu::paint(juce::Graphics& g) {
+void SubOscillatorMenu::paint() {
     Display::clear_screen();
     
     int y_offset = 5;
@@ -173,5 +175,7 @@ void SubOscillatorMenu::paint(juce::Graphics& g) {
     
     y_offset = 64 - 7;
     Display::put_string_5x5(128 / 2 - strlen("PRESS L ENC TO SYNC") * 6 / 2, y_offset, strlen("PRESS L ENC TO SYNC"), "PRESS L ENC TO SYNC");
+
+}
 
 }

@@ -14,6 +14,8 @@
 
 class State;
 
+namespace waves {
+
 class WavetableModeMenu: public State
 {
 public:
@@ -22,7 +24,7 @@ public:
     virtual bool handleKeyPress(int key) { return false; }
     virtual bool handleKeyRelease(int key);
     virtual bool handleKeyLongPress(int key) { return false; }
-    virtual void paint(juce::Graphics& g);
+    virtual void paint();
     void triggerUpdate(bool back_pressed);
 
 private:
@@ -31,3 +33,5 @@ private:
 
     DISALLOW_COPY_AND_ASSIGN (WavetableModeMenu);
 };
+
+}

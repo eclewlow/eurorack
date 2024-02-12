@@ -14,6 +14,9 @@
 
 class State;
 
+namespace waves {
+
+
 class InfoMenu: public State
 {
 public:
@@ -26,7 +29,7 @@ public:
     virtual bool handleKeyPress(int key) { return false; }
     virtual bool handleKeyRelease(int key);
     virtual bool handleKeyLongPress(int key) { return false; }
-    virtual void paint(juce::Graphics& g);
+    virtual void paint();
     void triggerUpdate(bool back_pressed) {};
     inline void setState(InfoMenuState state) { state_ = state; }
 
@@ -34,3 +37,5 @@ private:
     InfoMenuState state_;
     DISALLOW_COPY_AND_ASSIGN (InfoMenu);
 };
+
+}

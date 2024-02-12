@@ -12,6 +12,8 @@
 #include "waves/graphics.h"
 #include "waves/Globals.h"
 
+namespace waves {
+
 Oscilloscope::Oscilloscope() {
     setState(OSCILLOSCOPE_STATE_NONE);
 }
@@ -59,7 +61,7 @@ bool Oscilloscope::handleKeyRelease(int key) {
     return true;
 }
 
-void Oscilloscope::paint(juce::Graphics& g) {
+void Oscilloscope::paint() {
     Display::clear_screen();
     
     int y_offset;
@@ -111,4 +113,6 @@ void Oscilloscope::paint(juce::Graphics& g) {
     snprintf(second_line, 20, "TIME;%02d;%02d;%02d.%01d", hours, minutes, seconds, milliseconds);
 
     Display::put_string_5x5(x_offset, y_offset, strlen(second_line), second_line);
+}
+
 }

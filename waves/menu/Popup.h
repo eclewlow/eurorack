@@ -11,6 +11,7 @@
 #pragma once
 
 
+namespace waves {
 
 class Popup
 {
@@ -20,7 +21,7 @@ public:
     bool handleKeyPress(int key) { return false; }
     bool handleKeyRelease(int key);
     bool handleKeyLongPress(int key) { return false; }
-    void paint(juce::Graphics& g);
+    void paint();
     void show(int32_t timer_length = 2000);
     void hide();
     void SetLine(int line_no, char* str);
@@ -31,3 +32,5 @@ private:
     bool is_showing_;
     DISALLOW_COPY_AND_ASSIGN (Popup);
 };
+
+}

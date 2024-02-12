@@ -12,6 +12,8 @@
 #include "waves/graphics.h"
 #include "waves/Globals.h"
 
+namespace waves {
+
 ABModeMenu::ABModeMenu() {
     left_state_ = AB_LOAD_HOVER;
     right_state_ = AB_LOAD_HOVER;
@@ -24,6 +26,11 @@ ABModeMenu::ABModeMenu() {
     right_wavetable_offset_ = 0;
     right_frame_offset_ = 0;
     active_menu_ = LEFT;
+    
+    left_ticker_timer_ = 0;
+    right_ticker_timer_ = 0;
+    left_ticker_ = 0;
+    right_ticker_ = 0;
 }
 
 ABModeMenu::~ABModeMenu() {
@@ -457,9 +464,11 @@ void ABModeMenu::DrawSide(int side) {
     }
 }
 
-void ABModeMenu::paint(juce::Graphics& g) {
+void ABModeMenu::paint() {
     Display::clear_screen();
 
     DrawSide(0);
     DrawSide(1);
+}
+
 }

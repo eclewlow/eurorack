@@ -10,7 +10,9 @@
 
 #include "waves/Display.h"
 #include "waves/graphics.h"
-#include "waves/Globals.h"
+// #include "waves/Globals.h"
+
+namespace waves {
 
 MainMenu::MainMenu() {
     setState(MAIN_WAVE_DESIGN);
@@ -87,7 +89,7 @@ bool MainMenu::handleKeyRelease(int key) {
     return true;
 }
 
-void MainMenu::paint(juce::Graphics& g) {
+void MainMenu::paint() {
     Display::clear_screen();
     
     int y_offset = 4;
@@ -174,5 +176,7 @@ void MainMenu::paint(juce::Graphics& g) {
     col = currentState % 4;
     row = currentState / 4;
     Display::invert_rectangle(col*(23+2)+x_offset, row*(22+2)+y_offset, 23, 22);
+
+}
 
 }

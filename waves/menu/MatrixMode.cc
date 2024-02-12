@@ -12,6 +12,9 @@
 #include "waves/graphics.h"
 #include "waves/Globals.h"
 
+namespace waves {
+
+
 MatrixMode::MatrixMode() {
     edit_state_ = MATRIX_MODE_EDIT_DEFAULT;
     editing_offset_ = false;
@@ -130,7 +133,7 @@ bool MatrixMode::handleKeyRelease(int key) {
     return true;
 }
 
-void MatrixMode::paint(juce::Graphics& g) {
+void MatrixMode::paint() {
     Display::clear_screen();
     
     uint16_t tune = adc.getChannelProcessed(0);
@@ -211,4 +214,7 @@ void MatrixMode::paint(juce::Graphics& g) {
 
     snprintf(line, 20, "%*d", 2, matrixEngine.GetWavelistOffset());
     Display::put_string_5x5(x_offset + 1 + 4 * 6, 35 + 7 + 12, strlen(line), line, edit_state_ == MATRIX_MODE_EDIT_OFFSET);
+}
+
+
 }

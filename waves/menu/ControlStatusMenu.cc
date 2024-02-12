@@ -13,6 +13,8 @@
 #include "waves/graphics.h"
 #include "waves/Globals.h"
 
+namespace waves {
+
 ControlStatusMenu::ControlStatusMenu() {
     setState(CONTROL_STATUS_STATE_NONE);
 }
@@ -56,7 +58,7 @@ bool ControlStatusMenu::handleKeyRelease(int key) {
     return true;
 }
 
-void ControlStatusMenu::paint(juce::Graphics& g) {
+void ControlStatusMenu::paint() {
     Display::clear_screen();
     UpdateWaveform();
     
@@ -144,4 +146,6 @@ void ControlStatusMenu::UpdateWaveform() {
     fx_amount_wavedata_[19] = adc.getChannelProcessed(Adc::ADC_CHANNEL_FX_AMOUNT_CV);
     fx_wavedata_[19] = adc.getChannelProcessed(Adc::ADC_CHANNEL_FX_CV);
     morph_wavedata_[19] = adc.getChannelProcessed(Adc::ADC_CHANNEL_MORPH_CV);
+}
+
 }

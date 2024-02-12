@@ -12,6 +12,8 @@
 #include "waves/graphics.h"
 #include "waves/Globals.h"
 
+namespace waves {
+
 ModeMenu::ModeMenu() {
     setState(MODE_AB);
 }
@@ -65,7 +67,7 @@ bool ModeMenu::handleKeyRelease(int key) {
     return true;
 }
 
-void ModeMenu::paint(juce::Graphics& g) {
+void ModeMenu::paint() {
     Display::clear_screen();
     
     int y_offset = 32 - (22+2) / 2;
@@ -114,4 +116,6 @@ void ModeMenu::paint(juce::Graphics& g) {
     col = currentState;
     row = 0;
     Display::invert_rectangle(col*(23+2)+x_offset, row*(22+2)+y_offset, 23, 22);
+}
+
 }

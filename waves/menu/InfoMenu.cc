@@ -12,6 +12,8 @@
 #include "waves/graphics.h"
 #include "waves/Globals.h"
 
+namespace waves {
+
 InfoMenu::InfoMenu() {
     setState(INFO_MENU_NONE);
 }
@@ -29,7 +31,7 @@ bool InfoMenu::handleKeyRelease(int key) {
     return true;
 }
 
-void InfoMenu::paint(juce::Graphics& g) {
+void InfoMenu::paint() {
     Display::clear_screen();
     
     int y_offset = 5;
@@ -67,4 +69,6 @@ void InfoMenu::paint(juce::Graphics& g) {
     Display::put_string_5x5(center - strlen("SNAPSHOTS") * 6, y_offset, strlen("SNAPSHOTS"), "SNAPSHOTS");
     snprintf(line, 20, "%d/64", snapshot_count);
     Display::put_string_5x5(center + 2 * 6, y_offset, strlen(line), line);
+}
+
 }

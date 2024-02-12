@@ -12,6 +12,9 @@
 #include "waves/graphics.h"
 #include "waves/Globals.h"
 
+namespace waves {
+
+
 CalibrationMenu::CalibrationMenu() {
 //    setState(IO_CONFIG_MENU_INPUT);
     setState(CALIBRATION_MENU_STATE_1V);
@@ -58,7 +61,7 @@ bool CalibrationMenu::handleKeyRelease(int key) {
     return true;
 }
 
-void CalibrationMenu::paint(juce::Graphics& g) {
+void CalibrationMenu::paint() {
     Display::clear_screen();
 
     int x_offset;
@@ -174,4 +177,6 @@ void CalibrationMenu::paint(juce::Graphics& g) {
 }
 
 void CalibrationMenu::triggerUpdate(bool back_pressed) {
+}
+
 }

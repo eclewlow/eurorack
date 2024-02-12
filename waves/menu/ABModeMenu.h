@@ -15,6 +15,8 @@
 
 class State;
 
+namespace waves {
+
 class ABModeMenu: public State
 {
 public:
@@ -36,7 +38,7 @@ public:
     virtual bool handleKeyPress(int key) { return false; }
     virtual bool handleKeyRelease(int key);
     virtual bool handleKeyLongPress(int key) { return false; }
-    virtual void paint(juce::Graphics& g);
+    virtual void paint();
     void triggerUpdate(bool back_pressed) {};
     void DrawSide(int side);
 //    inline void setLeftState(ABMenuState state) { left_state_ = state; }
@@ -65,10 +67,12 @@ private:
     int left_frame_;
     int right_wavetable_;
     int right_frame_;
-    uint32_t left_ticker_timer_ = 0;
-    uint32_t right_ticker_timer_ = 0;
-    uint8_t left_ticker_ = 0;
-    uint8_t right_ticker_ = 0;
+    uint32_t left_ticker_timer_;
+    uint32_t right_ticker_timer_;
+    uint8_t left_ticker_;
+    uint8_t right_ticker_;
 
     DISALLOW_COPY_AND_ASSIGN (ABModeMenu);
 };
+
+}

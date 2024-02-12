@@ -12,6 +12,9 @@
 #include "waves/graphics.h"
 #include "waves/Globals.h"
 
+namespace waves {
+
+
 MemoryClearMenu::MemoryClearMenu() {
     option_selected_ = MEMORY_MENU_WAVETABLES;
 }
@@ -74,7 +77,7 @@ bool MemoryClearMenu::handleKeyRelease(int key) {
     return true;
 }
 
-void MemoryClearMenu::paint(juce::Graphics& g) {
+void MemoryClearMenu::paint() {
     Display::clear_screen();
     
     if(state_ == MEMORY_MENU_NONE) {
@@ -151,4 +154,6 @@ void MemoryClearMenu::paint(juce::Graphics& g) {
         Display::put_image_16bit(x_offset, y_offset, Graphic_icon_delete_11x11, 11);
         Display::put_string_9x9(x_offset + 16, y_offset, strlen("YES"), "YES", option_selected_ == MEMORY_MENU_YES, 3);
     }
+}
+
 }

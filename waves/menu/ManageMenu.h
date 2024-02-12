@@ -14,6 +14,8 @@
 
 class State;
 
+namespace waves {
+
 class ManageMenu: public State
 {
 public:
@@ -50,7 +52,7 @@ public:
     virtual bool handleKeyPress(int key);
     virtual bool handleKeyRelease(int key);
     virtual bool handleKeyLongPress(int key);
-    virtual void paint(juce::Graphics& g);
+    virtual void paint();
     void triggerUpdate(bool back_pressed);
     inline void setState(int8_t state) { state_ = state; }
     inline void setTarget(int8_t target) { target_ = target; }
@@ -89,10 +91,12 @@ private:
     float morph_;
     int8_t target_;
     uint32_t ticker_timer_;
-    uint8_t ticker_ = 0;
+    uint8_t ticker_;
     uint32_t press_timer_;
     uint32_t blink_timer_;
     bool absorb_keypress_;
     int8_t copy_state_;
     DISALLOW_COPY_AND_ASSIGN (ManageMenu);
 };
+
+}

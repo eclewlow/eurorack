@@ -12,6 +12,8 @@
 #include "waves/graphics.h"
 #include "waves/Globals.h"
 
+namespace waves {
+
 QuantizerMenu::QuantizerMenu() {
 }
 
@@ -36,7 +38,7 @@ bool QuantizerMenu::handleKeyRelease(int key) {
     return true;
 }
 
-void QuantizerMenu::paint(juce::Graphics& g) {
+void QuantizerMenu::paint() {
     Display::clear_screen();
     
     int y_offset = 5;
@@ -180,4 +182,6 @@ void QuantizerMenu::paint(juce::Graphics& g) {
 
     y_offset = 64 - 6 - 3;
     Display::put_string_5x5(64 - strlen(line2) * 6 / 2, y_offset, strlen(line2), line2, true);
+}
+
 }

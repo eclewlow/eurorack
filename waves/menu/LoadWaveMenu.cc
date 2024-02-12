@@ -12,10 +12,15 @@
 #include "waves/graphics.h"
 #include "waves/Globals.h"
 
+namespace waves {
+
+
 LoadWaveMenu::LoadWaveMenu() {
     setState(LOAD_WAVE_MENU_SELECT_WAVETABLE);
     wavetable_ = 0;
     frame_ = 0;
+    ticker_timer_ = 0;
+    ticker_ = 0;
 }
 
 LoadWaveMenu::~LoadWaveMenu() {
@@ -206,7 +211,7 @@ bool LoadWaveMenu::handleKeyRelease(int key) {
     return true;
 }
 
-void LoadWaveMenu::paint(juce::Graphics& g) {
+void LoadWaveMenu::paint() {
     Display::clear_screen();
     if(state_ == LOAD_WAVE_MENU_SELECT_WAVETABLE) {
 
@@ -330,4 +335,6 @@ void LoadWaveMenu::paint(juce::Graphics& g) {
 
         Display::Draw_Wave(64, y_offset - y_shift, 64, bar_height - 3, BUF1);
     }
+}
+
 }

@@ -14,6 +14,8 @@
 #include "waves/dsp/fft/fft.h"
 #include <cmath>
 
+namespace waves {
+
 WaveEditor::WaveEditor() {
 //    setLeftState(AB_LOAD_HOVER);
 //    setRightState(AB_LOAD_HOVER);
@@ -682,7 +684,7 @@ void WaveEditor::DrawMenu() {
     Display::put_string_5x5(64 - strlen(line)*6 / 2, menu_offset_y_ + 20, strlen(line), line);
 }
 
-void WaveEditor::paint(juce::Graphics& g) {
+void WaveEditor::paint() {
     Display::clear_screen();
 
     if(mode_ == WAVE_EDITOR_SELECTION_SPECTRAL) {
@@ -798,4 +800,6 @@ void WaveEditor::paint(juce::Graphics& g) {
 //        }
 //    }
     
+}
+
 }

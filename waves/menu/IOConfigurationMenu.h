@@ -14,6 +14,9 @@
 
 class State;
 
+namespace waves {
+
+
 class IOConfigurationMenu: public State
 {
 public:
@@ -35,7 +38,7 @@ public:
     virtual bool handleKeyPress(int key) { return false; }
     virtual bool handleKeyRelease(int key);
     virtual bool handleKeyLongPress(int key) { return false; }
-    virtual void paint(juce::Graphics& g);
+    virtual void paint();
     void triggerUpdate(bool back_pressed);
     inline void setState(int8_t state) { state_ = state; }
     void UpdateWaveform();
@@ -47,3 +50,5 @@ private:
     uint16_t wavedata_[50];
     DISALLOW_COPY_AND_ASSIGN (IOConfigurationMenu);
 };
+
+}

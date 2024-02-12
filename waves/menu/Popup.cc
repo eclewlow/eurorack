@@ -12,6 +12,8 @@
 #include "waves/graphics.h"
 #include "waves/Globals.h"
 
+namespace waves {
+
 Popup::Popup() {
     is_showing_ = false;
     timer_length_ = 2000;
@@ -55,7 +57,7 @@ void Popup::SetLine(int line_no, char* str) {
     strncpy(line, str, strlen(str));
 }
 
-void Popup::paint(juce::Graphics& g) {
+void Popup::paint() {
     int width = 112;
     int height = 32;
     int x = 64 - width / 2;
@@ -90,4 +92,6 @@ void Popup::paint(juce::Graphics& g) {
         }
         y_offset += 6;
     }
+}
+
 }

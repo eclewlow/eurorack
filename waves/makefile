@@ -39,6 +39,7 @@ UPLOAD_COMMAND  = upload_combo_jtag_erase_first
 # Packages to build
 TARGET         = waves
 PACKAGES       = waves \
+		waves/menu \
 		waves/dsp \
 		waves/dsp/fx \
 		waves/dsp/fft \

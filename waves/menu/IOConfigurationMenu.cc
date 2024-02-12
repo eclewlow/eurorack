@@ -12,6 +12,8 @@
 #include "waves/graphics.h"
 #include "waves/Globals.h"
 
+namespace waves {
+
 IOConfigurationMenu::IOConfigurationMenu() {
     setState(IO_CONFIG_MENU_INPUT);
 }
@@ -76,7 +78,7 @@ bool IOConfigurationMenu::handleKeyRelease(int key) {
     return true;
 }
 
-void IOConfigurationMenu::paint(juce::Graphics& g) {
+void IOConfigurationMenu::paint() {
     Display::clear_screen();
 
     UpdateWaveform();
@@ -168,4 +170,6 @@ void IOConfigurationMenu::UpdateWaveform() {
     uint16_t channel;
     channel = adc.getChannelProcessed(input_ + 4);
     wavedata_[49] = channel;
+}
+
 }

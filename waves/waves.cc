@@ -245,8 +245,10 @@ void TIM1_UP_TIM10_IRQHandler(void) {
   // sample += 1;
   _write(0, (char*)value, 80);
 
-  Display::clear_screen();
-  Display::LCD_Line(64, 32, 64 + 10*sin(radians), 32 + 10*cos(radians), true);
+  // Display::clear_screen();
+  // Display::LCD_Line(64, 32, 64 + 10*sin(radians), 32 + 10*cos(radians), true);
+  mainMenu.paint();
+
   lcd.Display(Display::framebuffer);
 
   radians += 2 * M_PI / 1200;
