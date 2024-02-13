@@ -103,6 +103,7 @@ void DeviceConfigurationMenu::paint() {
             caption = (char*)"MEMORY";
             break;
         default:
+            caption = (char*) "";
             break;
     }
 

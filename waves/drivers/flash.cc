@@ -180,7 +180,7 @@ void Flash::Init() {
 //   SetFlag(&_EREG_, _BUSY_, FLAG_SET);
 // }
 
-void Flash::StartFrameDMARead(uint32_t * buffer, uint32_t __bytes, uint32_t address, void (* func)()) {
+void Flash::StartFrameDMARead(uint32_t * buffer, uint32_t __bytes, uint32_t address, void (* func)(), uint16_t pin) {
   // if(GetFlag(&_EREG_, _BUSY_)) return;
   StopDMA(true);
   SetFlag(&_EREG_, _RXTC_, FLAG_CLEAR);
@@ -191,7 +191,7 @@ void Flash::StartFrameDMARead(uint32_t * buffer, uint32_t __bytes, uint32_t addr
   set_on_dma_read_finished_func(func);
 
   // loading = 3;
-  LOW(EEPROM_FACTORY_SS);
+  LOW(pin);
 
   uint8_t send_buf[5];
   send_buf[0] = READ_66MHZ;
@@ -264,6 +264,8 @@ void Flash::StopDMA(bool bypass) {
   SPI_I2S_DMACmd(SPI1, SPI_I2S_DMAReq_Rx, DISABLE);
 
   HIGH(EEPROM_FACTORY_SS);
+  HIGH(EEPROM_USER_SS);
+  HIGH(EEPROM_PERSISTENT_SS);
 
   if(!bypass)
     SetFlag(&_EREG_, _RXNE_, FLAG_SET);

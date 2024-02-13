@@ -63,6 +63,51 @@ void ABModeMenu::on_load_one_ab_right_finished() {
 }
 
 
+void ABModeMenu::on_load_left_wavetable_names_finished() {
+    abModeMenu.left_state_ = AB_SELECT_WAVETABLE;
+    abModeMenu.ResetTicker(0);
+    SetFlag(&_EREG_, _RXNE_, FLAG_CLEAR);
+    SetFlag(&_EREG_, _BUSY_, FLAG_CLEAR);
+}
+
+void ABModeMenu::on_load_right_wavetable_names_finished() {
+    abModeMenu.right_state_ = AB_SELECT_WAVETABLE;
+    abModeMenu.ResetTicker(1);
+    SetFlag(&_EREG_, _RXNE_, FLAG_CLEAR);
+    SetFlag(&_EREG_, _BUSY_, FLAG_CLEAR);
+}
+
+void ABModeMenu::on_load_left_frame_names_finished() {
+    abModeMenu.left_state_ = AB_SELECT_FRAME;
+    abModeMenu.ResetTicker(0);
+    if(abModeMenu.left_wavetable_ != abEngine.GetLeftWavetable()) {
+        abModeMenu.left_frame_offset_ = 0;
+        abModeMenu.left_frame_ = 0;
+    }
+    else {
+        abModeMenu.left_frame_offset_ = CLAMP(abEngine.GetLeftFrame(), 0, 15-2);
+        abModeMenu.left_frame_ = abEngine.GetLeftFrame();
+    }
+    SetFlag(&_EREG_, _RXNE_, FLAG_CLEAR);
+    SetFlag(&_EREG_, _BUSY_, FLAG_CLEAR);
+}
+
+void ABModeMenu::on_load_right_frame_names_finished() {
+    abModeMenu.right_state_ = AB_SELECT_FRAME;
+    abModeMenu.ResetTicker(1);
+    if(abModeMenu.right_wavetable_ != abEngine.GetRightWavetable()) {
+        abModeMenu.right_frame_offset_ = 0;
+        abModeMenu.right_frame_ = 0;
+    }
+    else {
+        abModeMenu.right_frame_offset_ = CLAMP(abEngine.GetRightFrame(), 0, 15-2);
+        abModeMenu.right_frame_ = abEngine.GetRightFrame();
+    }
+    SetFlag(&_EREG_, _RXNE_, FLAG_CLEAR);
+    SetFlag(&_EREG_, _BUSY_, FLAG_CLEAR);
+}
+
+
 bool ABModeMenu::handleKeyRelease(int key) {
     if(key == LEFT_ENCODER_CCW) {
         active_menu_ = LEFT;
@@ -138,12 +183,13 @@ bool ABModeMenu::handleKeyRelease(int key) {
         active_menu_ = LEFT;
         switch(left_state_) {
             case AB_LOAD_HOVER:
-                left_state_ = AB_SELECT_WAVETABLE;
-                ResetTicker(0);
+                flash.StartFrameDMARead((uint32_t*)left_wavetable_names_, 16 * 9, 0, ABModeMenu::on_load_left_wavetable_names_finished, EEPROM_PERSISTENT_SS);
+                // left_state_ = AB_SELECT_WAVETABLE;
+                // ResetTicker(0);
                 break;
             case AB_EDIT_HOVER:
                 if(!abEngine.IsEditingLeft()) {
-                    flash.StopDMA(true);
+                    // flash.StopDMA(true);
                     flash.StartFrameDMARead((uint32_t*)&front_buffer_2[0], 4096, abEngine.GetLeftWavetable() * 65536 + abEngine.GetLeftFrame() * 4096, ABModeMenu::on_load_one_ab_left_finished);
                     // abEngine.FillWaveform(&front_buffer_2[0], abEngine.GetLeftWavetable(), abEngine.GetLeftFrame());
                     abEngine.SetIsEditingLeft(true);
@@ -152,16 +198,17 @@ bool ABModeMenu::handleKeyRelease(int key) {
                 context.setState(&waveEditor);
                 break;
             case AB_SELECT_WAVETABLE:
-                left_state_ = AB_SELECT_FRAME;
-                ResetTicker(0);
-                if(left_wavetable_ != abEngine.GetLeftWavetable()) {
-                    left_frame_offset_ = 0;
-                    left_frame_ = 0;
-                }
-                else {
-                    left_frame_offset_ = CLAMP(abEngine.GetLeftFrame(), 0, 15-2);
-                    left_frame_ = abEngine.GetLeftFrame();
-                }
+                flash.StartFrameDMARead((uint32_t*)left_frame_names_, 16 * 9, 16 * 9 + 16 * 9 * left_wavetable_, ABModeMenu::on_load_left_frame_names_finished, EEPROM_PERSISTENT_SS);
+                // left_state_ = AB_SELECT_FRAME;
+                // ResetTicker(0);
+                // if(left_wavetable_ != abEngine.GetLeftWavetable()) {
+                //     left_frame_offset_ = 0;
+                //     left_frame_ = 0;
+                // }
+                // else {
+                //     left_frame_offset_ = CLAMP(abEngine.GetLeftFrame(), 0, 15-2);
+                //     left_frame_ = abEngine.GetLeftFrame();
+                // }
                 break;
             case AB_SELECT_FRAME:
                 abEngine.SetIsEditingLeft(false);
@@ -248,13 +295,14 @@ bool ABModeMenu::handleKeyRelease(int key) {
         active_menu_ = RIGHT;
         switch(right_state_) {
             case AB_LOAD_HOVER:
-                right_state_ = AB_SELECT_WAVETABLE;
-                ResetTicker(1);
+                flash.StartFrameDMARead((uint32_t*)right_wavetable_names_, 16 * 9, 0, ABModeMenu::on_load_right_wavetable_names_finished, EEPROM_PERSISTENT_SS);
+                // right_state_ = AB_SELECT_WAVETABLE;
+                // ResetTicker(1);
                 break;
             case AB_EDIT_HOVER:
                 if(!abEngine.IsEditingRight()) {
 
-                    flash.StopDMA(true);
+                    // flash.StopDMA(true);
                     flash.StartFrameDMARead((uint32_t*)&front_buffer_2[2048], 4096, abEngine.GetRightWavetable() * 65536 + abEngine.GetRightFrame() * 4096, ABModeMenu::on_load_one_ab_right_finished);
 
                     // abEngine.FillWaveform(&front_buffer_2[2048], abEngine.GetRightWavetable(), abEngine.GetRightFrame());
@@ -264,16 +312,17 @@ bool ABModeMenu::handleKeyRelease(int key) {
                 context.setState(&waveEditor);
                 break;
             case AB_SELECT_WAVETABLE:
-                right_state_ = AB_SELECT_FRAME;
-                ResetTicker(1);
-                if(right_wavetable_ != abEngine.GetRightWavetable()) {
-                    right_frame_offset_ = 0;
-                    right_frame_ = 0;
-                }
-                else {
-                    right_frame_offset_ = CLAMP(abEngine.GetRightFrame(), 0, 15-2);
-                    right_frame_ = abEngine.GetRightFrame();
-                }
+                flash.StartFrameDMARead((uint32_t*)right_frame_names_, 16 * 9, 16 * 9 + 16 * 9 * right_wavetable_, ABModeMenu::on_load_right_frame_names_finished, EEPROM_PERSISTENT_SS);
+                // right_state_ = AB_SELECT_FRAME;
+                // ResetTicker(1);
+                // if(right_wavetable_ != abEngine.GetRightWavetable()) {
+                //     right_frame_offset_ = 0;
+                //     right_frame_ = 0;
+                // }
+                // else {
+                //     right_frame_offset_ = CLAMP(abEngine.GetRightFrame(), 0, 15-2);
+                //     right_frame_ = abEngine.GetRightFrame();
+                // }
                 break;
             case AB_SELECT_FRAME:
                 abEngine.SetIsEditingRight(false);
@@ -338,6 +387,31 @@ bool ABModeMenu::handleKeyRelease(int key) {
     return true;
 }
 
+void ABModeMenu::on_load_left_gui_finished() {
+    if(abModeMenu.left_state_ == AB_SELECT_FRAME || abModeMenu.left_state_ == AB_SELECT_WAVETABLE) {
+        abModeMenu.left_wavetable_gui_ = abModeMenu.left_wavetable_;
+        abModeMenu.left_frame_gui_ = abModeMenu.left_frame_;
+    } else {
+        abModeMenu.left_wavetable_gui_ = abEngine.GetLeftWavetable();
+        abModeMenu.left_frame_gui_ = abEngine.GetLeftFrame();
+    }
+    SetFlag(&_EREG_, _RXNE_, FLAG_CLEAR);
+    SetFlag(&_EREG_, _BUSY_, FLAG_CLEAR);
+}
+
+void ABModeMenu::on_load_right_gui_finished() {
+    if(abModeMenu.right_state_ == AB_SELECT_FRAME || abModeMenu.right_state_ == AB_SELECT_WAVETABLE) {
+        abModeMenu.right_wavetable_gui_ = abModeMenu.right_wavetable_;
+        abModeMenu.right_frame_gui_ = abModeMenu.right_frame_;
+    } else {
+        abModeMenu.right_wavetable_gui_ = abEngine.GetRightWavetable();
+        abModeMenu.right_frame_gui_ = abEngine.GetRightFrame();
+    }
+    SetFlag(&_EREG_, _RXNE_, FLAG_CLEAR);
+    SetFlag(&_EREG_, _BUSY_, FLAG_CLEAR);
+}
+
+
 void ABModeMenu::DrawSide(int side) {
     int graph_y_offset = 3;
     int graph_height = 32 - graph_y_offset;
@@ -346,7 +420,7 @@ void ABModeMenu::DrawSide(int side) {
     
     int x_offset = side == 0 ? 0 : graph_width + gap * 2;
     
-    int16_t* wavebuffer = side == 0 ? &front_buffer_1[0] : &front_buffer_1[2048];
+    int16_t* wavebuffer = side == 0 ? &front_buffer_3[0] : &front_buffer_3[2048];
     int16_t* alternate_wavebuffer = side == 0 ? &front_buffer_2[0] : &front_buffer_2[2048];
     uint32_t* ticker_timer = side == 0 ? &left_ticker_timer_ : &right_ticker_timer_;
     uint8_t* ticker = side == 0 ? &left_ticker_ : &right_ticker_;
@@ -358,13 +432,36 @@ void ABModeMenu::DrawSide(int side) {
     ABMenuState state = side == 0 ? left_state_ : right_state_;
     int abEngineWavetable = side == 0 ? abEngine.GetLeftWavetable() : abEngine.GetRightWavetable();
     int abEngineFrame = side == 0 ? abEngine.GetLeftFrame() : abEngine.GetRightFrame();
+    int wavetable_gui = side == 0 ? left_wavetable_gui_ : right_wavetable_gui_;
+    int frame_gui = side == 0 ? left_frame_gui_ : right_frame_gui_;
 
     Display::outline_rectangle(x_offset, graph_y_offset, graph_width, graph_height);
     
-    if(state == AB_SELECT_FRAME || state == AB_SELECT_WAVETABLE)
-        abEngine.FillWaveform(wavebuffer, wavetable, frame);
-    else
-        abEngine.FillWaveform(wavebuffer, abEngineWavetable, abEngineFrame);
+    if(state == AB_SELECT_FRAME || state == AB_SELECT_WAVETABLE) {
+        // 
+        if(wavetable_gui != wavetable || frame_gui != frame) {
+            // load into wavebuffer the current frame
+            // flash.StopDMA(true);
+            if(side == 0) {
+                flash.StartFrameDMARead((uint32_t*)&front_buffer_3[0], 4096, wavetable * 65536 + frame * 4096, ABModeMenu::on_load_left_gui_finished);
+            } else {
+                flash.StartFrameDMARead((uint32_t*)&front_buffer_3[2048], 4096, wavetable * 65536 + frame * 4096, ABModeMenu::on_load_right_gui_finished);
+            }
+        }
+        // abEngine.FillWaveform(wavebuffer, wavetable, frame);
+    }
+    else {
+        if(wavetable_gui != abEngineWavetable || frame_gui != abEngineFrame) {
+            // load into wavebuffer the current frame
+            // flash.StopDMA(true);
+            if(side == 0) {
+                flash.StartFrameDMARead((uint32_t*)&front_buffer_3[0], 4096, abEngineWavetable * 65536 + abEngineFrame * 4096, ABModeMenu::on_load_left_gui_finished);
+            } else {
+                flash.StartFrameDMARead((uint32_t*)&front_buffer_3[2048], 4096, abEngineWavetable * 65536 + abEngineFrame * 4096, ABModeMenu::on_load_right_gui_finished);
+            }
+        }
+        // abEngine.FillWaveform(wavebuffer, abEngineWavetable, abEngineFrame);
+    }
 
     if(state == AB_SELECT_FRAME || state == AB_SELECT_WAVETABLE)
         Display::Draw_Wave(x_offset + 1, graph_y_offset + 1, graph_width-2, graph_height-2, wavebuffer);
@@ -384,13 +481,19 @@ void ABModeMenu::DrawSide(int side) {
             snprintf(line, 20, "%*d", 2, i + wavetable_offset + 1);
             Display::put_string_3x5(x_offset + 2, y_offset + i * 8, strlen(line), line);
             
-            char * name = storage.GetWavetable(i + wavetable_offset)->name;
+            // char * name = storage.GetWavetable(i + wavetable_offset)->name;
+            char * name;
+            if(side == 0) {
+                name = left_wavetable_names_[i + frame_offset];
+            } else {
+                name = right_wavetable_names_[i + frame_offset];
+            }
 
             char * line2 = name;
 
             int32_t elapsed_time = system_clock.milliseconds() - *ticker_timer;
 
-            int8_t num_chars = 7;
+            uint8_t num_chars = 7;
 
             if(i + wavetable_offset == wavetable) {
                 if(*ticker == 0) {
@@ -427,13 +530,19 @@ void ABModeMenu::DrawSide(int side) {
             snprintf(line, 20, "%*d", 2, i + frame_offset + 1);
             Display::put_string_3x5(x_offset + 2, y_offset + i * 8, strlen(line), line);
 
-            char * name = storage.GetWavetable(wavetable)->waves[i + frame_offset].name;
+            // char * name = storage.GetWavetable(wavetable)->waves[i + frame_offset].name;
+            char * name;
+            if(side == 0) {
+                name = left_frame_names_[i + frame_offset];
+            } else {
+                name = right_frame_names_[i + frame_offset];
+            }
 
             char * line2 = name;
 
             int32_t elapsed_time = system_clock.milliseconds() - *ticker_timer;
 
-            int8_t num_chars = 7;
+            uint8_t num_chars = 7;
 
             if(i + frame_offset == frame) {
                 if(*ticker == 0) {

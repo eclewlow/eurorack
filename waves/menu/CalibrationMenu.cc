@@ -11,6 +11,7 @@
 #include "waves/Display.h"
 #include "waves/graphics.h"
 #include "waves/Globals.h"
+#include <string>
 
 namespace waves {
 
@@ -49,7 +50,8 @@ bool CalibrationMenu::handleKeyRelease(int key) {
             message_displayed_ = true;
             timer_ = system_clock.milliseconds();
             c5_value_ = adc.getChannel(Adc::ADC_CHANNEL_PITCH_CV);
-            user_settings.Calibrate(c1_value_, c5_value_);
+            // user_settings.Calibrate(c1_value_, c5_value_);
+            abEngine.Calibrate(c1_value_, c5_value_);
         } else if(state_ == CALIBRATION_MENU_STATE_DONE) {
             message_displayed_ = false;
             timer_ = system_clock.milliseconds();
@@ -79,12 +81,13 @@ void CalibrationMenu::paint() {
     Display::put_string_5x5(128 - strlen(line) * 6, y_offset, strlen(line), line);
 
     
-    float note = tune * user_settings.getCalibrationX() + user_settings.getCalibrationY();
+    // float note = tune * user_settings.getCalibrationX() + user_settings.getCalibrationY();
+    float note = tune * abEngine.getCalibrationX() + abEngine.getCalibrationY();
     
     note = clamp(note, 0.0f, 120.0f);
 
-    float a = 440; //frequency of A (coomon value is 440Hz)
-    float frequency = (a / 32) * pow(2, ((note - 9) / 12.0));
+    // float a = 440; //frequency of A (coomon value is 440Hz)
+    // float frequency = (a / 32) * pow(2, ((note - 9) / 12.0));
     
     std::string note_letter = "C C#D D#E F F#G G#A A#B ";
     int note_index = static_cast<int16_t>(floor(note + 0.5)) % 12;
@@ -108,8 +111,8 @@ void CalibrationMenu::paint() {
     // draw graph
     /****/
 //    x_offset = 12;
-    int line_height = 56;
-    int line_spacing = 24;
+    // int line_height = 56;
+    // int line_spacing = 24;
     int line_width = 100;
 //    Display::LCD_Line(x_offset, 32 - line_height / 2, x_offset, 32 + line_height / 2, true);
 //

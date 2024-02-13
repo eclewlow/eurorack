@@ -15,7 +15,10 @@
 #include "waves/Storage.h"
 #include "waves/Globals.h"
 
-class Storage;
+
+// class Storage;
+
+namespace waves {
 
 class UserSettings {
 public:
@@ -80,23 +83,25 @@ public:
     // inline void setFXEffect(uint8_t effect) { settings_.fx_effect = CLAMP<uint8_t>(effect, 0, 8); }
     // inline uint8_t getFXEffect() { return settings_.fx_effect; }
 
-    void Calibrate(uint16_t c1, uint16_t c5);
+    // void Calibrate(uint16_t c1, uint16_t c5);
     // inline float getCalibrationX() { return settings_.calibration_x; }
     // inline float getCalibrationY() { return settings_.calibration_y; }
 
     // inline SNAPSHOT * settings_ptr() { return &settings_; }
     
-    float RandomFloat(float min, float max);
-    int32_t RandomInt(int32_t min, int32_t max);
+    // float RandomFloat(float min, float max);
+    // int32_t RandomInt(int32_t min, int32_t max);
 
-    bool ResetSettings();
-    bool RandomizeSettings();
-    bool SaveSnapshot(const char * name, uint8_t index);
-    bool LoadSnapshot(int8_t snapshot);
-    // SNAPSHOT settings_;
+    // bool ResetSettings();
+    // bool RandomizeSettings();
+    // bool SaveSnapshot(const char * name, uint8_t index);
+    // bool LoadSnapshot(int8_t snapshot);
+    SNAPSHOT settings_;
         
 private:
     uint32_t app_start_time_;
        
     DISALLOW_COPY_AND_ASSIGN (UserSettings);
 };
+
+}

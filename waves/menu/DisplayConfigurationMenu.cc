@@ -17,6 +17,11 @@ namespace waves {
 
 DisplayConfigurationMenu::DisplayConfigurationMenu() {
     setState(DISPLAY_MENU_BRIGHTNESS);
+    brightness = 100;
+    contrast = 100;
+    invert = false;
+    scope_setting = SETTING_SCOPE_LINE;
+    morph_setting = SETTING_MORPH_SMOOTH;
 }
 
 DisplayConfigurationMenu::~DisplayConfigurationMenu() {
@@ -35,16 +40,16 @@ bool DisplayConfigurationMenu::handleKeyRelease(int key) {
     else if(key == LEFT_ENCODER_CCW) {
         switch(state_) {
             case DISPLAY_MENU_BRIGHTNESS:
-                user_settings.setBrightness(user_settings.getBrightness()-1);
+                setBrightness(getBrightness()-1);
                 break;
             case DISPLAY_MENU_CONTRAST:
-                user_settings.setContrast(user_settings.getContrast()-1);
+                setContrast(getContrast()-1);
                 break;
             case DISPLAY_MENU_INVERT:
-                user_settings.setInvert(!user_settings.getInvert());
+                setInvert(!getInvert());
                 break;
             case DISPLAY_MENU_SCOPE:
-                user_settings.setScopeSetting(user_settings.getScopeSetting() == UserSettings::SETTING_SCOPE_LINE ? UserSettings::SETTING_SCOPE_FILL: UserSettings::SETTING_SCOPE_LINE);
+                setScopeSetting(getScopeSetting() == SETTING_SCOPE_LINE ? SETTING_SCOPE_FILL: SETTING_SCOPE_LINE);
                 break;
             default:
                 break;
@@ -53,16 +58,16 @@ bool DisplayConfigurationMenu::handleKeyRelease(int key) {
     else if(key == LEFT_ENCODER_CW) {
         switch(state_) {
             case DISPLAY_MENU_BRIGHTNESS:
-                user_settings.setBrightness(user_settings.getBrightness()+1);
+                setBrightness(getBrightness()+1);
                 break;
             case DISPLAY_MENU_CONTRAST:
-                user_settings.setContrast(user_settings.getContrast()+1);
+                setContrast(getContrast()+1);
                 break;
             case DISPLAY_MENU_INVERT:
-                user_settings.setInvert(!user_settings.getInvert());
+                setInvert(!getInvert());
                 break;
             case DISPLAY_MENU_SCOPE:
-                user_settings.setScopeSetting(user_settings.getScopeSetting() == UserSettings::SETTING_SCOPE_LINE ? UserSettings::SETTING_SCOPE_FILL: UserSettings::SETTING_SCOPE_LINE);
+                setScopeSetting(getScopeSetting() == SETTING_SCOPE_LINE ? SETTING_SCOPE_FILL: SETTING_SCOPE_LINE);
                 break;
             default:
                 break;
@@ -100,32 +105,32 @@ void DisplayConfigurationMenu::paint() {
     
     char line[20];
 
-    int wavetable_count = 32;
-    int snapshot_count = 4;
+    // int wavetable_count = 32;
+    // int snapshot_count = 4;
     
     int center = 128 / 2 - 6 / 2;
 //    snprintf(line, 20, "   VERSION; %s", "0.07");
     Display::put_string_5x5(center, y_offset, 1, ":");
     Display::put_string_5x5(center - strlen("BRIGHTNESS") * 6, y_offset, strlen("BRIGHTNESS"), "BRIGHTNESS");
-    snprintf(line, 20, "%d", user_settings.getBrightness());
+    snprintf(line, 20, "%d", getBrightness());
     Display::put_string_5x5(center + 6, y_offset, strlen(line), line, state_==DISPLAY_MENU_BRIGHTNESS);
 
     y_offset += 8;
     Display::put_string_5x5(center, y_offset, 1, ":");
     Display::put_string_5x5(center - strlen("CONTRAST") * 6, y_offset, strlen("CONTRAST"), "CONTRAST");
-    snprintf(line, 20, "%d", user_settings.getContrast());
+    snprintf(line, 20, "%d", getContrast());
     Display::put_string_5x5(center + 6, y_offset, strlen(line), line, state_==DISPLAY_MENU_CONTRAST);
 
     y_offset += 8;
     Display::put_string_5x5(center, y_offset, 1, ":");
     Display::put_string_5x5(center - strlen("INVERT") * 6, y_offset, strlen("INVERT"), "INVERT");
-    snprintf(line, 20, "%s", user_settings.getInvert() ? "ON" : "OFF");
+    snprintf(line, 20, "%s", getInvert() ? "ON" : "OFF");
     Display::put_string_5x5(center + 6, y_offset, strlen(line), line, state_==DISPLAY_MENU_INVERT);
 
     y_offset += 8;
     Display::put_string_5x5(center, y_offset, 1, ":");
     Display::put_string_5x5(center - strlen("SCOPE") * 6, y_offset, strlen("SCOPE"), "SCOPE");
-    snprintf(line, 20, "%s", user_settings.getScopeSetting() == UserSettings::SETTING_SCOPE_LINE ? "LINE" : "FILL");
+    snprintf(line, 20, "%s", getScopeSetting() == SETTING_SCOPE_LINE ? "LINE" : "FILL");
     Display::put_string_5x5(center + 6, y_offset, strlen(line), line, state_==DISPLAY_MENU_SCOPE);
 }
 

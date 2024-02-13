@@ -57,6 +57,14 @@ public:
 
     inline int8_t get_fx_effect() { return fx_effect_; }
 
+    inline void Calibrate(uint16_t c1, uint16_t c5) {
+      calibration_x_ = 48.0f / (c5 - c1);
+      calibration_y_ = 24.0f - c1 * calibration_x_;
+    }
+
+    inline float getCalibrationX() { return calibration_x_; }
+    inline float getCalibrationY() { return calibration_y_; }
+
 protected:
     float phase_;
     float morph_;

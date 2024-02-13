@@ -58,6 +58,15 @@ public:
     static void on_load_one_ab_left_finished();
     static void on_load_one_ab_right_finished();
 
+    static void on_load_left_gui_finished();
+    static void on_load_right_gui_finished();
+
+    static void on_load_left_wavetable_names_finished();
+    static void on_load_right_wavetable_names_finished();
+
+    static void on_load_left_frame_names_finished();
+    static void on_load_right_frame_names_finished();
+
 private:
     int16_t left_wavetable_offset_;
     int16_t left_frame_offset_;
@@ -74,6 +83,17 @@ private:
     uint32_t right_ticker_timer_;
     uint8_t left_ticker_;
     uint8_t right_ticker_;
+
+    int left_wavetable_gui_;
+    int left_frame_gui_;
+    int right_wavetable_gui_;
+    int right_frame_gui_;
+
+    char left_wavetable_names_[16][9];
+    char left_frame_names_[16][9];
+
+    char right_wavetable_names_[16][9];
+    char right_frame_names_[16][9];
 
     DISALLOW_COPY_AND_ASSIGN (ABModeMenu);
 };

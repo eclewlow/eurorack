@@ -1194,7 +1194,7 @@ void W25qxx_Init (void)
 }   
 
     w25qxx_t    w25qxx;
-    void StartFrameDMARead(uint32_t * buffer, uint32_t size, uint32_t address, void (* func)() = NULL);
+    void StartFrameDMARead(uint32_t * buffer, uint32_t size, uint32_t address, void (* func)() = NULL, uint16_t pin = EEPROM_FACTORY_SS);
     void StartDMARead(uint16_t __bytes);
     void StartDMAWrite(uint16_t __bytes);
     void StopDMA(bool bypass = false);
@@ -1206,6 +1206,7 @@ void W25qxx_Init (void)
  private:
     void (*on_dma_read_finished_func)();
     static Flash* instance_;
+    // uint16_t current_pin_;
   // NextSampleFn next_sample_fn_;
   // static FirmwareUpdateDac* instance_;
   

@@ -13,7 +13,7 @@
 using namespace waves;
 
 Context context;
-// UserSettings user_settings;
+UserSettings user_settings;
 // SNAPSHOT settings_;
 int8_t engine;
 int8_t switch_1_test;
@@ -112,8 +112,10 @@ int16_t * back_buffer = triple_waveframe_buffer_2;
 
 int16_t * front_buffer_1 = triple_waveframe_buffer_1;
 int16_t * front_buffer_2 = triple_waveframe_buffer_2;
-int16_t * back_buffer_1 = triple_waveframe_buffer_3;
-int16_t * back_buffer_2 = triple_waveframe_buffer_4;
+int16_t * front_buffer_3 = triple_waveframe_buffer_3;
+int16_t * back_buffer_1 = triple_waveframe_buffer_4;
+int16_t * back_buffer_2 = triple_waveframe_buffer_5;
+int16_t * back_buffer_3 = triple_waveframe_buffer_6;
 
 int16_t * matrix_front_buffer_1 = triple_waveframe_buffer_1;
 int16_t * matrix_front_buffer_2 = triple_waveframe_buffer_2;
