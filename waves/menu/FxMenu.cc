@@ -28,29 +28,54 @@ bool FxMenu::handleKeyRelease(int key) {
     if(key == LEFT_ENCODER_CCW) {
         switch(left_state_) {
             case FX_MENU_LEFT_FX:
+                // if(abEngine.get_fx_effect() == EFFECT_TYPE_FM) {
+                //     abEngine.set_fx_effect(EFFECT_TYPE_BYPASS);
+                // }
+                // else if(abEngine.get_fx_effect() == EFFECT_TYPE_RING_MODULATOR) {
+                //     abEngine.set_fx_effect(EFFECT_TYPE_FM);
+                // }
+                // else if(abEngine.get_fx_effect() == EFFECT_TYPE_PHASE_DISTORTION) {
+                //     abEngine.set_fx_effect(EFFECT_TYPE_RING_MODULATOR);
+                // }
+                // else if(abEngine.get_fx_effect() == EFFECT_TYPE_WAVEFOLDER) {
+                //     abEngine.set_fx_effect(EFFECT_TYPE_PHASE_DISTORTION);
+                // }
+                // else if(abEngine.get_fx_effect() == EFFECT_TYPE_WAVEWRAPPER) {
+                //     abEngine.set_fx_effect(EFFECT_TYPE_WAVEFOLDER);
+                // }
+                // else if(abEngine.get_fx_effect() == EFFECT_TYPE_BITCRUSH) {
+                //     abEngine.set_fx_effect(EFFECT_TYPE_WAVEWRAPPER);
+                // }
+                // else if(abEngine.get_fx_effect() == EFFECT_TYPE_DRIVE) {
+                //     abEngine.set_fx_effect(EFFECT_TYPE_BITCRUSH);
+                // }
+                // else if(abEngine.get_fx_effect() == EFFECT_TYPE_BYPASS) {
+                //     abEngine.set_fx_effect(EFFECT_TYPE_DRIVE);
+                // }
+                // break;                
                 if(effect_manager.getEffect() == &fm) {
-                    effect_manager.setEffect(EffectManager::EFFECT_TYPE_BYPASS);
+                    effect_manager.setEffect(EFFECT_TYPE_BYPASS);
                 }
                 else if(effect_manager.getEffect() == &ring_modulator) {
-                    effect_manager.setEffect(EffectManager::EFFECT_TYPE_FM);
+                    effect_manager.setEffect(EFFECT_TYPE_FM);
                 }
                 else if(effect_manager.getEffect() == &phase_distortion) {
-                    effect_manager.setEffect(EffectManager::EFFECT_TYPE_RING_MODULATOR);
+                    effect_manager.setEffect(EFFECT_TYPE_RING_MODULATOR);
                 }
                 else if(effect_manager.getEffect() == &wavefolder) {
-                    effect_manager.setEffect(EffectManager::EFFECT_TYPE_PHASE_DISTORTION);
+                    effect_manager.setEffect(EFFECT_TYPE_PHASE_DISTORTION);
                 }
                 else if(effect_manager.getEffect() == &wavewrapper) {
-                    effect_manager.setEffect(EffectManager::EFFECT_TYPE_WAVEFOLDER);
+                    effect_manager.setEffect(EFFECT_TYPE_WAVEFOLDER);
                 }
                 else if(effect_manager.getEffect() == &bitcrush) {
-                    effect_manager.setEffect(EffectManager::EFFECT_TYPE_WAVEWRAPPER);
+                    effect_manager.setEffect(EFFECT_TYPE_WAVEWRAPPER);
                 }
                 else if(effect_manager.getEffect() == &drive) {
-                    effect_manager.setEffect(EffectManager::EFFECT_TYPE_BITCRUSH);
+                    effect_manager.setEffect(EFFECT_TYPE_BITCRUSH);
                 }
                 else if(effect_manager.getEffect() == &bypass) {
-                    effect_manager.setEffect(EffectManager::EFFECT_TYPE_DRIVE);
+                    effect_manager.setEffect(EFFECT_TYPE_DRIVE);
                 }
                 break;
             case FX_MENU_LEFT_DEPTH:
@@ -63,29 +88,55 @@ bool FxMenu::handleKeyRelease(int key) {
     if(key == LEFT_ENCODER_CW) {
         switch(left_state_) {
             case FX_MENU_LEFT_FX:
+                // if(abEngine.get_fx_effect() == EFFECT_TYPE_FM) {
+                //     abEngine.set_fx_effect(EFFECT_TYPE_RING_MODULATOR);
+                // }
+                // else if(abEngine.get_fx_effect() == EFFECT_TYPE_RING_MODULATOR) {
+                //     abEngine.set_fx_effect(EFFECT_TYPE_PHASE_DISTORTION);
+                // }
+                // else if(abEngine.get_fx_effect() == EFFECT_TYPE_PHASE_DISTORTION) {
+                //     abEngine.set_fx_effect(EFFECT_TYPE_WAVEFOLDER);
+                // }
+                // else if(abEngine.get_fx_effect() == EFFECT_TYPE_WAVEFOLDER) {
+                //     abEngine.set_fx_effect(EFFECT_TYPE_WAVEWRAPPER);
+                // }
+                // else if(abEngine.get_fx_effect() == EFFECT_TYPE_WAVEWRAPPER) {
+                //     abEngine.set_fx_effect(EFFECT_TYPE_BITCRUSH);
+                // }
+                // else if(abEngine.get_fx_effect() == EFFECT_TYPE_BITCRUSH) {
+                //     abEngine.set_fx_effect(EFFECT_TYPE_DRIVE);
+                // }
+                // else if(abEngine.get_fx_effect() == EFFECT_TYPE_DRIVE) {
+                //     abEngine.set_fx_effect(EFFECT_TYPE_BYPASS);
+                // }
+                // else if(abEngine.get_fx_effect() == EFFECT_TYPE_BYPASS) {
+                //     abEngine.set_fx_effect(EFFECT_TYPE_FM);
+                // }
+                // break;                
+
                 if(effect_manager.getEffect() == &fm) {
-                    effect_manager.setEffect(EffectManager::EFFECT_TYPE_RING_MODULATOR);
+                    effect_manager.setEffect(EFFECT_TYPE_RING_MODULATOR);
                 }
                 else if(effect_manager.getEffect() == &ring_modulator) {
-                    effect_manager.setEffect(EffectManager::EFFECT_TYPE_PHASE_DISTORTION);
+                    effect_manager.setEffect(EFFECT_TYPE_PHASE_DISTORTION);
                 }
                 else if(effect_manager.getEffect() == &phase_distortion) {
-                    effect_manager.setEffect(EffectManager::EFFECT_TYPE_WAVEFOLDER);
+                    effect_manager.setEffect(EFFECT_TYPE_WAVEFOLDER);
                 }
                 else if(effect_manager.getEffect() == &wavefolder) {
-                    effect_manager.setEffect(EffectManager::EFFECT_TYPE_WAVEWRAPPER);
+                    effect_manager.setEffect(EFFECT_TYPE_WAVEWRAPPER);
                 }
                 else if(effect_manager.getEffect() == &wavewrapper) {
-                    effect_manager.setEffect(EffectManager::EFFECT_TYPE_BITCRUSH);
+                    effect_manager.setEffect(EFFECT_TYPE_BITCRUSH);
                 }
                 else if(effect_manager.getEffect() == &bitcrush) {
-                    effect_manager.setEffect(EffectManager::EFFECT_TYPE_DRIVE);
+                    effect_manager.setEffect(EFFECT_TYPE_DRIVE);
                 }
                 else if(effect_manager.getEffect() == &drive) {
-                    effect_manager.setEffect(EffectManager::EFFECT_TYPE_BYPASS);
+                    effect_manager.setEffect(EFFECT_TYPE_BYPASS);
                 }
                 else if(effect_manager.getEffect() == &bypass) {
-                    effect_manager.setEffect(EffectManager::EFFECT_TYPE_FM);
+                    effect_manager.setEffect(EFFECT_TYPE_FM);
                 }
                 break;
             case FX_MENU_LEFT_DEPTH:
@@ -120,7 +171,7 @@ bool FxMenu::handleKeyRelease(int key) {
                 effect_manager.setScale(effect_manager.getScale() - 1);
                 break;
             case FX_MENU_RIGHT_WAVE:
-                effect_manager.setOscillatorShape((effect_manager.getOscillatorShape() + EffectManager::OSCILLATOR_SHAPE_LAST - 1) % EffectManager::OSCILLATOR_SHAPE_LAST);
+                effect_manager.setOscillatorShape((effect_manager.getOscillatorShape() + OSCILLATOR_SHAPE_LAST - 1) % OSCILLATOR_SHAPE_LAST);
                 break;
             case FX_MENU_RIGHT_RATIO:
 //                effect_manager.setRatio(effect_manager.getRatio()-1);
@@ -151,7 +202,7 @@ bool FxMenu::handleKeyRelease(int key) {
                 effect_manager.setScale(effect_manager.getScale() + 1);
                 break;
             case FX_MENU_RIGHT_WAVE:
-                effect_manager.setOscillatorShape((effect_manager.getOscillatorShape() + 1) % EffectManager::OSCILLATOR_SHAPE_LAST);
+                effect_manager.setOscillatorShape((effect_manager.getOscillatorShape() + 1) % OSCILLATOR_SHAPE_LAST);
                 break;
             case FX_MENU_RIGHT_RATIO:
 //                effect_manager.setRatio(effect_manager.getRatio()+1);
@@ -259,6 +310,10 @@ void FxMenu::paint() {
     {
         effectName = (char*)"BYPASS";
     }
+    else
+    {
+        effectName = (char*)"";
+    }
     
 
     int row_height = 9;
@@ -286,6 +341,10 @@ void FxMenu::paint() {
     {
         controlName = (char*)"IN";
     }
+    else
+    {
+        controlName = (char*)"";
+    }
     
     int centered_control_name = (64 + 5 + 10 * 3 + 128) / 2 - strlen(controlName) * 6 / 2;
     Display::put_string_5x5(centered_control_name, y_offset + (row_height-5) / 2, strlen(controlName), controlName, right_state_ == FX_MENU_RIGHT_MOD);
@@ -301,6 +360,7 @@ void FxMenu::paint() {
     uint16_t morph = adc.getChannelProcessed(3);
 
     context.getEngine()->FillWaveform(BUF1, tune,  fx_amount,  fx,  morph);
+    // abEngine.FillWaveform(BUF1, tune,  fx_amount,  fx,  morph, true);
 
     int depth_y_offset = graph_y_offset + graph_height + 3;
     Display::put_string_5x5(1, depth_y_offset, strlen("DEPTH:"), "DEPTH:");
@@ -322,29 +382,33 @@ void FxMenu::paint() {
         Display::Draw_Wave(64+1, graph_y_offset + 1, 64-3-2, graph_height - 2, BUF1);
         
         char * waveName;
-        if(effect_manager.getOscillatorShape() == EffectManager::SINE_SHAPE)
+        if(effect_manager.getOscillatorShape() == SINE_SHAPE)
         {
             waveName = (char*)"SINE";
         }
-        else if(effect_manager.getOscillatorShape() == EffectManager::TRIANGLE_SHAPE)
+        else if(effect_manager.getOscillatorShape() == TRIANGLE_SHAPE)
         {
             waveName = (char*)"TRI";
         }
-        else if(effect_manager.getOscillatorShape() == EffectManager::SNH_SHAPE)
+        else if(effect_manager.getOscillatorShape() == SNH_SHAPE)
         {
             waveName = (char*)"S&H";
         }
-        else if(effect_manager.getOscillatorShape() == EffectManager::SQUARE_SHAPE)
+        else if(effect_manager.getOscillatorShape() == SQUARE_SHAPE)
         {
             waveName = (char*)"SQUA";
         }
-        else if(effect_manager.getOscillatorShape() == EffectManager::RAMP_SHAPE)
+        else if(effect_manager.getOscillatorShape() == RAMP_SHAPE)
         {
             waveName = (char*)"RAMP";
         }
-        else if(effect_manager.getOscillatorShape() == EffectManager::SAWTOOTH_SHAPE)
+        else if(effect_manager.getOscillatorShape() == SAWTOOTH_SHAPE)
         {
             waveName = (char*)"SAW";
+        }
+        else
+        {
+            waveName = (char*)"";
         }
         
         char rs_strings[5];

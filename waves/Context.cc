@@ -11,6 +11,8 @@
 // #include "waves/Context.h"
 #include "waves/Globals.h"
 
+namespace waves {
+
 Context::Context() {_state = NULL;}
 Context::~Context() {}
 
@@ -105,4 +107,7 @@ Engine* Context::getLastEngine() {
             break;
     }
     return engine;
+}
+
+
 }

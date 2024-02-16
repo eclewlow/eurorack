@@ -40,6 +40,9 @@ public:
     inline void setTarget(LoadWaveMenuTarget target) { target_ = target; }
     void ResetTicker();
     
+    static void on_load_wavetable_names_finished();
+    static void on_load_frame_names_finished();
+
 private:
     int8_t state_;
     int16_t wavetable_offset_;
@@ -50,7 +53,14 @@ private:
     int8_t target_;
     uint32_t ticker_timer_;
     uint8_t ticker_;
+
+    char wavetable_names_[16][9];
+    char frame_names_[16][9];
     
+    int wavetable_gui_;
+    int frame_gui_;
+
+
     DISALLOW_COPY_AND_ASSIGN (LoadWaveMenu);
 };
 

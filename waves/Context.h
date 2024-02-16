@@ -12,6 +12,8 @@
 
 #include "waves/Globals.h"
 
+namespace waves {
+
 class Context {
 public:
     Context();
@@ -38,3 +40,5 @@ private:
     Context& operator=(Context const&);
     // DISALLOW_COPY_AND_ASSIGN (Context);
 };
+
+}

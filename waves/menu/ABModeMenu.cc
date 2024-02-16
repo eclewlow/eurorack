@@ -443,9 +443,9 @@ void ABModeMenu::DrawSide(int side) {
             // load into wavebuffer the current frame
             // flash.StopDMA(true);
             if(side == 0) {
-                flash.StartFrameDMARead((uint32_t*)&front_buffer_3[0], 4096, wavetable * 65536 + frame * 4096, ABModeMenu::on_load_left_gui_finished);
+                flash.StartFrameDMARead((uint32_t*)wavebuffer, 4096, wavetable * 65536 + frame * 4096, ABModeMenu::on_load_left_gui_finished);
             } else {
-                flash.StartFrameDMARead((uint32_t*)&front_buffer_3[2048], 4096, wavetable * 65536 + frame * 4096, ABModeMenu::on_load_right_gui_finished);
+                flash.StartFrameDMARead((uint32_t*)wavebuffer, 4096, wavetable * 65536 + frame * 4096, ABModeMenu::on_load_right_gui_finished);
             }
         }
         // abEngine.FillWaveform(wavebuffer, wavetable, frame);
@@ -455,9 +455,9 @@ void ABModeMenu::DrawSide(int side) {
             // load into wavebuffer the current frame
             // flash.StopDMA(true);
             if(side == 0) {
-                flash.StartFrameDMARead((uint32_t*)&front_buffer_3[0], 4096, abEngineWavetable * 65536 + abEngineFrame * 4096, ABModeMenu::on_load_left_gui_finished);
+                flash.StartFrameDMARead((uint32_t*)wavebuffer, 4096, abEngineWavetable * 65536 + abEngineFrame * 4096, ABModeMenu::on_load_left_gui_finished);
             } else {
-                flash.StartFrameDMARead((uint32_t*)&front_buffer_3[2048], 4096, abEngineWavetable * 65536 + abEngineFrame * 4096, ABModeMenu::on_load_right_gui_finished);
+                flash.StartFrameDMARead((uint32_t*)wavebuffer, 4096, abEngineWavetable * 65536 + abEngineFrame * 4096, ABModeMenu::on_load_right_gui_finished);
             }
         }
         // abEngine.FillWaveform(wavebuffer, abEngineWavetable, abEngineFrame);

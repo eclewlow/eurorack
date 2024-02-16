@@ -8,13 +8,16 @@
   ==============================================================================
 */
 
-#include "EnterNameMenu.h"
-
 #include "waves/Display.h"
 #include "waves/graphics.h"
 #include "waves/Globals.h"
+#include <string.h>
+#include <cstring>
+#include <stdio.h>
 
 namespace waves {
+
+const char * EnterNameMenu::char_list = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_- //";
 
 EnterNameMenu::EnterNameMenu() {
     char_index = 0;
@@ -130,13 +133,13 @@ void EnterNameMenu::paint() {
 
     y_offset += 3;
     x_offset += 3;
-    int row = 0;
+    // int row = 0;
     for(int i = 0; i < num_of_chars - 2; i++) {
         // 16 per row
         int row = i / 16;
         int col = i % 16;
         char theChar[2];
-        snprintf(theChar, 2, "%c", (char*)"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_- //"[i]);
+        snprintf(theChar, 2, "%c", char_list[i]);
         
         Display::put_string_5x5(x_offset + col * 7, y_offset + row * 8, 1, theChar, i == char_index);
     }

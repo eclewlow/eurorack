@@ -110,6 +110,7 @@ void IOConfigurationMenu::paint() {
             line = (char* ) "MORPH";
             break;
         default:
+            line = (char* ) "";
             break;
     }
     Display::put_string_5x5(x_offset + strlen("INPUT:") * 6, y_offset, strlen(line), line, state_ == IO_CONFIG_MENU_INPUT);
@@ -148,7 +149,7 @@ void IOConfigurationMenu::paint() {
     Display::LCD_Line(x_offset + 2, 32 - line_spacing / 2, x_offset - 2, 32 - line_spacing / 2, true);
     Display::LCD_Line(x_offset + 2, 32 + line_spacing / 2, x_offset - 2, 32 + line_spacing / 2, true);
 
-    int graph_width = 128 - x_offset;
+    // int graph_width = 128 - x_offset;
     Display::Draw_NWave(x_offset, 32 - line_spacing + 1, 50, 2 * line_spacing, wavedata_, 4095);
 }
 

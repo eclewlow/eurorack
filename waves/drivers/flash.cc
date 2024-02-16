@@ -183,10 +183,13 @@ void Flash::Init() {
 void Flash::StartFrameDMARead(uint32_t * buffer, uint32_t __bytes, uint32_t address, void (* func)(), uint16_t pin) {
   // if(GetFlag(&_EREG_, _BUSY_)) return;
   StopDMA(true);
+
+  while(&_EREG_, _BUSY_);
+  SetFlag(&_EREG_, _BUSY_, FLAG_SET);
+
   SetFlag(&_EREG_, _RXTC_, FLAG_CLEAR);
   SetFlag(&_EREG_, _TXTC_, FLAG_CLEAR);
   SetFlag(&_EREG_, _RXNE_, FLAG_CLEAR);
-  SetFlag(&_EREG_, _BUSY_, FLAG_SET);
 
   set_on_dma_read_finished_func(func);
 
@@ -272,6 +275,11 @@ void Flash::StopDMA(bool bypass) {
 
   if(on_dma_read_finished_func && !bypass)
     (*on_dma_read_finished_func)();
+
+  if(!on_dma_read_finished_func) {
+    SetFlag(&_EREG_, _RXNE_, FLAG_CLEAR);
+    SetFlag(&_EREG_, _BUSY_, FLAG_CLEAR);    
+  }
 }
 
 }  // namespace waves

@@ -11,6 +11,9 @@
 #pragma once
 
 #include "waves/State.h"
+#include "waves/Globals.h"
+#include <string.h>
+#include <cstring>
 
 class State;
 
@@ -36,7 +39,7 @@ public:
 private:
     static const int num_of_chars = 41;
     static const int num_of_name_chars = 8;
-    // char * char_list = (char*)"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_- //";
+    static const char * char_list;
     int char_index;
     int name_index;
     char name_chars[9];

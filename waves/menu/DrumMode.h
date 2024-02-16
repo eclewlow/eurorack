@@ -36,6 +36,8 @@ public:
     void triggerUpdate(bool back_pressed);
     void setEditing(bool editing);
 
+    static void on_load_wavetable_names_finished();
+
 private:
     // depth -50 to 50
     // decays 0 to 100
@@ -43,6 +45,11 @@ private:
     uint32_t timer_;
     bool is_editing_;
     int8_t edit_state_;
+
+    int loaded_wavetable_;
+
+    char wavetable_names_[16][9];
+
     DISALLOW_COPY_AND_ASSIGN (DrumMode);
 };
 

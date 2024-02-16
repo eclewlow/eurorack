@@ -114,35 +114,35 @@ float ABEngine::GetSampleBetweenFrames(float phase, float morph) {
 }
 
 void ABEngine::FillWaveform(int16_t * waveform, uint16_t tune, uint16_t fx_amount, uint16_t fx, uint16_t morph, bool withFx) {
-    // float frequency = 23.4375;
+    float frequency = 23.4375;
 
-    // float phaseIncrement = frequency / 48000.0f;
+    float phaseIncrement = frequency / 48000.0f;
     
-    // float temp_phase = 0.0f;
+    float temp_phase = 0.0f;
     
-    // if(withFx)
-    //     effect_manager.getEffect()->Sync_phases();
+    if(withFx)
+        effect_manager.getEffect()->Sync_phases();
 
-    // for(int i = 0; i < 2048; i++) {
-    //     float thisX = morph_;
-    //     thisX = CLAMP<float>(thisX, 0.0, 1.0);
+    for(int i = 0; i < 2048; i++) {
+        float thisX = morph_;
+        thisX = CLAMP<float>(thisX, 0.0, 0.9999);
         
-    //     float calculated_phase = temp_phase;
-    //     if(withFx)
-    //         calculated_phase = effect_manager.RenderPhaseEffect(temp_phase, frequency, fx_amount, fx, true);
+        float calculated_phase = temp_phase;
+        if(withFx)
+            calculated_phase = effect_manager.RenderPhaseEffect(temp_phase, frequency, fx_amount, fx, true);
         
-    //     float sample = GetSampleBetweenFrames(calculated_phase, thisX);
+        float sample = GetSampleBetweenFrames(calculated_phase, thisX);
         
-    //     if(withFx)
-    //         sample = effect_manager.RenderSampleEffect(sample, temp_phase, frequency, fx_amount, fx, true);
+        if(withFx)
+            sample = effect_manager.RenderSampleEffect(sample, temp_phase, frequency, fx_amount, fx, true);
         
-    //     temp_phase += phaseIncrement;
+        temp_phase += phaseIncrement;
         
-    //     if(temp_phase >= 1.0f)
-    //         temp_phase -= 1.0f;
+        if(temp_phase >= 1.0f)
+            temp_phase -= 1.0f;
         
-    //     waveform[i] = static_cast<int16_t>(sample * 32767.0f);
-    // }
+        waveform[i] = static_cast<int16_t>(sample * 32767.0f);
+    }
 }
 
 void ABEngine::FillWaveform(int16_t * waveform, bool is_left) {
@@ -182,6 +182,58 @@ void ABEngine::triggerUpdate() {
     flash.StopDMA(true);
     flash.StartFrameDMARead((uint32_t*)back_buffer_1, 4096, 0 * 4096, ABEngine::on_load_both_ab_left_finished);
  }
+
+int16_t ABEngine::GetSampleBetweenFramesNoDMA(float phase, float morph) {
+    int16_t sample = 0;
+
+    int16_t sample1 = 0;
+    int16_t sample2 = 0;
+
+    float index = phase * 2048.0;
+    uint16_t integral = floor(index);
+    float fractional = index - integral;
+    uint16_t nextIntegral = (integral + 1) % 2048;
+
+    float frame = morph * 15.0f;
+    int frame_integral = floor(frame);
+    float frame_fractional = frame - frame_integral;
+
+    int16_t * buf = front_buffer_4;
+    sample1 = buf[integral] + (buf[nextIntegral] - buf[integral]) * fractional;
+    sample2 = buf[2048 + integral] + (buf[2048 + nextIntegral] - buf[2048 + integral]) * fractional;
+
+    // if(frame_integral > current_frame_)
+    //     sample = sample2;
+    // else if(frame_integral < current_frame_)
+    //     sample = sample1;
+    // else
+        sample = sample1 * (1.0f - frame_fractional) + sample2 * frame_fractional;
+
+    return sample;
+}
+int16_t ABEngine::FillWaveform(int16_t * waveform, float morph) {
+    float frequency = 23.4375;
+
+    float phaseIncrement = frequency / 48000.0f;
+    
+    float temp_phase = 0.0f;
+
+    for(int i = 0; i < 2048; i++) {
+        float thisX = morph;
+        thisX = CLAMP<float>(thisX, 0.0, 0.9999);
+        
+        float calculated_phase = temp_phase;
+        
+        int16_t sample = GetSampleBetweenFramesNoDMA(calculated_phase, thisX);
+
+        temp_phase += phaseIncrement;
+        
+        if(temp_phase >= 1.0f)
+            temp_phase -= 1.0f;
+        
+        waveform[i] = sample;
+    }
+}
 
 void ABEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, uint16_t fx_amount, uint16_t fx, uint16_t morph)
 {

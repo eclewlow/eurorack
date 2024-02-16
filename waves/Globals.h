@@ -49,9 +49,11 @@ extern int16_t * back_buffer;
 extern int16_t * front_buffer_1;
 extern int16_t * front_buffer_2;
 extern int16_t * front_buffer_3;
+extern int16_t * front_buffer_4;
 extern int16_t * back_buffer_1;
 extern int16_t * back_buffer_2;
 extern int16_t * back_buffer_3;
+extern int16_t * back_buffer_4;
 extern int16_t pump_buffer[6144];
 extern float loading;
 extern uint8_t lcd_buffer[8][128];
@@ -164,7 +166,7 @@ extern MatrixEngine matrixEngine;
 extern DrumEngine drumEngine;
 extern Suboscillator suboscillator;
 
-// extern EffectManager effect_manager;
+extern EffectManager effect_manager;
 extern FM fm;
 extern PhaseDistortion phase_distortion;
 extern RingModulator ring_modulator;
@@ -180,9 +182,9 @@ extern Quantizer quantizer;
 // extern SystemClock system_clock;
 extern Flash flash;
 
-// extern int16_t BUF1[2048];
-// extern int16_t BUF2[2048];
-// extern int16_t BUF3[2048];
-// extern int16_t BUF4[2048];
-// extern int16_t BUF5[2048];
+extern int16_t BUF1[2048];
+extern int16_t BUF2[2048];
+extern int16_t BUF3[2048];
+extern int16_t BUF4[2048];
+extern int16_t BUF5[2048];
 

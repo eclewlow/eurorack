@@ -56,7 +56,7 @@ MatrixEngine matrixEngine;
 DrumEngine drumEngine;
 Suboscillator suboscillator;
 
-// EffectManager effect_manager;
+EffectManager effect_manager;
 FM fm;
 PhaseDistortion phase_distortion;
 RingModulator ring_modulator;
@@ -72,11 +72,11 @@ Quantizer quantizer;
 // SystemClock system_clock;
 Flash flash;
 
-// int16_t BUF1[2048];
-// int16_t BUF2[2048];
-// int16_t BUF3[2048];
-// int16_t BUF4[2048];
-// int16_t BUF5[2048];
+int16_t BUF1[2048];
+int16_t BUF2[2048];
+int16_t BUF3[2048];
+int16_t BUF4[2048];
+int16_t BUF5[2048];
 
 EEPROM_PIN eeprom[11] = {
   { GPIOA, GPIO_Pin_4  },
@@ -106,6 +106,8 @@ int16_t triple_waveframe_buffer_3[6144];
 int16_t triple_waveframe_buffer_4[6144];
 int16_t triple_waveframe_buffer_5[6144];
 int16_t triple_waveframe_buffer_6[6144];
+int16_t triple_waveframe_buffer_7[6144];
+int16_t triple_waveframe_buffer_8[6144];
 
 int16_t * front_buffer = triple_waveframe_buffer_1;
 int16_t * back_buffer = triple_waveframe_buffer_2;
@@ -113,9 +115,11 @@ int16_t * back_buffer = triple_waveframe_buffer_2;
 int16_t * front_buffer_1 = triple_waveframe_buffer_1;
 int16_t * front_buffer_2 = triple_waveframe_buffer_2;
 int16_t * front_buffer_3 = triple_waveframe_buffer_3;
-int16_t * back_buffer_1 = triple_waveframe_buffer_4;
-int16_t * back_buffer_2 = triple_waveframe_buffer_5;
-int16_t * back_buffer_3 = triple_waveframe_buffer_6;
+int16_t * front_buffer_4 = triple_waveframe_buffer_4;
+int16_t * back_buffer_1 = triple_waveframe_buffer_5;
+int16_t * back_buffer_2 = triple_waveframe_buffer_6;
+int16_t * back_buffer_3 = triple_waveframe_buffer_7;
+int16_t * back_buffer_4 = triple_waveframe_buffer_8;
 
 int16_t * matrix_front_buffer_1 = triple_waveframe_buffer_1;
 int16_t * matrix_front_buffer_2 = triple_waveframe_buffer_2;

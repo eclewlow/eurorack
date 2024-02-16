@@ -34,6 +34,12 @@ void DrumMode::triggerUpdate(bool back_pressed) {
     edit_state_ = DRUM_MODE_EDIT_WAVETABLE;
 }
 
+
+void DrumMode::on_load_wavetable_names_finished() {
+    SetFlag(&_EREG_, _RXNE_, FLAG_CLEAR);
+    SetFlag(&_EREG_, _BUSY_, FLAG_CLEAR);
+}
+
 bool DrumMode::handleKeyRelease(int key) {
 //    DRUM_MODE_EDIT_WAVETABLE = 0,
 //    DRUM_MODE_EDIT_AMP_DECAY = 1,
@@ -53,6 +59,7 @@ bool DrumMode::handleKeyRelease(int key) {
     if(key == RIGHT_ENCODER_CCW) {
         switch(edit_state_) {
             case DRUM_MODE_EDIT_WAVETABLE:
+                flash.StartFrameDMARead((uint32_t*)wavetable_names_, 16 * 9, 0, DrumMode::on_load_wavetable_names_finished, EEPROM_PERSISTENT_SS);
                 drumEngine.SetWavetable(drumEngine.GetWavetable() - 1);
                 break;
             case DRUM_MODE_EDIT_AMP_DECAY:
@@ -78,6 +85,7 @@ bool DrumMode::handleKeyRelease(int key) {
     if(key == RIGHT_ENCODER_CW) {
         switch(edit_state_) {
             case DRUM_MODE_EDIT_WAVETABLE:
+                flash.StartFrameDMARead((uint32_t*)wavetable_names_, 16 * 9, 0, DrumMode::on_load_wavetable_names_finished, EEPROM_PERSISTENT_SS);
                 drumEngine.SetWavetable(drumEngine.GetWavetable() + 1);
                 break;
             case DRUM_MODE_EDIT_AMP_DECAY:
@@ -133,8 +141,10 @@ void DrumMode::paint() {
     int y_offset = 0;//32 - 10 - wave_height;
     Display::outline_rectangle(x_offset, y_offset, wave_width, wave_height);
     
-    storage.LoadWaveSample(BUF1, drumEngine.GetWavetable(), morph * 1.0f / 4095.0f);
-    Display::Draw_Wave(x_offset + 1, y_offset + 1, wave_width - 2, wave_height - 2, BUF1);
+    int16_t wave_buffer[2048];
+    drumEngine.FillWaveform(wave_buffer, morph * 1.0f / 4095.0f);
+
+    Display::Draw_Wave(x_offset + 1, y_offset + 1, wave_width - 2, wave_height - 2, wave_buffer);
 
     /****/
     // draw cursor
@@ -147,11 +157,12 @@ void DrumMode::paint() {
     // draw wave name
     /****/
     char * line;
-    if(storage.GetWavetable(drumEngine.GetWavetable())->name[0] == '\0')
-        line = (char*)"--------";
-    else
-        line = storage.GetWavetable(drumEngine.GetWavetable())->name;
-    //    snprintf(line, 20, "", 1.0 + matrixEngine.GetX1() + (matrixEngine.GetX2() - matrixEngine.GetX1()) * fx * 1.0f / 4095.0f);
+    // if(storage.GetWavetable(drumEngine.GetWavetable())->name[0] == '\0')
+    //     line = (char*)"--------";
+    // else
+    //     line = storage.GetWavetable(drumEngine.GetWavetable())->name;
+    line = wavetable_names_[drumEngine.GetWavetable()];
+
     y_offset += wave_height + 2;
     x_offset = 64 - strlen("WAVETABLE:") * 6 + 6;
     Display::put_string_5x5(x_offset, y_offset, strlen("WAVETABLE:"), "WAVETABLE:");
@@ -181,7 +192,7 @@ void DrumMode::paint() {
     
     int last_x = -1;
     for (float i = 0.0f; i < 1.0; i += 0.01f) {
-        float curve = drumEngine.GetFMShape();
+        // float curve = drumEngine.GetFMShape();
         float x = i;
         float y = drumEngine.GetY(x);
         

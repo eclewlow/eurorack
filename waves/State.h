@@ -10,6 +10,7 @@
 
 #pragma once
 
+namespace waves {
 
 class State {
 public:
@@ -29,3 +30,5 @@ protected:
     // State& operator=(State const&);
     // DISALLOW_COPY_AND_ASSIGN (State);
 };
+
+}

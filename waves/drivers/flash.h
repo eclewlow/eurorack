@@ -1207,6 +1207,7 @@ void W25qxx_Init (void)
     void (*on_dma_read_finished_func)();
     static Flash* instance_;
     // uint16_t current_pin_;
+    bool loading_external_;
   // NextSampleFn next_sample_fn_;
   // static FirmwareUpdateDac* instance_;
   
