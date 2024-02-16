@@ -39,7 +39,7 @@ public:
     virtual bool handleKeyRelease(int key);
     virtual bool handleKeyLongPress(int key) { return false; }
     virtual void paint();
-    void triggerUpdate(bool back_pressed) {};
+    void triggerUpdate(bool back_pressed);
     void DrawSide(int side);
 //    inline void setLeftState(ABMenuState state) { left_state_ = state; }
 //    inline void setRightState(ABMenuState state) { right_state_ = state; }

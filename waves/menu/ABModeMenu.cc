@@ -36,6 +36,64 @@ ABModeMenu::ABModeMenu() {
 ABModeMenu::~ABModeMenu() {
     
 }
+
+void ABModeMenu::triggerUpdate(bool back_pressed) {
+    if(!back_pressed) {
+        left_wavetable_offset_ = 0;
+        left_wavetable_ = 0;
+        left_frame_ = 0;
+        left_frame_offset_ = 0;
+
+        right_wavetable_offset_ = 0;
+        right_wavetable_ = 0;
+        right_frame_ = 0;
+        right_frame_offset_ = 0;
+
+        flash.StartFrameDMARead((uint32_t*)left_wavetable_names_, 16 * 9, 0, NULL, EEPROM_PERSISTENT_SS);
+        flash.StartFrameDMARead((uint32_t*)right_wavetable_names_, 16 * 9, 0, NULL, EEPROM_PERSISTENT_SS);
+        flash.StartFrameDMARead((uint32_t*)left_frame_names_, 16 * 9, 16 * 9 + 16 * 9 * left_wavetable_, NULL, EEPROM_PERSISTENT_SS);
+        flash.StartFrameDMARead((uint32_t*)right_frame_names_, 16 * 9, 16 * 9 + 16 * 9 * right_wavetable_, NULL, EEPROM_PERSISTENT_SS);
+
+        return;
+    }
+
+    if(left_wavetable_ < left_wavetable_offset_) {
+        left_wavetable_offset_ = left_wavetable_;
+    }
+
+    if(left_frame_ < left_frame_offset_) {
+        left_frame_offset_ = left_frame_;
+    }
+    
+    if(left_wavetable_ > left_wavetable_offset_ + 2) {
+        left_wavetable_offset_ = left_wavetable_ - 2;
+    }
+
+    if(left_frame_ > left_frame_offset_ + 2) {
+        left_frame_offset_ = left_frame_ - 2;
+    }
+
+    if(right_wavetable_ < right_wavetable_offset_) {
+        right_wavetable_offset_ = right_wavetable_;
+    }
+
+    if(right_frame_ < right_frame_offset_) {
+        right_frame_offset_ = right_frame_;
+    }
+    
+    if(right_wavetable_ > right_wavetable_offset_ + 2) {
+        right_wavetable_offset_ = right_wavetable_ - 2;
+    }
+
+    if(right_frame_ > right_frame_offset_ + 2) {
+        right_frame_offset_ = right_frame_ - 2;
+    }
+
+    flash.StartFrameDMARead((uint32_t*)left_wavetable_names_, 16 * 9, 0, NULL, EEPROM_PERSISTENT_SS);
+    flash.StartFrameDMARead((uint32_t*)right_wavetable_names_, 16 * 9, 0, NULL, EEPROM_PERSISTENT_SS);
+    flash.StartFrameDMARead((uint32_t*)left_frame_names_, 16 * 9, 16 * 9 + 16 * 9 * left_wavetable_, NULL, EEPROM_PERSISTENT_SS);
+    flash.StartFrameDMARead((uint32_t*)right_frame_names_, 16 * 9, 16 * 9 + 16 * 9 * right_wavetable_, NULL, EEPROM_PERSISTENT_SS);
+}
 //AB_NONE,
 //AB_LOAD_HOVER,
 //AB_EDIT_HOVER,

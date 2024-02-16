@@ -22,7 +22,7 @@ int8_t switch_2_test;
 // uint8_t effect = EFFECT_TYPE_FM;
 // uint8_t sub_osc_shape = SUBOSC_WAVE_RAMP;
 
-// Storage storage;
+Storage storage;
 
 MainMenu mainMenu;
 ModeMenu modeMenu;

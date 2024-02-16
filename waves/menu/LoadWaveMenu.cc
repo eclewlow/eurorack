@@ -288,10 +288,12 @@ void LoadWaveMenu::paint() {
         uint8_t frame = morph_ * 15.0f;
         if(wavetable_gui_ != wavetable_ && frame_gui_ != frame) {
             // load double frame. draw double frame
-            flash.StartFrameDMARead((uint32_t*)front_buffer_4, 8192, wavetable_ * 65536 + frame * 4096, NULL, EEPROM_PERSISTENT_SS);
+            flash.StartFrameDMARead((uint32_t*)front_buffer_4, 8192, wavetable_ * 65536 + frame * 4096, NULL, EEPROM_FACTORY_SS);
             wavetable_gui_ = wavetable_;
             frame_gui_ = frame;
         }
+        // storage.LoadWaveSample(BUF1, wavetable_, morph_);
+
         abEngine.FillWaveform(BUF1, morph_);
 
         Display::Draw_Wave(64, y_offset - y_shift, 64, bar_height - 3, BUF1);
@@ -359,7 +361,7 @@ void LoadWaveMenu::paint() {
 
         if(wavetable_gui_ != wavetable_ && frame_gui_ != frame_) {
             // load double frame. draw double frame
-            flash.StartFrameDMARead((uint32_t*)front_buffer_4, 4096, wavetable_ * 65536 + frame_ * 4096, NULL, EEPROM_PERSISTENT_SS);
+            flash.StartFrameDMARead((uint32_t*)front_buffer_4, 4096, wavetable_ * 65536 + frame_ * 4096, NULL, EEPROM_FACTORY_SS);
             wavetable_gui_ = wavetable_;
             frame_gui_ = frame_;
         }

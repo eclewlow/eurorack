@@ -33,6 +33,8 @@ void ManageMenu::triggerUpdate(bool back_pressed) {
         wavetable_ = 0;
         frame_ = 0;
         frame_offset_ = 0;
+        flash.StartFrameDMARead((uint32_t*)wavetable_names_, 16 * 9, 0, NULL, EEPROM_PERSISTENT_SS);
+        flash.StartFrameDMARead((uint32_t*)frame_names_, 16 * 9, 16 * 9 + 16 * 9 * wavetable_, NULL, EEPROM_PERSISTENT_SS);
         return;
     }
 
@@ -51,6 +53,9 @@ void ManageMenu::triggerUpdate(bool back_pressed) {
     if(frame_ > frame_offset_ + 5) {
         frame_offset_ = frame_ - 5;
     }
+
+    flash.StartFrameDMARead((uint32_t*)wavetable_names_, 16 * 9, 0, NULL, EEPROM_PERSISTENT_SS);
+    flash.StartFrameDMARead((uint32_t*)frame_names_, 16 * 9, 16 * 9 + 16 * 9 * wavetable_, NULL, EEPROM_PERSISTENT_SS);
 }
 
 void ManageMenu::ResetTicker() {
@@ -69,7 +74,7 @@ bool ManageMenu::handleKeyLongPress(int key) {
             }
         } else if(state_ == MANAGE_MENU_SELECT_FRAME) {
             if(system_clock.milliseconds() - press_timer_ > 1000) {
-                if(storage.GetWavetable(wavetable_)->factory_preset) {
+                if(false) { //storage.GetWavetable(wavetable_)->factory_preset) {
                     option_selected_ = MANAGE_MENU_COPY;
                 } else {
                     option_selected_ = MANAGE_MENU_EDIT;
@@ -159,7 +164,7 @@ bool ManageMenu::handleKeyRelease(int key) {
                 break;
             }
             case MANAGE_MENU_WAVETABLE_OPTIONS:
-                if(storage.GetWavetable(wavetable_)->factory_preset)
+                if(false) //storage.GetWavetable(wavetable_)->factory_preset)
                 {
                     
                 }
@@ -167,7 +172,7 @@ bool ManageMenu::handleKeyRelease(int key) {
                     setOptionSelected(CLAMP<int8_t>(option_selected_ - 1, MANAGE_MENU_COPY, MANAGE_MENU_DELETE));
                 break;
             case MANAGE_MENU_FRAME_OPTIONS:
-                if(storage.GetWavetable(wavetable_)->factory_preset)
+                if(false) //storage.GetWavetable(wavetable_)->factory_preset)
                 {
                     
                 }
@@ -277,7 +282,7 @@ bool ManageMenu::handleKeyRelease(int key) {
     if(key == RIGHT_ENCODER_CCW) {
         switch(state_) {
             case MANAGE_MENU_SELECT_WAVETABLE:
-                morph_ = CLAMP<float>(morph_ - 1.0f / 30.0f, 0.0f, 1.0f);
+                morph_ = CLAMP<float>(morph_ - 1.0f / 30.0f, 0.0f, 0.9999f);
                 break;
             default:
                 break;
@@ -286,7 +291,7 @@ bool ManageMenu::handleKeyRelease(int key) {
     if(key == RIGHT_ENCODER_CW) {
         switch(state_) {
             case MANAGE_MENU_SELECT_WAVETABLE:
-                morph_ = CLAMP<float>(morph_ + 1.0f / 30.0f, 0.0f, 1.0f);
+                morph_ = CLAMP<float>(morph_ + 1.0f / 30.0f, 0.0f, 0.9999f);
                 break;
             default:
                 break;
@@ -317,7 +322,7 @@ bool ManageMenu::handleKeyRelease(int key) {
         }
         switch(state_) {
             case MANAGE_MENU_SELECT_WAVETABLE:
-                if(copy_state_ == MANAGE_MENU_COPY_STATE_WAVETABLE && storage.GetWavetable(wavetable_)->factory_preset) {
+                if(false) { //copy_state_ == MANAGE_MENU_COPY_STATE_WAVETABLE && storage.GetWavetable(wavetable_)->factory_preset) {
                     popup.show();
                     popup.SetLine(0, (char*)"CANNOT OVERWRITE");
                     popup.SetLine(1, (char*)"FACTORY PRESETS!");
@@ -340,13 +345,14 @@ bool ManageMenu::handleKeyRelease(int key) {
                     setState(MANAGE_MENU_SELECT_FRAME);
                     frame_ = 0;
                     frame_offset_ = 0;
+                    flash.StartFrameDMARead((uint32_t*)frame_names_, 16 * 9, 16 * 9 + 16 * 9 * wavetable_, NULL, EEPROM_PERSISTENT_SS);
                 }
                 break;
             case MANAGE_MENU_MOVE_WAVETABLE:
                 setState(MANAGE_MENU_SELECT_WAVETABLE);
                 break;
             case MANAGE_MENU_SELECT_FRAME: {
-                if(copy_state_ == MANAGE_MENU_COPY_STATE_FRAME && storage.GetWavetable(wavetable_)->factory_preset) {
+                if(false) { //copy_state_ == MANAGE_MENU_COPY_STATE_FRAME && storage.GetWavetable(wavetable_)->factory_preset) {
                     popup.show();
                     popup.SetLine(0, (char*)"CANNOT OVERWRITE");
                     popup.SetLine(1, (char*)"FACTORY PRESETS!");
@@ -384,7 +390,8 @@ bool ManageMenu::handleKeyRelease(int key) {
                     context.setState(&enterNameMenu);
                     enterNameMenu.setBackMenu(this);
                     enterNameMenu.setExecFunc(ManageMenu::SaveWavetable);
-                    enterNameMenu.setNameChars(storage.GetWavetable(wavetable_)->name);
+                    // enterNameMenu.setNameChars(storage.GetWavetable(wavetable_)->name);
+                    enterNameMenu.setNameChars(wavetable_names_[wavetable_]);
                 } else if(option_selected_ == MANAGE_MENU_DELETE) {
                     option_selected_ = MANAGE_MENU_NO;
                     setState(MANAGE_MENU_CONFIRM);
@@ -399,7 +406,8 @@ bool ManageMenu::handleKeyRelease(int key) {
             case MANAGE_MENU_FRAME_OPTIONS:
                 if(option_selected_ == MANAGE_MENU_EDIT) {
                     waveEditor.setBackMenu(this);
-                    storage.LoadWaveSample(BUF5, wavetable_, frame_);
+                    flash.StartFrameDMARead((uint32_t*)BUF5, 4096, wavetable_ * 65536 + frame_ * 4096, ManageMenu::on_load_wave_editor_finished, EEPROM_FACTORY_SS);
+                    // storage.LoadWaveSample(BUF5, wavetable_, frame_);
                     waveEditor.setWavedata(BUF5);
                     waveEditor.setWavetable(wavetable_);
                     waveEditor.setFrame(frame_);
@@ -415,7 +423,8 @@ bool ManageMenu::handleKeyRelease(int key) {
                     context.setState(&enterNameMenu);
                     enterNameMenu.setBackMenu(this);
                     enterNameMenu.setExecFunc(ManageMenu::SaveWave);
-                    enterNameMenu.setNameChars(storage.GetWavetable(wavetable_)->waves[frame_].name);
+                    // enterNameMenu.setNameChars(storage.GetWavetable(wavetable_)->waves[frame_].name);
+                    enterNameMenu.setNameChars(frame_names_[frame_]);
                 } else if(option_selected_ == MANAGE_MENU_DELETE) {
                     option_selected_ = MANAGE_MENU_NO;
                     setState(MANAGE_MENU_CONFIRM);
@@ -507,6 +516,13 @@ bool ManageMenu::handleKeyRelease(int key) {
     return true;
 }
 
+void ManageMenu::on_load_wave_editor_finished() {
+    waveEditor.setWavedata(BUF5);
+    SetFlag(&_EREG_, _RXNE_, FLAG_CLEAR);
+    SetFlag(&_EREG_, _BUSY_, FLAG_CLEAR);
+}
+
+
 void ManageMenu::SetLine(int line_no, char* str) {
     char* line = confirm_lines_[line_no];
     memset(line, 0, 20);
@@ -559,7 +575,10 @@ void ManageMenu::CancelDeleteFrame() {
 }
 
 void ManageMenu::SaveWavetable(char* param) {
-    storage.SaveWavetable(param, manageMenu.wavetable_);
+    // storage.SaveWavetable(param, manageMenu.wavetable_);    
+    strncpy(manageMenu.wavetable_names_[manageMenu.wavetable_], param, 9);
+    flash.SectorErase4K(0, EEPROM_PERSISTENT_SS);
+    flash.Page_Program_Repeat((uint8_t *)manageMenu.wavetable_names_, 16 * 9, 0, EEPROM_PERSISTENT_SS);
     manageMenu.setState(MANAGE_MENU_SELECT_WAVETABLE);
     manageMenu.ResetTicker();
 }
@@ -578,10 +597,11 @@ void ManageMenu::paint() {
     if(state_ == MANAGE_MENU_WAVETABLE_OPTIONS) {
         char * title;
 
-        if(storage.GetWavetable(wavetable_)->name[0] == '\0')
-            title = (char*) "--------";
-        else
-            title = (char *) storage.GetWavetable(wavetable_)->name;
+        // if(storage.GetWavetable(wavetable_)->name[0] == '\0')
+        //     title = (char*) "--------";
+        // else
+        //     title = (char *) storage.GetWavetable(wavetable_)->name;
+        title = wavetable_names_[wavetable_];        
 
         int y_offset = 3;
         int x_offset = 1 + 2 * 4;
@@ -593,7 +613,7 @@ void ManageMenu::paint() {
         x_offset = 20;
         y_offset = 18;
         
-        if(storage.GetWavetable(wavetable_)->factory_preset) {
+        if(false) { //storage.GetWavetable(wavetable_)->factory_preset) {
             Display::put_image_16bit(x_offset, y_offset, Graphic_icon_edit_11x11, 11);
             Display::put_string_9x9(x_offset + 16, y_offset + 1, strlen("COPY"), "COPY", option_selected_ == MANAGE_MENU_COPY, 3);
         }
@@ -612,10 +632,11 @@ void ManageMenu::paint() {
     }
     else if(state_ == MANAGE_MENU_FRAME_OPTIONS) {
         char * title;
-        if(storage.GetWavetable(wavetable_)->waves[frame_].name[0] == '\0')
-            title = (char*) "--------";
-        else
-            title = (char *) storage.GetWavetable(wavetable_)->waves[frame_].name;
+        // if(storage.GetWavetable(wavetable_)->waves[frame_].name[0] == '\0')
+        //     title = (char*) "--------";
+        // else
+        //     title = (char *) storage.GetWavetable(wavetable_)->waves[frame_].name;
+        title = frame_names_[frame_];
 
         int y_offset = 3;
         int x_offset = 1 + 2 * 4;
@@ -627,7 +648,7 @@ void ManageMenu::paint() {
         x_offset = 20;
         y_offset = 18;
         
-        if(storage.GetWavetable(wavetable_)->factory_preset) {
+        if(false) { //storage.GetWavetable(wavetable_)->factory_preset) {
             Display::put_image_16bit(x_offset, y_offset, Graphic_icon_edit_11x11, 11);
             Display::put_string_9x9(x_offset + 16, y_offset + 1, strlen("COPY"), "COPY", option_selected_ == MANAGE_MENU_COPY, 3);
         }
@@ -739,13 +760,14 @@ void ManageMenu::paint() {
             snprintf(line, 20, "%*d", 2, i + wavetable_offset_ + 1);
             Display::put_string_3x5(2, y_offset + i * 8, strlen(line), line);
             
-            char * name = storage.GetWavetable(i + wavetable_offset_)->name;
+            // char * name = storage.GetWavetable(i + wavetable_offset_)->name;
+            char * name = wavetable_names_[i + wavetable_offset_];
 
             char * line2 = name;
 
             int32_t elapsed_time = system_clock.milliseconds() - ticker_timer_;
 
-            int8_t num_chars = 7;
+            uint8_t num_chars = 7;
 
             if(i + wavetable_offset_ == wavetable_) {
                 if(ticker_ == 0) {
@@ -774,7 +796,15 @@ void ManageMenu::paint() {
         Display::outline_rectangle(x_offset+1, y_offset + 1 - y_shift + y_cursor_offset, 1, 3);
         Display::invert_rectangle(x_offset, y_offset - y_shift, 3, bar_height);
 
-        storage.LoadWaveSample(BUF1, wavetable_, morph_);
+        // storage.LoadWaveSample(BUF1, wavetable_, morph_);
+        uint8_t frame = morph_ * 15.0f;
+        if(wavetable_gui_ != wavetable_ && frame_gui_ != frame) {
+            // load double frame. draw double frame
+            flash.StartFrameDMARead((uint32_t*)front_buffer_4, 8192, wavetable_ * 65536 + frame * 4096, NULL, EEPROM_FACTORY_SS);
+            wavetable_gui_ = wavetable_;
+            frame_gui_ = frame;
+        }
+        abEngine.FillWaveform(BUF1, morph_);
 
         Display::Draw_Wave(64, y_offset - y_shift, 64, bar_height - 3, BUF1);
 
@@ -791,8 +821,10 @@ void ManageMenu::paint() {
             title = (char *) "COPY WAVETABLE TO:";
         else if(copy_state_ == MANAGE_MENU_COPY_STATE_FRAME)
             title = (char *) "COPY WAVE TO:";
+        // else
+            // title = (char *) storage.GetWavetable(wavetable_)->name;
         else
-            title = (char *) storage.GetWavetable(wavetable_)->name;
+            title = wavetable_names_[wavetable_];
         
         int y_offset = 3;
         int x_offset = 1 + 2 * 4;
@@ -819,7 +851,7 @@ void ManageMenu::paint() {
 
             int32_t elapsed_time = system_clock.milliseconds() - ticker_timer_;
 
-            int8_t num_chars = 7;
+            uint8_t num_chars = 7;
 
             if(i + frame_offset_ == frame_) {
                 if(ticker_ == 0) {
@@ -848,7 +880,7 @@ void ManageMenu::paint() {
         Display::outline_rectangle(x_offset+1, y_offset + 1 - y_shift + y_cursor_offset, 1, 3);
         Display::invert_rectangle(x_offset, y_offset - y_shift, 3, bar_height);
 
-        storage.LoadWaveSample(BUF1, wavetable_, frame_);
+        // storage.LoadWaveSample(BUF1, wavetable_, frame_);
 
         Display::Draw_Wave(64, y_offset - y_shift, 64, bar_height - 3, BUF1);
     }

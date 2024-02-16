@@ -1010,10 +1010,13 @@ bool Page_Program_Repeat(uint8_t * buffer, uint32_t size, uint32_t address, uint
     if(size < 2) return false;
     if(size % 2 != 0) return false;
 
-    WriteStatusRegister(0x00, EEPROM_FACTORY_SS);
-      system_clock.Delay(25);
+    while(GetFlag(&_EREG_, _BUSY_));
+    SetFlag(&_EREG_, _BUSY_, FLAG_SET);
 
-    for (int j = 0; j < 16; j++) {
+    WriteStatusRegister(0x00, pin);
+    system_clock.Delay(25);
+
+    for (uint32_t j = 0; j < 16; j++) {
 
       CMD(WRITE_ENABLE, pin);
 
@@ -1029,8 +1032,10 @@ bool Page_Program_Repeat(uint8_t * buffer, uint32_t size, uint32_t address, uint
       send_buf[2] = ((address >> 8) & 0xFF);
       send_buf[3] = ((address) & 0xFF);
 
-      for(int i = 0; i < 256; i++) {
-        send_buf[4 + i] = buffer[i + j * 256];
+      for(uint32_t i = 0; i < 256; i++) {
+        if(i + j * 256 < size) {
+          send_buf[4 + i] = buffer[i + j * 256];
+        }
       }
       // memcpy(send_buf + 4, buffer + j * 256, 256);
 
@@ -1053,12 +1058,17 @@ bool Page_Program_Repeat(uint8_t * buffer, uint32_t size, uint32_t address, uint
       address += 256;
     }
 
+    SetFlag(&_EREG_, _BUSY_, FLAG_CLEAR);    
+
     return true;
 }
 
 bool SectorErase4K(uint32_t address, uint8_t pin) {
 
-    WriteStatusRegister(0x00, EEPROM_FACTORY_SS);
+    while(GetFlag(&_EREG_, _BUSY_));
+    SetFlag(&_EREG_, _BUSY_, FLAG_SET);
+
+    WriteStatusRegister(0x00, pin);
       system_clock.Delay(25);
 
     // loading = 22;
@@ -1105,6 +1115,7 @@ bool SectorErase4K(uint32_t address, uint8_t pin) {
 
     // loading = 26;
     // CMD(WRITE_DISABLE, pin);
+    SetFlag(&_EREG_, _BUSY_, FLAG_CLEAR);    
 
     return true;
 }
@@ -1123,9 +1134,9 @@ void W25qxx_Init (void)
     // Program(0xef, 0, EEPROM_FACTORY_SS);
     // Program(0xaa, 1, EEPROM_FACTORY_SS);
 
-    while(GetFlag(&_EREG_, _BUSY_));
+    // while(GetFlag(&_EREG_, _BUSY_));
 
-    SetFlag(&_EREG_, _BUSY_, FLAG_SET);
+    // SetFlag(&_EREG_, _BUSY_, FLAG_SET);
 
     int wavetable = 0;
 
@@ -1155,7 +1166,7 @@ void W25qxx_Init (void)
     // AAI_Word_Program((uint8_t *)ROM, 4096, 0, EEPROM_FACTORY_SS);
 
 
-    SetFlag(&_EREG_, _BUSY_, FLAG_CLEAR);
+    // SetFlag(&_EREG_, _BUSY_, FLAG_CLEAR);
     // Program(0x1, 0, EEPROM_FACTORY_SS);
     // system_clock.Delay(100);
     // Program(0x1, 1, EEPROM_FACTORY_SS);

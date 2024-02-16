@@ -72,6 +72,8 @@ public:
     void SetLine(int line_no, char* str);
     void ResetTicker();
 
+    static void on_load_wave_editor_finished();
+
 private:
     int8_t state_;
     int8_t option_selected_;
@@ -96,6 +98,13 @@ private:
     uint32_t blink_timer_;
     bool absorb_keypress_;
     int8_t copy_state_;
+
+    char wavetable_names_[16][9];
+    char frame_names_[16][9];
+
+    int wavetable_gui_;
+    int frame_gui_;
+
     DISALLOW_COPY_AND_ASSIGN (ManageMenu);
 };
 

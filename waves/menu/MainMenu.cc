@@ -10,7 +10,7 @@
 
 #include "waves/Display.h"
 #include "waves/graphics.h"
-// #include "waves/Globals.h"
+#include "waves/Globals.h"
 
 namespace waves {
 
@@ -109,6 +109,8 @@ void MainMenu::paint() {
                 caption = (char*)"MATRIX";
             } else if(context.getEngine() == &drumEngine) {
                 caption = (char*)"DRUM";
+            } else {
+                caption = (char*)"";
             }
             break;
         case MODE_SELECT:

@@ -1,52 +1,52 @@
-// /*
-//   ==============================================================================
+/*
+  ==============================================================================
 
-//     Storage.cpp
-//     Created: 20 Nov 2023 5:41:08pm
-//     Author:  Eugene Clewlow
+    Storage.cpp
+    Created: 20 Nov 2023 5:41:08pm
+    Author:  Eugene Clewlow
 
-//   ==============================================================================
-// */
+  ==============================================================================
+*/
 
-// #include "waves/wavetables.h"
-// #include "waves/Globals.h"
+#include "waves/wavetables.h"
+#include "waves/Globals.h"
 
-// void Storage::Init() {
-// //    save_file_ = juce::File::getCurrentWorkingDirectory().getChildFile ("file.txt");
+void Storage::Init() {
+//    save_file_ = juce::File::getCurrentWorkingDirectory().getChildFile ("file.txt");
     
-// //    printf("%s\n", juce::File::getCurrentWorkingDirectory().getFullPathName().toStdString().c_str());
-//     save_file_ = juce::File("/Users/eclewlow/file.txt");
-//     if( !save_file_.existsAsFile() )
-//     {
-//         auto result = save_file_.create();
-//         if( !result.wasOk() )
-//         {
-//             printf("failed creating file!");
-//             DBG("failed creating file!");
-//             jassertfalse; //pause so we can see the error message
-//             return;  //bail
-//         }
-//         EraseAll();
-//         SaveAll();
-//     } else {
-//         LoadAll();
-//     }
-// //    printf("size of = %d", sizeof(SNAPSHOT));
-// //    printf("signed int=%d", static_cast<uint16_t>(static_cast<int16_t>(65535)));
-// }
+//    printf("%s\n", juce::File::getCurrentWorkingDirectory().getFullPathName().toStdString().c_str());
+    // save_file_ = juce::File("/Users/eclewlow/file.txt");
+    // if( !save_file_.existsAsFile() )
+    // {
+    //     auto result = save_file_.create();
+    //     if( !result.wasOk() )
+    //     {
+    //         printf("failed creating file!");
+    //         DBG("failed creating file!");
+    //         jassertfalse; //pause so we can see the error message
+    //         return;  //bail
+    //     }
+    //     EraseAll();
+    //     SaveAll();
+    // } else {
+    //     LoadAll();
+    // }
+//    printf("size of = %d", sizeof(SNAPSHOT));
+//    printf("signed int=%d", static_cast<uint16_t>(static_cast<int16_t>(65535)));
+}
 
-// bool Storage::SaveAll() {
-//     save_file_.replaceWithData(&persistent_storage_, sizeof(PERSISTENT_STORAGE));
-//     return true;
-// }
+bool Storage::SaveAll() {
+    // save_file_.replaceWithData(&persistent_storage_, sizeof(PERSISTENT_STORAGE));
+    return true;
+}
 
-// bool Storage::LoadAll() {
-//     juce::FileInputStream input_stream(save_file_);
-//     input_stream.read(&persistent_storage_, sizeof(PERSISTENT_STORAGE));
-//     return true;
-// }
+bool Storage::LoadAll() {
+    // juce::FileInputStream input_stream(save_file_);
+    // input_stream.read(&persistent_storage_, sizeof(PERSISTENT_STORAGE));
+    return true;
+}
 
-// bool Storage::ResetFactoryWavetables() {
+bool Storage::ResetFactoryWavetables() {
 //     char *names[16] = {
 //         (char*)"SQUISH",
 //         (char*)"HARMONIX",
@@ -79,57 +79,57 @@
 //         }
 //     }
     
-//     SaveAll();
+    SaveAll();
 
-//     return true;
-// }
-// bool Storage::EraseAllUserWavetables() {
-//     for(int table = FACTORY_WAVETABLE_COUNT; table <  FACTORY_WAVETABLE_COUNT + USER_WAVETABLE_COUNT; table++) {
-//         strncpy(GetWavetable(table)->name, "INIT", 9);
-//         GetWavetable(table)->factory_preset = false;
-//         GetWavetable(table)->is_empty = true;
-//         for(int frame = 0; frame < 16; frame++) {
-//             GetWavetable(table)->waves[frame].memory_location = table * 16 * 2048 + frame * 2048;
-//             strncpy(GetWavetable(table)->waves[frame].name, "INIT", 9);
-//             GetWavetable(table)->waves[frame].factory_preset = false;
-//             GetWavetable(table)->waves[frame].is_empty = true;
-//             memset(&ROM[GetWavetable(table)->waves[frame].memory_location], 0, 2048 * 2);
-//         }
-//     }
-//     return true;
-// }
+    return true;
+}
+bool Storage::EraseAllUserWavetables() {
+    // for(int table = FACTORY_WAVETABLE_COUNT; table <  FACTORY_WAVETABLE_COUNT + USER_WAVETABLE_COUNT; table++) {
+    //     strncpy(GetWavetable(table)->name, "INIT", 9);
+    //     GetWavetable(table)->factory_preset = false;
+    //     GetWavetable(table)->is_empty = true;
+    //     for(int frame = 0; frame < 16; frame++) {
+    //         GetWavetable(table)->waves[frame].memory_location = table * 16 * 2048 + frame * 2048;
+    //         strncpy(GetWavetable(table)->waves[frame].name, "INIT", 9);
+    //         GetWavetable(table)->waves[frame].factory_preset = false;
+    //         GetWavetable(table)->waves[frame].is_empty = true;
+    //         memset(&ROM[GetWavetable(table)->waves[frame].memory_location], 0, 2048 * 2);
+    //     }
+    // }
+    return true;
+}
 
-// bool Storage::EraseAllWavetables() {
-//     ResetFactoryWavetables();
-//     EraseAllUserWavetables();
+bool Storage::EraseAllWavetables() {
+    ResetFactoryWavetables();
+    EraseAllUserWavetables();
     
-//     SaveAll();
+    SaveAll();
 
-//     return true;
-// }
+    return true;
+}
 
-// bool Storage::EraseAllSnapshots() {
-//     for(int snapshot = 0; snapshot < FACTORY_SNAPSHOT_COUNT + USER_SNAPSHOT_COUNT; snapshot++) {
-//         SNAPSHOT * snapshot_ptr = GetSnapshot(snapshot);
-//         EraseSnapshot(snapshot_ptr, snapshot, false);
-//     }
+bool Storage::EraseAllSnapshots() {
+    // for(int snapshot = 0; snapshot < FACTORY_SNAPSHOT_COUNT + USER_SNAPSHOT_COUNT; snapshot++) {
+    //     SNAPSHOT * snapshot_ptr = GetSnapshot(snapshot);
+    //     EraseSnapshot(snapshot_ptr, snapshot, false);
+    // }
     
-//     SaveAll();
+    SaveAll();
 
-//     return true;
-// }
+    return true;
+}
 
 
-// bool Storage::EraseAll() {
-//     EraseAllWavetables();
-//     EraseAllSnapshots();
+bool Storage::EraseAll() {
+    EraseAllWavetables();
+    EraseAllSnapshots();
     
-//     SaveAll();
+    SaveAll();
 
-//     return true;
-// }
+    return true;
+}
 
-// bool Storage::EraseSnapshot(SNAPSHOT *snapshot, uint8_t index, bool save) {
+bool Storage::EraseSnapshot(SNAPSHOT *snapshot, uint8_t index, bool save) {
 //     char* lines[4] = {
 //         (char*)"WHOOPSIE\0",
 //         (char*)"TEST\0",
@@ -203,29 +203,29 @@
 //     snapshot_ptr->calibration_x = 0.023619047619048;    // don't randomize this, but save in snapshot
 //     snapshot_ptr->calibration_y = 12.0f;    // don't randomize this, but save in snapshot
     
-//     if(save)
-//         SaveAll();
-//     return true;
-// }
+    if(save)
+        SaveAll();
+    return true;
+}
 
-// bool Storage::SaveSnapshot(const char * name, uint8_t index, SNAPSHOT * snapshot)
-// {
-//     if(GetSnapshot(index)->factory_preset)
-//         return false;
+bool Storage::SaveSnapshot(const char * name, uint8_t index, SNAPSHOT * snapshot)
+{
+    // if(GetSnapshot(index)->factory_preset)
+    //     return false;
     
-//     char temp_name[9];
+    // char temp_name[9];
     
-//     strncpy(temp_name, name, 9);
+    // strncpy(temp_name, name, 9);
 
-//     memcpy(GetSnapshot(index), snapshot, sizeof(SNAPSHOT));
-//     strncpy(GetSnapshot(index)->name, temp_name, 9);
+    // memcpy(GetSnapshot(index), snapshot, sizeof(SNAPSHOT));
+    // strncpy(GetSnapshot(index)->name, temp_name, 9);
     
-//     GetSnapshot(index)->factory_preset = false;
-//     GetSnapshot(index)->is_empty = false;
+    // GetSnapshot(index)->factory_preset = false;
+    // GetSnapshot(index)->is_empty = false;
 
-//     SaveAll();
-//     return true;
-// }
+    SaveAll();
+    return true;
+}
 
 // int16_t Storage::LoadWaveSample(int table, int frame, int index) {
 
@@ -325,177 +325,141 @@
 //     return count;
 // }
 
-// bool Storage::SaveWavetable(char * name, int table) {
-//     // make sure wavetable is not in factory memory
-//     WAVETABLE * t = GetWavetable(table);
+bool Storage::SaveWavetable(char * name, int table) {
+    // make sure wavetable is not in factory memory
+    // WAVETABLE * t = GetWavetable(table);
 
-//     if(t->factory_preset)
-//         return false;
+    // if(t->factory_preset)
+    //     return false;
 
-//     t->is_empty = GetNumberOfWavesInTable(table) == 0;
+    // t->is_empty = GetNumberOfWavesInTable(table) == 0;
     
-//     strncpy(t->name, name, 9);
+    // strncpy(t->name, name, 9);
     
-//     SaveAll();
+    // SaveAll();
 
-//     return true;
-// }
+    return true;
+}
 
-// bool Storage::SaveWave(const char * name, int16_t * data, int table, int frame) {
-//     WAVETABLE * t = GetWavetable(table);
-//     if(t->factory_preset)
-//         return false;
+bool Storage::SaveWave(const char * name, int16_t * data, int table, int frame) {
+    // WAVETABLE * t = GetWavetable(table);
+    // if(t->factory_preset)
+    //     return false;
 
-//     std::strncpy(t->waves[frame].name, name, 9);
+    // std::strncpy(t->waves[frame].name, name, 9);
     
-//     t->waves[frame].memory_location = 2048 * 16 * table + 2048 * frame;
-//     t->waves[frame].is_empty = false;
+    // t->waves[frame].memory_location = 2048 * 16 * table + 2048 * frame;
+    // t->waves[frame].is_empty = false;
     
-//     std::memcpy((void*)&ROM[t->waves[frame].memory_location], data, 2048 * 2);
+    // std::memcpy((void*)&ROM[t->waves[frame].memory_location], data, 2048 * 2);
 
-//     SaveAll();
+    SaveAll();
 
-//     return true;
-// }
+    return true;
+}
 
-// bool Storage::CopyWavetable(int table_dst, int table_src) {
-//     WAVETABLE * t_dst = GetWavetable(table_dst);
-//     WAVETABLE * t_src = GetWavetable(table_src);
+bool Storage::CopyWavetable(int table_dst, int table_src) {
+    // WAVETABLE * t_dst = GetWavetable(table_dst);
+    // WAVETABLE * t_src = GetWavetable(table_src);
     
-//     if(t_dst->factory_preset) return false;
+    // if(t_dst->factory_preset) return false;
     
-//     t_dst->factory_preset = false;
-//     strncpy(t_dst->name, t_src->name, 9);
-//     for(int i = 0; i < 16; i++) {
-//         strncpy(t_dst->waves[i].name, t_src->waves[i].name, 9);
-//         t_dst->waves[i].is_empty = t_src->waves[i].is_empty;
-//         std::memcpy((void*)&ROM[t_dst->waves[i].memory_location], (void*)&ROM[t_src->waves[i].memory_location], 2048 * 2);
-//     }
+    // t_dst->factory_preset = false;
+    // strncpy(t_dst->name, t_src->name, 9);
+    // for(int i = 0; i < 16; i++) {
+    //     strncpy(t_dst->waves[i].name, t_src->waves[i].name, 9);
+    //     t_dst->waves[i].is_empty = t_src->waves[i].is_empty;
+    //     std::memcpy((void*)&ROM[t_dst->waves[i].memory_location], (void*)&ROM[t_src->waves[i].memory_location], 2048 * 2);
+    // }
 
-//     SaveAll();
-//     return true;
-// }
+    SaveAll();
+    return true;
+}
 
-// bool Storage::CopyWave(int table_dst, int frame_dst, int table_src, int frame_src) {
-//     WAVETABLE * t_dst = GetWavetable(table_dst);
-//     WAVETABLE * t_src = GetWavetable(table_src);
+bool Storage::CopyWave(int table_dst, int frame_dst, int table_src, int frame_src) {
+    // WAVETABLE * t_dst = GetWavetable(table_dst);
+    // WAVETABLE * t_src = GetWavetable(table_src);
     
-//     if(t_dst->factory_preset) return false;
+    // if(t_dst->factory_preset) return false;
     
-//     t_dst->factory_preset = false;
+    // t_dst->factory_preset = false;
 
-//     strncpy(t_dst->waves[frame_dst].name, t_src->waves[frame_src].name, 9);
-//     std::memcpy((void*)&ROM[t_dst->waves[frame_dst].memory_location], (void*)&ROM[t_src->waves[frame_src].memory_location], 2048 * 2);
+    // strncpy(t_dst->waves[frame_dst].name, t_src->waves[frame_src].name, 9);
+    // std::memcpy((void*)&ROM[t_dst->waves[frame_dst].memory_location], (void*)&ROM[t_src->waves[frame_src].memory_location], 2048 * 2);
 
-//     t_dst->waves[frame_dst].is_empty = t_src->waves[frame_src].is_empty;
+    // t_dst->waves[frame_dst].is_empty = t_src->waves[frame_src].is_empty;
     
-//     SaveAll();
-//     return true;
-// }
+    SaveAll();
+    return true;
+}
 
 
-// bool Storage::DeleteWavetable(int table) {
-//     WAVETABLE * t = GetWavetable(table);
-//     if(t->factory_preset)
-//         return false;
+bool Storage::DeleteWavetable(int table) {
+    // WAVETABLE * t = GetWavetable(table);
+    // if(t->factory_preset)
+    //     return false;
 
-//     for (int8_t i = 0; i < 16; i++) {
-//         strncpy(t->waves[i].name, "INIT", 9);
-//         memset(&ROM[t->waves[i].memory_location], 0, 2048 * 2);
-//         t->waves[i].is_empty = true;
+    // for (int8_t i = 0; i < 16; i++) {
+    //     strncpy(t->waves[i].name, "INIT", 9);
+    //     memset(&ROM[t->waves[i].memory_location], 0, 2048 * 2);
+    //     t->waves[i].is_empty = true;
 
-//     }
-//     strncpy(t->name, "INIT", 9);
-//     t->is_empty = true;
+    // }
+    // strncpy(t->name, "INIT", 9);
+    // t->is_empty = true;
 
-//     SaveAll();
-//     return true;
-// }
+    SaveAll();
+    return true;
+}
 
-// bool Storage::DeleteWave(int table, int frame) {
-//     WAVETABLE * t = GetWavetable(table);
-//     if(t->factory_preset)
-//         return false;
+bool Storage::DeleteWave(int table, int frame) {
+    // WAVETABLE * t = GetWavetable(table);
+    // if(t->factory_preset)
+    //     return false;
     
-//     strncpy(t->waves[frame].name, "INIT", 9);
-//     memset(&ROM[t->waves[frame].memory_location], 0, 2048 * 2);
-//     t->waves[frame].is_empty = true;
+    // strncpy(t->waves[frame].name, "INIT", 9);
+    // memset(&ROM[t->waves[frame].memory_location], 0, 2048 * 2);
+    // t->waves[frame].is_empty = true;
     
-//     SaveAll();
-//     return true;
-// }
+    SaveAll();
+    return true;
+}
 
-// bool Storage::SwapWaves(int table, int frame1, int frame2) {
-//     WAVETABLE * wt = GetWavetable(table);
+bool Storage::SwapWaves(int table, int frame1, int frame2) {
+    // WAVETABLE * wt = GetWavetable(table);
     
-//     if(wt->factory_preset)
-//         return false;
+    // if(wt->factory_preset)
+    //     return false;
     
-//     WAVE w = GetWavetable(table)->waves[frame1];
+    // WAVE w = GetWavetable(table)->waves[frame1];
     
-//     GetWavetable(table)->waves[frame1] = GetWavetable(table)->waves[frame2];
-//     GetWavetable(table)->waves[frame2] = w;
-//     return true;
-// }
+    // GetWavetable(table)->waves[frame1] = GetWavetable(table)->waves[frame2];
+    // GetWavetable(table)->waves[frame2] = w;
+    return true;
+}
 
-// bool Storage::SwapWavetables(int table1, int table2) {
-//         // easy swap
-//     WAVETABLE wt = persistent_storage_.wavetables[table1];
-//     persistent_storage_.wavetables[table1] = persistent_storage_.wavetables[table2];
-//     persistent_storage_.wavetables[table2] = wt;
-//     return true;
-//     /*
-//      // swapping wavetables requires swapping of all wave data memory locations.
-//     char name_buffer1[9];
-//     char name_buffer2[9];
-
-//     for(int frame = 0; frame < 16; frame++) {
-//         // TODO: if the wave doesn't exist, we have to update the memory_location before swapping
-//         if(!WaveDoesExist(table1, frame)) {
-//             WaveTables[table1].waves[frame].memory_location = 2048 * 16 * table1 + 2048 * frame;
-//         }
-//         if(!WaveDoesExist(table2, frame)) {
-//             WaveTables[table2].waves[frame].memory_location = 2048 * 16 * table2 + 2048 * frame;
-//         }
-
-//         // swap frames between tables
-//         uint16_t swap_buffer1[2048];
-//         uint16_t swap_buffer2[2048];
-
-//         std::memcpy(swap_buffer1, &ROM[WaveTables[table1].waves[frame].memory_location], 2048 * 2);
-//         std::memcpy(swap_buffer2, &ROM[WaveTables[table2].waves[frame].memory_location], 2048 * 2);
-//         strncpy(name_buffer1, WaveTables[table1].waves[frame].name, 9);
-//         strncpy(name_buffer2, WaveTables[table2].waves[frame].name, 9);
-
-//         std::memcpy(&ROM[WaveTables[table1].waves[frame].memory_location], swap_buffer2, 2048 * 2);
-//         std::memcpy(&ROM[WaveTables[table2].waves[frame].memory_location], swap_buffer1, 2048 * 2);
-//         strncpy(WaveTables[table1].waves[frame].name, name_buffer2, 9);
-//         strncpy(WaveTables[table2].waves[frame].name, name_buffer1, 9);
-//     }
-
-//     strncpy(name_buffer1, WaveTables[table1].name, 9);
-//     strncpy(name_buffer2, WaveTables[table2].name, 9);
-//     strncpy(WaveTables[table1].name, name_buffer2, 9);
-//     strncpy(WaveTables[table2].name, name_buffer1, 9);
-
-//     return false;
-//      //*/
-// }
-// //
-// //int16_t Storage::NumAvailableWaveSlots() {
-// //    int16_t count = 0;
-// //    for(int i = 0; i < FACTORY_WAVE_COUNT + USER_WAVE_COUNT; i ++) {
-// //        if(Waves[i].name[0] != '\0')
-// //            count ++;
-// //    }
-// //    return count;
-// //}
-// //
-// //int16_t Storage::NextAvailableWaveSlot() {
-// //    for(int i = 0; i < FACTORY_WAVE_COUNT + USER_WAVE_COUNT; i ++) {
-// //        if(Waves[i].name[0] != '\0')
-// //            return i;
-// //    }
-// //    return -1;
-// //}
+bool Storage::SwapWavetables(int table1, int table2) {
+        // easy swap
+    // WAVETABLE wt = persistent_storage_.wavetables[table1];
+    // persistent_storage_.wavetables[table1] = persistent_storage_.wavetables[table2];
+    // persistent_storage_.wavetables[table2] = wt;
+    return true;
+}
+//
+//int16_t Storage::NumAvailableWaveSlots() {
+//    int16_t count = 0;
+//    for(int i = 0; i < FACTORY_WAVE_COUNT + USER_WAVE_COUNT; i ++) {
+//        if(Waves[i].name[0] != '\0')
+//            count ++;
+//    }
+//    return count;
+//}
+//
+//int16_t Storage::NextAvailableWaveSlot() {
+//    for(int i = 0; i < FACTORY_WAVE_COUNT + USER_WAVE_COUNT; i ++) {
+//        if(Waves[i].name[0] != '\0')
+//            return i;
+//    }
+//    return -1;
+//}
 
