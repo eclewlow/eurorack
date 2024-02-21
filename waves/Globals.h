@@ -127,7 +127,7 @@ using namespace waves;
 
 extern Context context;
 extern UserSettings user_settings;
-// extern SNAPSHOT settings_;
+extern SNAPSHOT settings_;
 extern Storage storage;
 // extern uint8_t effect;
 // extern uint8_t sub_osc_shape;

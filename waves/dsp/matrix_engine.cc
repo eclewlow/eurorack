@@ -245,23 +245,77 @@ float MatrixEngine::GetSampleBetweenFrames(float phase, float morph_x, float mor
     return sample;
 }
 
+float MatrixEngine::GetSampleBetweenFramesNoDMA(float phase, float morph_x, float morph_y) {
+    // if x1 = 8 and x2 = 12. and morph_x = 0.5, then x1 + morph_x * (x2 - x1)
+
+    // y sits between two wavetable numbers
+    // x sists between two wavetable frames
+    float frame_x = GetX1() + morph_x * ( GetX2() -  GetX1());
+    uint16_t frame_x_integral = floor(frame_x);
+    float frame_x_fractional = frame_x - frame_x_integral;
+
+    // uint16_t next_frame_x_integral = (frame_x_integral + 1) % 16;
+
+    float frame_y =  GetY1() + morph_y * ( GetY2() -  GetY1());
+    uint16_t frame_y_integral = floor(frame_y);
+    float frame_y_fractional = frame_y - frame_y_integral;
+
+    // uint16_t next_frame_y_integral = (frame_y_integral + 1) % 16;
+
+    if(frame_y_integral <= current_frame_y) {
+        if(frame_x_integral <= current_frame_x) {
+            front_buffer_1 = &matrix_front_buffer_1[0];
+            front_buffer_2 = &matrix_front_buffer_2[0];
+        } else {
+            front_buffer_1 = &matrix_front_buffer_1[2048];
+            front_buffer_2 = &matrix_front_buffer_2[2048];
+        }
+    } else {
+        if(frame_x_integral <= current_frame_x) {
+            front_buffer_1 = &matrix_front_buffer_2[0];
+            front_buffer_2 = &matrix_front_buffer_3[0];
+        } else {
+            front_buffer_1 = &matrix_front_buffer_2[2048];
+            front_buffer_2 = &matrix_front_buffer_3[2048];
+        }
+    }
+
+    // TODO: get sample across 4 frames
+    float frame_x1y1_sample = GetSample(0, 0, phase);
+    float frame_x2y1_sample = GetSample(0, 1, phase);
+
+    float frame_x1y2_sample = GetSample(1, 0, phase);
+    float frame_x2y2_sample = GetSample(1, 1, phase);
+
+    float upper_sample;
+    float lower_sample;
+    float sample;
+    
+    upper_sample = frame_x1y1_sample * (1 - frame_x_fractional) + frame_x2y1_sample * frame_x_fractional;
+    lower_sample = frame_x1y2_sample * (1 - frame_x_fractional) + frame_x2y2_sample * frame_x_fractional;
+
+    sample = upper_sample * (1.0f - frame_y_fractional) + lower_sample * frame_y_fractional;
+
+    return sample;
+}
+
 void MatrixEngine::FillWaveform(int16_t * waveform, uint16_t tune, uint16_t fx_amount, uint16_t fx, uint16_t morph, bool withFx) {
     float frequency = 23.4375;
 
-    float phaseIncrement = frequency / 48000.0f;
+    float phaseIncrement = frequency / kCorrectedSampleRate;
     
     float temp_phase = 0.0f;
     
-    // if(withFx)
-    //     effect_manager.getEffect()->Sync_phases();
+    if(withFx)
+        effect_manager.getEffect()->Sync_phases();
 
     for(int i = 0; i < 2048; i++) {
         float morph_y = morph_;
         float morph_x = fx_;
-        morph_x = CLAMP<float>(morph_x, 0.0, 1.0);
-        morph_y = CLAMP<float>(morph_y, 0.0, 1.0);
+        morph_x = CLAMP<float>(morph_x, 0.0, 0.9999f);
+        morph_y = CLAMP<float>(morph_y, 0.0, 0.9999f);
 
-        float sample = GetSampleBetweenFrames(temp_phase, morph_x, morph_y);
+        float sample = GetSampleBetweenFramesNoDMA(temp_phase, morph_x, morph_y);
         
         temp_phase += phaseIncrement;
         

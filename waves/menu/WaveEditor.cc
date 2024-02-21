@@ -679,6 +679,7 @@ void WaveEditor::DrawMenu() {
             line = (char*)"SAVE";
             break;
         default:
+            line = (char*)"";
             break;
     }
     Display::put_string_5x5(64 - strlen(line)*6 / 2, menu_offset_y_ + 20, strlen(line), line);

@@ -89,13 +89,13 @@ public:
 
     inline SNAPSHOT * settings_ptr() { return &settings_; }
     
-    // float RandomFloat(float min, float max);
-    // int32_t RandomInt(int32_t min, int32_t max);
+    float RandomFloat(float min, float max);
+    int32_t RandomInt(int32_t min, int32_t max);
 
-    // bool ResetSettings();
-    // bool RandomizeSettings();
+    bool ResetSettings();
+    bool RandomizeSettings();
     // bool SaveSnapshot(const char * name, uint8_t index);
-    // bool LoadSnapshot(int8_t snapshot);
+    bool LoadSnapshot(int8_t snapshot);
     SNAPSHOT settings_;
         
 private:

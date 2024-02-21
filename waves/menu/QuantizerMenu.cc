@@ -45,7 +45,7 @@ void QuantizerMenu::paint() {
     
     Display::put_string_9x9(128 / 2 - Display::get_string_9x9_width("QUANTIZER", 2) / 2, y_offset, strlen("QUANTIZER"), "QUANTIZER", false, 2);
 
-    char line[20];
+    // char line[20];
     char * line2;
     int16_t scale_binary = 0b000000000000;
     switch(quantizer.getScale()) {

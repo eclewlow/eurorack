@@ -38,22 +38,22 @@ bool ModeMenu::handleKeyRelease(int key) {
             case MODE_AB:
                 abModeMenu.setBackMenu(&modeMenu);
                 context.setState(&abModeMenu);
-                context.setEngine(Context::ENGINE_TYPE_AB);
+                context.setEngine(ENGINE_TYPE_AB);
                 break;
             case MODE_WAVETABLE:
                 wavetableModeMenu.setBackMenu(&modeMenu);
                 context.setState(&wavetableModeMenu);
-                context.setEngine(Context::ENGINE_TYPE_WAVETABLE);
+                context.setEngine(ENGINE_TYPE_WAVETABLE);
                 break;
             case MODE_MATRIX:
                 matrixMode.setBackMenu(&modeMenu);
                 context.setState(&matrixMode);
-                context.setEngine(Context::ENGINE_TYPE_MATRIX);
+                context.setEngine(ENGINE_TYPE_MATRIX);
                 break;
             case MODE_DRUM:
                 drumMode.setBackMenu(&modeMenu);
                 context.setState(&drumMode);
-                context.setEngine(Context::ENGINE_TYPE_DRUM);
+                context.setEngine(ENGINE_TYPE_DRUM);
                 break;
             default:
                 break;
@@ -95,6 +95,7 @@ void ModeMenu::paint() {
             caption = (char*)"DRUM";
             break;
         default:
+            caption = (char*)"";
             break;
     }
     

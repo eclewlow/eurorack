@@ -182,7 +182,7 @@ void Flash::Init() {
 
 void Flash::StartFrameDMARead(uint32_t * buffer, uint32_t __bytes, uint32_t address, void (* func)(), uint16_t pin) {
   // if(GetFlag(&_EREG_, _BUSY_)) return;
-  StopDMA(true);
+  // StopDMA(true);
 
   while(GetFlag(&_EREG_, _BUSY_));
   SetFlag(&_EREG_, _BUSY_, FLAG_SET);

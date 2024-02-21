@@ -125,7 +125,7 @@ bool DrumMode::handleKeyRelease(int key) {
 void DrumMode::paint() {
     Display::clear_screen();
     
-    uint16_t morph = adc.getChannelProcessed(3);
+    // uint16_t morph = adc.getChannelProcessed(3);
     
     uint32_t elapsed_time = system_clock.milliseconds() - timer_;
     if(is_editing_ && elapsed_time > 1000) {
@@ -142,14 +142,32 @@ void DrumMode::paint() {
     Display::outline_rectangle(x_offset, y_offset, wave_width, wave_height);
     
     int16_t wave_buffer[2048];
-    drumEngine.FillWaveform(wave_buffer, morph * 1.0f / 4095.0f);
+    // drumEngine.FillWaveform(wave_buffer, morph * 1.0f / 4095.0f);
+
+    float morph = adc.getChannelProcessed(3) / 65536.0f;
+
+    uint8_t frame = morph * 15.0f;
+
+    if(wavetable_gui_ != drumEngine.GetWavetable() && frame_gui_ != frame) {
+        // load double frame. draw double frame
+        flash.StartFrameDMARead((uint32_t*)front_buffer_4, 8192, drumEngine.GetWavetable() * 65536 + frame * 4096, NULL, EEPROM_FACTORY_SS);
+        wavetable_gui_ = drumEngine.GetWavetable();
+        frame_gui_ = frame;
+    }
+    // storage.LoadWaveSample(BUF1, wavetable_, morph_);
+
+    abEngine.FillWaveform(wave_buffer, morph);
+
+    // storage.LoadWaveSample(BUF1, wavetable_, morph * 1.0f / 4095.0f);
+
+
 
     Display::Draw_Wave(x_offset + 1, y_offset + 1, wave_width - 2, wave_height - 2, wave_buffer);
 
     /****/
     // draw cursor
     /****/
-    int x = x_offset + 1 + (wave_width - 2 - 4) * morph * 1.0f / 4095.0f;
+    int x = x_offset + 1 + (wave_width - 2 - 4) * morph;
     Display::invert_rectangle(x, y_offset + 1, 4, wave_height - 2);
 
     

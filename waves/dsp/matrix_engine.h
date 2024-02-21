@@ -13,7 +13,7 @@
 #include "waves/dsp/fx/effect.h"
 #include "waves/dsp/Engine.h"
 
-class Engine;
+// class Engine;
 
 class MatrixEngine: public Engine
 {
@@ -25,6 +25,7 @@ public:
     void Init();
     float GetSample(int16_t wavetable, int16_t frame, float phase);
     float GetSampleBetweenFrames(float phase, float morph_x, float morph_y);
+    float GetSampleBetweenFramesNoDMA(float phase, float morph_x, float morph_y);
     void FillWaveform(int16_t * waveform, uint16_t tune, uint16_t fx_amount, uint16_t fx, uint16_t morph, bool withFx);
     float GetSample(float phase);
     float GetSampleNoFX(float phase, float fx, float morph);

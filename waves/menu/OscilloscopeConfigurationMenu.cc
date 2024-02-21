@@ -27,10 +27,10 @@ bool OscilloscopeConfigurationMenu::handleKeyRelease(int key) {
         context.setState(&deviceConfigurationMenu);
     }
     else if(key == LEFT_ENCODER_CCW) {
-        user_settings.setMorphSetting(user_settings.getMorphSetting()==UserSettings::SETTING_MORPH_SMOOTH ? UserSettings::SETTING_MORPH_DISCRETE:UserSettings::SETTING_MORPH_SMOOTH);
+        user_settings.setMorphSetting(user_settings.getMorphSetting()==SETTING_MORPH_SMOOTH ? SETTING_MORPH_DISCRETE:SETTING_MORPH_SMOOTH);
     }
     else if(key == LEFT_ENCODER_CW) {
-        user_settings.setMorphSetting(user_settings.getMorphSetting()==UserSettings::SETTING_MORPH_SMOOTH ? UserSettings::SETTING_MORPH_DISCRETE:UserSettings::SETTING_MORPH_SMOOTH);
+        user_settings.setMorphSetting(user_settings.getMorphSetting()==SETTING_MORPH_SMOOTH ? SETTING_MORPH_DISCRETE:SETTING_MORPH_SMOOTH);
     }
     else if(key == LEFT_ENCODER_CLICK) {
         context.setState(&deviceConfigurationMenu);
@@ -49,14 +49,14 @@ void OscilloscopeConfigurationMenu::paint() {
     
     char line[20];
 
-    int wavetable_count = 32;
-    int snapshot_count = 4;
+    // int wavetable_count = 32;
+    // int snapshot_count = 4;
     
     int center = 128 / 2 - 6 / 2;
 //    snprintf(line, 20, "   VERSION; %s", "0.07");
     Display::put_string_5x5(center, y_offset, 1, ":");
     Display::put_string_5x5(center - strlen("MORPH") * 6, y_offset, strlen("MORPH"), "MORPH");
-    snprintf(line, 20, "%s", user_settings.getMorphSetting() == UserSettings::SETTING_MORPH_SMOOTH ? "SMOOTH":"DISCRETE");
+    snprintf(line, 20, "%s", user_settings.getMorphSetting() == SETTING_MORPH_SMOOTH ? "SMOOTH":"DISCRETE");
     Display::put_string_5x5(center + 6, y_offset, strlen(line), line, true);
 }
 

@@ -8,12 +8,14 @@
  ==============================================================================
  */
 
-#include "waves/dsp/Engine.h"
+// #include "waves/dsp/Engine.h"
 // #include "waves/wavetables.h"
 // #include "waves/dsp/ParameterInterpolator.h"
 #include "waves/Globals.h"
 // #include "waves/dsp/downsampler/4x_downsampler.h"
 #include "math.h"
+
+namespace waves {
 
 Engine::Engine() {
     phase_ = 0.0f;
@@ -37,3 +39,4 @@ Engine::Engine() {
 //     return interpolatedFloat;
 // }
 
+}

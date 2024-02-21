@@ -34,7 +34,7 @@ void ManageMenu::triggerUpdate(bool back_pressed) {
         frame_ = 0;
         frame_offset_ = 0;
         flash.StartFrameDMARead((uint32_t*)wavetable_names_, 16 * 9, 0, NULL, EEPROM_PERSISTENT_SS);
-        flash.StartFrameDMARead((uint32_t*)frame_names_, 16 * 9, 16 * 9 + 16 * 9 * wavetable_, NULL, EEPROM_PERSISTENT_SS);
+        flash.StartFrameDMARead((uint32_t*)frame_names_, 16 * 9, 4096 + 4096 * wavetable_, NULL, EEPROM_PERSISTENT_SS);
         return;
     }
 
@@ -55,7 +55,7 @@ void ManageMenu::triggerUpdate(bool back_pressed) {
     }
 
     flash.StartFrameDMARead((uint32_t*)wavetable_names_, 16 * 9, 0, NULL, EEPROM_PERSISTENT_SS);
-    flash.StartFrameDMARead((uint32_t*)frame_names_, 16 * 9, 16 * 9 + 16 * 9 * wavetable_, NULL, EEPROM_PERSISTENT_SS);
+    flash.StartFrameDMARead((uint32_t*)frame_names_, 16 * 9, 4096 + 4096 * wavetable_, NULL, EEPROM_PERSISTENT_SS);
 }
 
 void ManageMenu::ResetTicker() {
@@ -251,7 +251,7 @@ bool ManageMenu::handleKeyRelease(int key) {
                 break;
             }
             case MANAGE_MENU_WAVETABLE_OPTIONS:
-                if(storage.GetWavetable(wavetable_)->factory_preset)
+                if(false) // storage.GetWavetable(wavetable_)->factory_preset)
                 {
                     
                 }
@@ -259,7 +259,7 @@ bool ManageMenu::handleKeyRelease(int key) {
                     setOptionSelected(CLAMP<int8_t>(option_selected_ + 1, MANAGE_MENU_COPY, MANAGE_MENU_DELETE));
                 break;
             case MANAGE_MENU_FRAME_OPTIONS:
-                if(storage.GetWavetable(wavetable_)->factory_preset)
+                if(false) // storage.GetWavetable(wavetable_)->factory_preset)
                 {
                     
                 }
@@ -345,7 +345,7 @@ bool ManageMenu::handleKeyRelease(int key) {
                     setState(MANAGE_MENU_SELECT_FRAME);
                     frame_ = 0;
                     frame_offset_ = 0;
-                    flash.StartFrameDMARead((uint32_t*)frame_names_, 16 * 9, 16 * 9 + 16 * 9 * wavetable_, NULL, EEPROM_PERSISTENT_SS);
+                    flash.StartFrameDMARead((uint32_t*)frame_names_, 16 * 9, 4096 + 4096 * wavetable_, NULL, EEPROM_PERSISTENT_SS);
                 }
                 break;
             case MANAGE_MENU_MOVE_WAVETABLE:
@@ -530,7 +530,40 @@ void ManageMenu::SetLine(int line_no, char* str) {
 }
 
 void ManageMenu::ConfirmCopyWavetable() {
-    storage.CopyWavetable(wavetable_, selected_wavetable_);
+
+    // for each wave in wavetable, copy name and then copy wavedata
+
+    // get wavenames for source wavetable locally
+    // program wavenames for destination wavetable
+    flash.StartFrameDMARead((uint32_t*)manageMenu.frame_names_, 16 * 9, 4096 + 4096 * manageMenu.selected_wavetable_, NULL, EEPROM_PERSISTENT_SS);
+    flash.SectorErase4K(4096 + 4096 * manageMenu.wavetable_, EEPROM_PERSISTENT_SS);
+    flash.Page_Program_Repeat((uint8_t *)manageMenu.frame_names_, 16 * 9, 4096 + 4096 * manageMenu.wavetable_, EEPROM_PERSISTENT_SS);
+
+    // for each wave from source
+    // get wave locally
+    // program wave for destination
+    for(uint8_t frame = 0; frame < 16; frame++) {
+        // read wave data src
+        int16_t wavedata[2048];
+        flash.StartFrameDMARead((uint32_t*)wavedata, 4096, 65536 * manageMenu.selected_wavetable_ + 4096 * frame, NULL, EEPROM_FACTORY_SS);
+        // erase 4k wave data dst
+        flash.SectorErase4K(manageMenu.wavetable_ * 65536 + frame * 4096, EEPROM_FACTORY_SS);
+        flash.Page_Program_Repeat((uint8_t *)wavedata, 4096, 65536 * manageMenu.wavetable_ + 4096 * frame, EEPROM_FACTORY_SS);
+    }
+
+    // get wavetable name for source wavetable 
+    // set target wavetable name
+    // program wavetable names
+    flash.StartFrameDMARead((uint32_t*)manageMenu.wavetable_names_, 16 * 9, 0, NULL, EEPROM_PERSISTENT_SS);
+
+    strncpy(manageMenu.wavetable_names_[manageMenu.wavetable_], manageMenu.wavetable_names_[manageMenu.selected_wavetable_], 9);
+
+    flash.SectorErase4K(0, EEPROM_PERSISTENT_SS);
+    flash.Page_Program_Repeat((uint8_t *)manageMenu.wavetable_names_, 16 * 9, 0, EEPROM_PERSISTENT_SS);
+
+    // storage.CopyWavetable(wavetable_, selected_wavetable_);
+
+
     setState(MANAGE_MENU_SELECT_WAVETABLE);
     copy_state_ = MANAGE_MENU_COPY_STATE_NONE;
 }
@@ -541,7 +574,27 @@ void ManageMenu::CancelCopyWavetable() {
 }
 
 void ManageMenu::ConfirmCopyWave() {
-    storage.CopyWave(wavetable_, frame_, selected_wavetable_, selected_frame_);
+    // storage.CopyWave(wavetable_, frame_, selected_wavetable_, selected_frame_);
+
+    // read selected wavetable frame name (src)
+    char * buf = new char[9];
+    flash.StartFrameDMARead((uint32_t*)buf, 9, 4096 + 4096 * manageMenu.selected_wavetable_ + 9 * manageMenu.selected_frame_, NULL, EEPROM_PERSISTENT_SS);
+
+    // copy to dest wavetable frame
+    strncpy(manageMenu.frame_names_[manageMenu.frame_], buf, 9);
+    flash.SectorErase4K(4096 + 4096 * manageMenu.wavetable_, EEPROM_PERSISTENT_SS);
+    flash.Page_Program_Repeat((uint8_t *)manageMenu.frame_names_, 16 * 9, 4096 + 4096 * manageMenu.wavetable_, EEPROM_PERSISTENT_SS);
+
+    // read wave data src
+    int16_t * wavedata = new int16_t[2048];
+    flash.StartFrameDMARead((uint32_t*)wavedata, 4096, 65536 * manageMenu.selected_wavetable_ + 4096 * manageMenu.selected_frame_, NULL, EEPROM_FACTORY_SS);
+    // erase 4k wave data dst
+    flash.SectorErase4K(manageMenu.wavetable_ * 65536 + manageMenu.frame_ * 4096, EEPROM_FACTORY_SS);
+    flash.Page_Program_Repeat((uint8_t *)wavedata, 4096, 65536 * manageMenu.wavetable_ + 4096 * manageMenu.frame_, EEPROM_FACTORY_SS);
+
+    delete wavedata;
+    delete buf;
+
     setState(MANAGE_MENU_SELECT_FRAME);
     copy_state_ = MANAGE_MENU_COPY_STATE_NONE;
     ResetTicker();
@@ -554,7 +607,19 @@ void ManageMenu::CancelCopyWave() {
 }
 
 void ManageMenu::ConfirmDeleteWavetable() {
-    storage.DeleteWavetable(wavetable_);
+    // storage.DeleteWavetable(wavetable_);
+    for(int i = 0; i < 16; i ++) {
+        flash.SectorErase4K(manageMenu.wavetable_ * 65536 + i * 4096, EEPROM_FACTORY_SS);
+        strncpy(manageMenu.frame_names_[i], "INIT", 9);
+    }
+
+    strncpy(manageMenu.wavetable_names_[manageMenu.wavetable_], "INIT", 9);
+    flash.SectorErase4K(0, EEPROM_PERSISTENT_SS);
+    flash.Page_Program_Repeat((uint8_t *)manageMenu.wavetable_names_, 16 * 9, 0, EEPROM_PERSISTENT_SS);
+
+    flash.SectorErase4K(4096 + 4096 * manageMenu.wavetable_, EEPROM_PERSISTENT_SS);
+    flash.Page_Program_Repeat((uint8_t *)manageMenu.frame_names_, 16 * 9, 4096 + 4096 * manageMenu.wavetable_, EEPROM_PERSISTENT_SS);
+
     setState(MANAGE_MENU_SELECT_WAVETABLE);
     ResetTicker();
 }
@@ -565,7 +630,11 @@ void ManageMenu::CancelDeleteWavetable() {
 
 
 void ManageMenu::ConfirmDeleteFrame() {
-    storage.DeleteWave(wavetable_, frame_);
+    // storage.DeleteWave(wavetable_, frame_);
+    flash.SectorErase4K(manageMenu.wavetable_ * 65536 + manageMenu.frame_ * 4096, EEPROM_FACTORY_SS);
+    strncpy(manageMenu.frame_names_[manageMenu.frame_], "INIT", 9);
+    flash.SectorErase4K(4096 + 4096 * manageMenu.wavetable_, EEPROM_PERSISTENT_SS);
+    flash.Page_Program_Repeat((uint8_t *)manageMenu.frame_names_, 16 * 9, 4096 + 4096 * manageMenu.wavetable_, EEPROM_PERSISTENT_SS);
     setState(MANAGE_MENU_SELECT_FRAME);
     ResetTicker();
 }
@@ -575,7 +644,7 @@ void ManageMenu::CancelDeleteFrame() {
 }
 
 void ManageMenu::SaveWavetable(char* param) {
-    // storage.SaveWavetable(param, manageMenu.wavetable_);    
+    // storage.SaveWavetable(param, manageMenu.wavetable_);
     strncpy(manageMenu.wavetable_names_[manageMenu.wavetable_], param, 9);
     flash.SectorErase4K(0, EEPROM_PERSISTENT_SS);
     flash.Page_Program_Repeat((uint8_t *)manageMenu.wavetable_names_, 16 * 9, 0, EEPROM_PERSISTENT_SS);
@@ -584,8 +653,13 @@ void ManageMenu::SaveWavetable(char* param) {
 }
 
 void ManageMenu::SaveWave(char* param) {
-    Storage::WAVETABLE * wt = storage.GetWavetable(manageMenu.wavetable_);
-    strncpy(wt->waves[manageMenu.frame_].name, param, 9);
+    // Storage::WAVETABLE * wt = storage.GetWavetable(manageMenu.wavetable_);
+    // strncpy(wt->waves[manageMenu.frame_].name, param, 9);
+
+    strncpy(manageMenu.frame_names_[manageMenu.frame_], param, 9);
+    flash.SectorErase4K(4096 + 4096 * manageMenu.wavetable_, EEPROM_PERSISTENT_SS);
+    flash.Page_Program_Repeat((uint8_t *)manageMenu.frame_names_, 16 * 9, 4096 + 4096 * manageMenu.wavetable_, EEPROM_PERSISTENT_SS);
+
     manageMenu.setState(MANAGE_MENU_SELECT_FRAME);
     manageMenu.ResetTicker();
 }

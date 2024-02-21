@@ -50,6 +50,9 @@ private:
 
     char wavetable_names_[16][9];
 
+    int wavetable_gui_;
+    int frame_gui_;
+
     DISALLOW_COPY_AND_ASSIGN (DrumMode);
 };
 

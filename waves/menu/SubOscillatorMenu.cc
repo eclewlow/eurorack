@@ -47,7 +47,7 @@ bool SubOscillatorMenu::handleKeyRelease(int key) {
                 user_settings.setSubOscMix(user_settings.getSubOscMix()-1);
                 break;
             case SUB_OSC_MENU_WAVE:
-                user_settings.setSubOscWave((user_settings.getSubOscWave() + UserSettings::SUBOSC_WAVE_LAST - 1) % UserSettings::SUBOSC_WAVE_LAST);
+                user_settings.setSubOscWave((user_settings.getSubOscWave() + SUBOSC_WAVE_LAST - 1) % SUBOSC_WAVE_LAST);
                 break;
             default:
                 break;
@@ -65,7 +65,7 @@ bool SubOscillatorMenu::handleKeyRelease(int key) {
                 user_settings.setSubOscMix(user_settings.getSubOscMix()+1);
                 break;
             case SUB_OSC_MENU_WAVE:
-                user_settings.setSubOscWave((user_settings.getSubOscWave() + 1) % UserSettings::SUBOSC_WAVE_LAST);
+                user_settings.setSubOscWave((user_settings.getSubOscWave() + 1) % SUBOSC_WAVE_LAST);
                 break;
             default:
                 break;
@@ -119,8 +119,8 @@ void SubOscillatorMenu::paint() {
     
     char line[20];
 
-    int wavetable_count = 32;
-    int snapshot_count = 4;
+    // int wavetable_count = 32;
+    // int snapshot_count = 4;
     
     int center = 128 / 2 - 6 / 2;
 //    snprintf(line, 20, "   VERSION; %s", "0.07");
@@ -148,29 +148,29 @@ void SubOscillatorMenu::paint() {
     char* wave_name;
 
     switch(user_settings.getSubOscWave()) {
-        case UserSettings::SUBOSC_WAVE_SINE:
+        case SUBOSC_WAVE_SINE:
             wave_name=(char*)"SINE";
             break;
-        case UserSettings::SUBOSC_WAVE_TRIANGLE:
+        case SUBOSC_WAVE_TRIANGLE:
             wave_name=(char*)"TRI";
             break;
-        case UserSettings::SUBOSC_WAVE_SAWTOOTH:
+        case SUBOSC_WAVE_SAWTOOTH:
             wave_name=(char*)"SAW";
             break;
-        case UserSettings::SUBOSC_WAVE_RAMP:
+        case SUBOSC_WAVE_RAMP:
             wave_name=(char*)"RAMP";
             break;
-        case UserSettings::SUBOSC_WAVE_SQUARE:
+        case SUBOSC_WAVE_SQUARE:
             wave_name=(char*)"SQUARE";
             break;
-        case UserSettings::SUBOSC_WAVE_COPY:
+        case SUBOSC_WAVE_COPY:
             wave_name=(char*)"COPY";
             break;
         default:
             wave_name=(char*)"";
             break;
     }
-//    snprintf(line, 20, "%s", user_settings.getScopeSetting() == UserSettings::SETTING_SCOPE_LINE ? "LINE" : "SHADED");
+//    snprintf(line, 20, "%s", user_settings.getScopeSetting() == SETTING_SCOPE_LINE ? "LINE" : "SHADED");
     Display::put_string_5x5(center + 6, y_offset, strlen(wave_name), wave_name, state_==SUB_OSC_MENU_WAVE);
     
     y_offset = 64 - 7;

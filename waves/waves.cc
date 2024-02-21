@@ -335,7 +335,7 @@ float swap_counter = 0.0f;
 float swap_increment = 1.0f / 10000.0f;
 float phase_increment = (440.0f) / 47992.0f;
 
-SNAPSHOT settings_;
+// SNAPSHOT settings_;
 
 void FillBuffer(AudioDac::Frame* output, size_t size) {
 

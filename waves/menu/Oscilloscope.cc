@@ -11,6 +11,7 @@
 #include "waves/Display.h"
 #include "waves/graphics.h"
 #include "waves/Globals.h"
+#include <string>
 
 namespace waves {
 
@@ -88,7 +89,7 @@ void Oscilloscope::paint() {
     int height = 40;
     Display::outline_rectangle(x, y, width, height);
     
-    Display::Draw_Wave(x+1, y+1, width-2, height-2, BUF1, user_settings.getScopeSetting() == UserSettings::SETTING_SCOPE_FILL);
+    Display::Draw_Wave(x+1, y+1, width-2, height-2, BUF1, user_settings.getScopeSetting() == SETTING_SCOPE_FILL);
     
     std::string note_letter = "C C#D D#E F F#G G#A A#B ";
     int note_index = static_cast<int16_t>(floor(note + 0.5)) % 12;

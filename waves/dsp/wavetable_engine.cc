@@ -60,7 +60,7 @@ void WavetableEngine::Init() {
 
 }
 
-inline float WavetableEngine::GetSampleBetweenFrames(float phase, float morph, bool swap) {
+float WavetableEngine::GetSampleBetweenFrames(float phase, float morph) {
 
     float sample = 0.0f;
 
@@ -126,33 +126,60 @@ inline float WavetableEngine::GetSampleBetweenFrames(float phase, float morph, b
     return sample;
 }
 
+float WavetableEngine::GetSampleBetweenFramesNoDMA(float phase, float morph) {
+
+    float sample = 0.0f;
+
+    int16_t sample1 = 0;
+    int16_t sample2 = 0;
+
+    float index = phase * 2048.0;
+    uint16_t integral = floor(index);
+    float fractional = index - integral;
+    uint16_t nextIntegral = (integral + 1) % 2048;
+
+    float frame = morph * 15.0f;
+    int frame_integral = floor(frame);
+    float frame_fractional = frame - frame_integral;
+
+    int16_t * buf = front_buffer_1;
+    sample1 = buf[integral] + (buf[nextIntegral] - buf[integral]) * fractional;
+    sample2 = buf[2048 + integral] + (buf[2048 + nextIntegral] - buf[2048 + integral]) * fractional;
+
+    if(frame_integral > current_frame_)
+        sample = sample2;
+    else if(frame_integral < current_frame_)
+        sample = sample1;
+    else
+        sample = sample1 * (1.0f - frame_fractional) + sample2 * frame_fractional;
+
+    sample = sample / 32768.0f;
+
+    return sample;
+}
+
 void WavetableEngine::FillWaveform(int16_t * waveform, uint16_t tune, uint16_t fx_amount, uint16_t fx, uint16_t morph, bool withFx) {
     float frequency = 23.4375;
 
-    float phaseIncrement = frequency / 48000.0f;
+    float phaseIncrement = frequency / kCorrectedSampleRate;
     
     float temp_phase = 0.0f;
     
-    // if(withFx)
-    //     effect_manager.getEffect()->Sync_phases();
-
-    float morph_float = morph / 65535.0f;
-    morph_float = CLAMP<float>(morph_float, 0.0, 0.9999);
-
-    // float frame = morph * 15.0f;
-    // uint16_t frame_integral = floor(frame);
-    // float frame_fractional = frame - frame_integral;
+    if(withFx)
+        effect_manager.getEffect()->Sync_phases();
 
     for(int i = 0; i < 2048; i++) {
+        float thisX = morph_;
+        thisX = CLAMP<float>(thisX, 0.0, 0.9999);
         
         float calculated_phase = temp_phase;
-        // if(withFx)
-        //     calculated_phase = effect_manager.RenderPhaseEffect(temp_phase, frequency, fx_amount, fx, true);
+        if(withFx)
+            calculated_phase = effect_manager.RenderPhaseEffect(temp_phase, frequency, fx_amount, fx, true);
         
-        float sample = GetSampleBetweenFrames(calculated_phase, morph_float);
+        float sample = GetSampleBetweenFramesNoDMA(calculated_phase, thisX);
         
-        // if(withFx)
-        //     sample = effect_manager.RenderSampleEffect(sample, temp_phase, frequency, fx_amount, fx, true);
+        if(withFx)
+            sample = effect_manager.RenderSampleEffect(sample, temp_phase, frequency, fx_amount, fx, true);
         
         temp_phase += phaseIncrement;
         

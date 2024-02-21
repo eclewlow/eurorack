@@ -183,8 +183,8 @@ void MatrixMode::paint() {
     /****/
     // draw cursor
     /****/
-    int16_t cursor_x = 4 * matrixEngine.GetX1() + 4 * (matrixEngine.GetX2() - matrixEngine.GetX1()) * fx * 1.0f / 4095.0f;
-    int16_t cursor_y = 4 * matrixEngine.GetY1() + 4 * (matrixEngine.GetY2() - matrixEngine.GetY1()) * morph * 1.0f / 4095.0f;
+    int16_t cursor_x = 4 * matrixEngine.GetX1() + 4 * (matrixEngine.GetX2() - matrixEngine.GetX1()) * fx * 1.0f / 65535.0f;
+    int16_t cursor_y = 4 * matrixEngine.GetY1() + 4 * (matrixEngine.GetY2() - matrixEngine.GetY1()) * morph * 1.0f / 65535.0f;
     Display::outline_rectangle(cursor_x + 1, cursor_y + 1, 3, 3);
     
 
@@ -203,10 +203,10 @@ void MatrixMode::paint() {
     char line[20];
     memset(line, 0, 20);
     
-    snprintf(line, 20, "X;%.1f", 1.0 + matrixEngine.GetX1() + (matrixEngine.GetX2() - matrixEngine.GetX1()) * fx * 1.0f / 4095.0f);
+    snprintf(line, 20, "X;%.1f", 1.0 + matrixEngine.GetX1() + (matrixEngine.GetX2() - matrixEngine.GetX1()) * fx * 1.0f / 65535.0f);
     Display::put_string_5x5(x_offset + 1, 35, strlen(line), line);
 
-    snprintf(line, 20, "Y;%.1f", 1.0 + matrixEngine.GetY1() + (matrixEngine.GetY2() - matrixEngine.GetY1()) * morph * 1.0f / 4095.0f);
+    snprintf(line, 20, "Y;%.1f", 1.0 + matrixEngine.GetY1() + (matrixEngine.GetY2() - matrixEngine.GetY1()) * morph * 1.0f / 65535.0f);
     Display::put_string_5x5(x_offset + 1, 35 + 7, strlen(line), line);
 
     strncpy(line, "OFS;  /16", 20);

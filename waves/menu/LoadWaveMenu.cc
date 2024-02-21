@@ -157,7 +157,7 @@ bool LoadWaveMenu::handleKeyRelease(int key) {
     if(key == LEFT_ENCODER_CLICK) {
         switch(state_) {
             case LOAD_WAVE_MENU_SELECT_WAVETABLE:
-                flash.StartFrameDMARead((uint32_t*)frame_names_, 16 * 9, 16 * 9 + 16 * 9 * wavetable_, NULL, EEPROM_PERSISTENT_SS);
+                flash.StartFrameDMARead((uint32_t*)frame_names_, 16 * 9, 4096 + 4096 * wavetable_, NULL, EEPROM_PERSISTENT_SS);
                 ResetTicker();
                 setState(LOAD_WAVE_MENU_SELECT_FRAME);
                 frame_ = 0;

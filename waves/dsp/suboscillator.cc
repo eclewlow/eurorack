@@ -44,8 +44,8 @@ void Suboscillator::Render(AudioDac::Frame* output, size_t size, uint16_t tune, 
     float morphTarget;
     float fxTarget;
     
-    morphTarget = morph / 4095.0;
-    fxTarget = fx / 4095.0;
+    morphTarget = morph / 65535.0;
+    fxTarget = fx / 65535.0;
 
     float tuneTarget = static_cast<float>(tune);
     
@@ -78,7 +78,7 @@ void Suboscillator::Render(AudioDac::Frame* output, size_t size, uint16_t tune, 
     float phaseIncrement; // = frequency / 48000.0f;
     
     frequency = (a / 32) * pow(2, (((note + subosc_detune_ / 100.0f + subosc_offset_) - 9) / 12.0));
-    phaseIncrement = frequency / 48000.0f;
+    phaseIncrement = frequency / kCorrectedSampleRate;
 
     ParameterInterpolator phase_increment_interpolator(&phase_increment_, phaseIncrement, size);
     

@@ -59,7 +59,7 @@ class Adc {
   void Convert();
   
   inline float float_value(int channel) {
-    return static_cast<float>(value(channel)) / 65536.0f;
+    return static_cast<float>(value(channel)) / 65535.0f;
   }
 
   inline uint16_t getChannel(int channel) {

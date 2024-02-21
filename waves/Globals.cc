@@ -14,7 +14,7 @@ using namespace waves;
 
 Context context;
 UserSettings user_settings;
-// SNAPSHOT settings_;
+SNAPSHOT settings_;
 int8_t engine;
 int8_t switch_1_test;
 int8_t switch_2_test;

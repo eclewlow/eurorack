@@ -11,10 +11,10 @@
 #pragma once
 
 #include "waves/Globals.h"
-#include "waves/dsp/downsampler/4x_downsampler.h"
+// #include "waves/dsp/downsampler/4x_downsampler.h"
 
 // #include "waves/dsp/fx/effect.h"
-// #include "waves/dsp/Engine.h"
+#include "waves/dsp/Engine.h"
 
 // class Engine;
 
@@ -34,9 +34,11 @@ public:
     float GetSample(int16_t wavetable, int16_t frame, float phase);
     float GetSample(int16_t wavetable, int16_t frame, float phase, bool isLeft);
     float GetSampleBetweenFrames(float phase, float morph);
+    int16_t GetSampleBetweenFramesNoDMA(float phase, float morph);
 //    void SetX(float newX);
     void FillWaveform(int16_t * waveform, uint16_t tune, uint16_t fx_amount, uint16_t fx, uint16_t morph, bool withFx);
     void FillWaveform(int16_t * waveform, bool is_left);
+    void FillWaveform(int16_t * waveform, float morph);
     float GetSample(float phase);
     float GetSampleNoFX(float phase, float fx, float morph);
     

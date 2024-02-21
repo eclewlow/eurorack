@@ -168,7 +168,7 @@ void DrumEngine::on_load_finished() {
 void DrumEngine::FillWaveform(int16_t * waveform, float morph) {
     float frequency = 23.4375;
 
-    float phaseIncrement = frequency / 48000.0f;
+    float phaseIncrement = frequency / kCorrectedSampleRate;
     
     float temp_phase = 0.0f;
 
@@ -192,25 +192,25 @@ void DrumEngine::FillWaveform(int16_t * waveform, float morph) {
 void DrumEngine::FillWaveform(int16_t * waveform, uint16_t tune, uint16_t fx_amount, uint16_t fx, uint16_t morph, bool withFx) {
     float frequency = 23.4375;
 
-    float phaseIncrement = frequency / 48000.0f;
+    float phaseIncrement = frequency / kCorrectedSampleRate;
     
     float temp_phase = 0.0f;
             
-    // if(withFx)
-    //     effect_manager.getEffect()->Sync_phases();
+    if(withFx)
+        effect_manager.getEffect()->Sync_phases();
 
     for(int i = 0; i < 2048; i++) {
         float thisX = morph_;
-        thisX = CLAMP<float>(thisX, 0.0, 1.0);
+        thisX = CLAMP<float>(thisX, 0.0f, 0.9999f);
         
         float calculated_phase = temp_phase;
-        // if(withFx)
-        //     calculated_phase = effect_manager.RenderPhaseEffect(temp_phase, frequency, fx_amount, fx, true);
+        if(withFx)
+            calculated_phase = effect_manager.RenderPhaseEffect(temp_phase, frequency, fx_amount, fx, true);
         
-        float sample = GetSampleBetweenFrames(calculated_phase, thisX);
+        float sample = GetSampleBetweenFramesNoDMA(calculated_phase, thisX);
         
-        // if(withFx)
-        //     sample = effect_manager.RenderSampleEffect(sample, temp_phase, frequency, fx_amount, fx, true);
+        if(withFx)
+            sample = effect_manager.RenderSampleEffect(sample, temp_phase, frequency, fx_amount, fx, true);
         
         sample = (1 - amp_decay_trigger_) * sample;
 

@@ -107,7 +107,7 @@ float Quantizer::Quantize(float input) {
     // input is a 0.0f to 120.0f [???]  float - type midi value.
     
     uint16_t tune = adc.getChannel(Adc::ADC_CHANNEL_PITCH_POT);
-    float tonic = (120.0f * tune) / 4095.0;
+    float tonic = (120.0f * tune) / 65535.0;
     
     float tonic_mod = fmod(tonic, 12.0f);
     float input_mod = fmod(input, 12.0f);

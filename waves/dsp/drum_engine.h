@@ -13,7 +13,7 @@
 #include "waves/dsp/fx/effect.h"
 #include "waves/dsp/Engine.h"
 
-class Engine;
+// class Engine;
 
 class DrumEngine: public Engine
 {

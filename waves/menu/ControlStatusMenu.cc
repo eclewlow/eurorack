@@ -81,25 +81,25 @@ void ControlStatusMenu::paint() {
     int text_gap = 7;
     Display::LCD_Circle(x_offset, y_offset, radius, true);
     Display::put_string_5x5(x_offset - strlen("TUNE") * 6 / 2, y_offset - radius - text_gap, strlen("TUNE"), "TUNE");
-    angle = 2 * M_PI * ((1.0f - tune / 4095.0f) * 300.0f - 60.0f) / 360.0f;
+    angle = 2 * M_PI * ((1.0f - tune / 65535.0f) * 300.0f - 60.0f) / 360.0f;
     Display::LCD_Line(x_offset, y_offset, radius * cos(angle) + x_offset, y_offset - radius * sin(angle), true);
     
     x_offset += gap + radius * 2;
     Display::LCD_Circle(x_offset, y_offset, radius, true);
     Display::put_string_5x5(x_offset - strlen("AMT") * 6 / 2, y_offset - radius - text_gap, strlen("AMT"), "AMT");
-    angle = 2 * M_PI * ((1.0f - fx_amount / 4095.0f) * 300.0f - 60.0f) / 360.0f;
+    angle = 2 * M_PI * ((1.0f - fx_amount / 65535.0f) * 300.0f - 60.0f) / 360.0f;
     Display::LCD_Line(x_offset, y_offset, radius * cos(angle) + x_offset, y_offset - radius * sin(angle), true);
 
     x_offset += gap + radius * 2;
     Display::LCD_Circle(x_offset, y_offset, radius, true);
     Display::put_string_5x5(x_offset - strlen("FX") * 6 / 2, y_offset - radius - text_gap, strlen("FX"), "FX");
-    angle = 2 * M_PI * ((1.0f - fx / 4095.0f) * 300.0f - 60.0f) / 360.0f;
+    angle = 2 * M_PI * ((1.0f - fx / 65535.0f) * 300.0f - 60.0f) / 360.0f;
     Display::LCD_Line(x_offset, y_offset, radius * cos(angle) + x_offset, y_offset - radius * sin(angle), true);
 
     x_offset += gap + radius * 2;
     Display::LCD_Circle(x_offset, y_offset, radius, true);
     Display::put_string_5x5(x_offset - strlen("MORPH") * 6 / 2, y_offset - radius - text_gap, strlen("MORPH"), "MORPH");
-    angle = 2 * M_PI * ((1.0f - morph / 4095.0f) * 300.0f - 60.0f) / 360.0f;
+    angle = 2 * M_PI * ((1.0f - morph / 65535.0f) * 300.0f - 60.0f) / 360.0f;
     Display::LCD_Line(x_offset, y_offset, radius * cos(angle) + x_offset, y_offset - radius * sin(angle), true);
 
     int row_gap = 4;

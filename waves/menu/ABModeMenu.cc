@@ -51,8 +51,8 @@ void ABModeMenu::triggerUpdate(bool back_pressed) {
 
         flash.StartFrameDMARead((uint32_t*)left_wavetable_names_, 16 * 9, 0, NULL, EEPROM_PERSISTENT_SS);
         flash.StartFrameDMARead((uint32_t*)right_wavetable_names_, 16 * 9, 0, NULL, EEPROM_PERSISTENT_SS);
-        flash.StartFrameDMARead((uint32_t*)left_frame_names_, 16 * 9, 16 * 9 + 16 * 9 * left_wavetable_, NULL, EEPROM_PERSISTENT_SS);
-        flash.StartFrameDMARead((uint32_t*)right_frame_names_, 16 * 9, 16 * 9 + 16 * 9 * right_wavetable_, NULL, EEPROM_PERSISTENT_SS);
+        flash.StartFrameDMARead((uint32_t*)left_frame_names_, 16 * 9, 4096 + 4096 * left_wavetable_, NULL, EEPROM_PERSISTENT_SS);
+        flash.StartFrameDMARead((uint32_t*)right_frame_names_, 16 * 9, 4096 + 4096 * right_wavetable_, NULL, EEPROM_PERSISTENT_SS);
 
         return;
     }
@@ -91,8 +91,8 @@ void ABModeMenu::triggerUpdate(bool back_pressed) {
 
     flash.StartFrameDMARead((uint32_t*)left_wavetable_names_, 16 * 9, 0, NULL, EEPROM_PERSISTENT_SS);
     flash.StartFrameDMARead((uint32_t*)right_wavetable_names_, 16 * 9, 0, NULL, EEPROM_PERSISTENT_SS);
-    flash.StartFrameDMARead((uint32_t*)left_frame_names_, 16 * 9, 16 * 9 + 16 * 9 * left_wavetable_, NULL, EEPROM_PERSISTENT_SS);
-    flash.StartFrameDMARead((uint32_t*)right_frame_names_, 16 * 9, 16 * 9 + 16 * 9 * right_wavetable_, NULL, EEPROM_PERSISTENT_SS);
+    flash.StartFrameDMARead((uint32_t*)left_frame_names_, 16 * 9, 4096 + 4096 * left_wavetable_, NULL, EEPROM_PERSISTENT_SS);
+    flash.StartFrameDMARead((uint32_t*)right_frame_names_, 16 * 9, 4096 + 4096 * right_wavetable_, NULL, EEPROM_PERSISTENT_SS);
 }
 //AB_NONE,
 //AB_LOAD_HOVER,
@@ -256,7 +256,7 @@ bool ABModeMenu::handleKeyRelease(int key) {
                 context.setState(&waveEditor);
                 break;
             case AB_SELECT_WAVETABLE:
-                flash.StartFrameDMARead((uint32_t*)left_frame_names_, 16 * 9, 16 * 9 + 16 * 9 * left_wavetable_, ABModeMenu::on_load_left_frame_names_finished, EEPROM_PERSISTENT_SS);
+                flash.StartFrameDMARead((uint32_t*)left_frame_names_, 16 * 9, 4096 + 4096 * left_wavetable_, ABModeMenu::on_load_left_frame_names_finished, EEPROM_PERSISTENT_SS);
                 // left_state_ = AB_SELECT_FRAME;
                 // ResetTicker(0);
                 // if(left_wavetable_ != abEngine.GetLeftWavetable()) {
@@ -370,7 +370,7 @@ bool ABModeMenu::handleKeyRelease(int key) {
                 context.setState(&waveEditor);
                 break;
             case AB_SELECT_WAVETABLE:
-                flash.StartFrameDMARead((uint32_t*)right_frame_names_, 16 * 9, 16 * 9 + 16 * 9 * right_wavetable_, ABModeMenu::on_load_right_frame_names_finished, EEPROM_PERSISTENT_SS);
+                flash.StartFrameDMARead((uint32_t*)right_frame_names_, 16 * 9, 4096 + 4096 * right_wavetable_, ABModeMenu::on_load_right_frame_names_finished, EEPROM_PERSISTENT_SS);
                 // right_state_ = AB_SELECT_FRAME;
                 // ResetTicker(1);
                 // if(right_wavetable_ != abEngine.GetRightWavetable()) {

@@ -10,15 +10,15 @@
 
 #pragma once
 
-#include "waves/dsp/fx/effect.h"
-#include "waves/dsp/fx/effect_manager.h"
+// #include "waves/dsp/fx/effect.h"
+// #include "waves/dsp/fx/effect_manager.h"
 #include "waves/defines.h"
 #include "waves/drivers/audio_dac.h"
 #include "stmlib/dsp/units.h"
 #include "stmlib/dsp/parameter_interpolator.h"
 #include "waves/resources.h"
 
-using namespace waves;
+namespace waves {
 
 static const float kCorrectedSampleRate = 47872.34f;
 const float a0 = (440.0f / 8.0f) / kCorrectedSampleRate;
@@ -100,3 +100,5 @@ protected:
     // Engine& operator=(Engine const&);
     // DISALLOW_COPY_AND_ASSIGN (Engine);
 };
+
+}

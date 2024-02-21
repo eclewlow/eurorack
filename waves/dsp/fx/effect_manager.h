@@ -11,6 +11,9 @@
 #pragma once
 
 #include "waves/dsp/fx/effect.h"
+#include "waves/Globals.h"
+
+namespace waves {
 
 class EffectManager {
 public:
@@ -60,3 +63,6 @@ private:
     EffectManager& operator=(EffectManager const&);
     // DISALLOW_COPY_AND_ASSIGN (EffectManager);
 };
+
+
+}

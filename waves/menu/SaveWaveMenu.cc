@@ -32,6 +32,8 @@ void SaveWaveMenu::triggerUpdate(bool back_pressed) {
         wavetable_ = 0;
         frame_ = 0;
         frame_offset_ = 0;
+        flash.StartFrameDMARead((uint32_t*)wavetable_names_, 16 * 9, 0, NULL, EEPROM_PERSISTENT_SS);
+        flash.StartFrameDMARead((uint32_t*)frame_names_, 16 * 9, 4096 + 4096 * wavetable_, NULL, EEPROM_PERSISTENT_SS);
         return;
     }
     if(wavetable_ < wavetable_offset_) {
@@ -49,6 +51,9 @@ void SaveWaveMenu::triggerUpdate(bool back_pressed) {
     if(frame_ > frame_offset_ + 5) {
         frame_offset_ = frame_ - 5;
     }
+
+    flash.StartFrameDMARead((uint32_t*)wavetable_names_, 16 * 9, 0, NULL, EEPROM_PERSISTENT_SS);
+    flash.StartFrameDMARead((uint32_t*)frame_names_, 16 * 9, 4096 + 4096 * wavetable_, NULL, EEPROM_PERSISTENT_SS);
     
     ResetTicker();
 
@@ -155,10 +160,11 @@ bool SaveWaveMenu::handleKeyRelease(int key) {
                 setState(SAVE_WAVE_MENU_SELECT_FRAME);
                 frame_ = 0;
                 frame_offset_ = 0;
+                flash.StartFrameDMARead((uint32_t*)frame_names_, 16 * 9, 4096 + 4096 * wavetable_, NULL, EEPROM_PERSISTENT_SS);
 //                }
                 break;
             case SAVE_WAVE_MENU_SELECT_FRAME: {
-                if(storage.GetWavetable(wavetable_)->factory_preset) {
+                if(false) { //storage.GetWavetable(wavetable_)->factory_preset) {
                     popup.show();
                     popup.SetLine(0, (char*)"CANNOT OVERWRITE");
                     popup.SetLine(1, (char*)"FACTORY PRESETS!");
@@ -196,11 +202,20 @@ bool SaveWaveMenu::handleKeyRelease(int key) {
 }
 
 void SaveWaveMenu::SaveWavetable(char* param) {
-    storage.SaveWavetable(param, saveWaveMenu.wavetable_);
+    // storage.SaveWavetable(param, saveWaveMenu.wavetable_);
+    strncpy(saveWaveMenu.wavetable_names_[saveWaveMenu.wavetable_], param, 9);
+    flash.SectorErase4K(0, EEPROM_PERSISTENT_SS);
+    flash.Page_Program_Repeat((uint8_t *)saveWaveMenu.wavetable_names_, 16 * 9, 0, EEPROM_PERSISTENT_SS);
 }
 
 void SaveWaveMenu::SaveWave(char* param) {
-    storage.SaveWave(param, saveWaveMenu.wavedata_, saveWaveMenu.wavetable_, saveWaveMenu.frame_);
+    // storage.SaveWave(param, saveWaveMenu.wavedata_, saveWaveMenu.wavetable_, saveWaveMenu.frame_);
+    strncpy(saveWaveMenu.frame_names_[saveWaveMenu.frame_], param, 9);
+    flash.SectorErase4K(4096 + 4096 * saveWaveMenu.wavetable_, EEPROM_PERSISTENT_SS);
+    flash.Page_Program_Repeat((uint8_t *)saveWaveMenu.frame_names_, 16 * 9, 4096 + 4096 * saveWaveMenu.wavetable_, EEPROM_PERSISTENT_SS);
+
+    flash.SectorErase4K(saveWaveMenu.wavetable_ * 65536 + saveWaveMenu.frame_ * 4096, EEPROM_FACTORY_SS);
+    flash.Page_Program_Repeat((uint8_t *)saveWaveMenu.wavedata_, 4096, saveWaveMenu.wavetable_ * 65536 + saveWaveMenu.frame_ * 4096, EEPROM_FACTORY_SS);
 }
 
 void SaveWaveMenu::paint() {
@@ -232,7 +247,7 @@ void SaveWaveMenu::paint() {
 //                strncpy(line2, "+NEW WAVETABLE", strlen("+NEW WAVETABLE"));
 //            }
 //            else {
-            snprintf(line2, 20, "%-8s    [%02d]", storage.GetWavetable(i + wavetable_offset_)->name, storage.GetNumberOfWavesInTable(i + wavetable_offset_));
+            snprintf(line2, 20, "%-8s    [%02d]", wavetable_names_[i + wavetable_offset_], 5);
 //            }
             
             Display::put_string_5x5(2 + 2 * 3 + 4, y_offset + i * 8, strlen(line2), line2, i+wavetable_offset_ == wavetable_);
@@ -246,7 +261,7 @@ void SaveWaveMenu::paint() {
 
     } else {
         char * title = (char *) "SELECT WAVE SLOT";
-        title = storage.GetWavetable(wavetable_)->name;
+        title = wavetable_names_[wavetable_];
 
         int y_offset = 3;
         int x_offset = 1 + 2 * 4;
@@ -265,13 +280,13 @@ void SaveWaveMenu::paint() {
             Display::put_string_3x5(2, y_offset + i * 8, strlen(line), line);
             
             
-            char * name = storage.GetWavetable(wavetable_)->waves[i + frame_offset_].name;
+            char * name = frame_names_[i + frame_offset_];
             
             char * line2 = name;
             
             int32_t elapsed_time = system_clock.milliseconds() - ticker_timer_;
             
-            int8_t num_chars = 7;
+            uint8_t num_chars = 7;
             
             if(i + frame_offset_ == frame_) {
                 if(ticker_ == 0) {
@@ -300,7 +315,15 @@ void SaveWaveMenu::paint() {
         Display::outline_rectangle(x_offset+1, y_offset + 1 - y_shift + y_cursor_offset, 1, 3);
         Display::invert_rectangle(x_offset, y_offset - y_shift, 3, bar_height);
 
-        storage.LoadWaveSample(BUF1, wavetable_, frame_);
+        if(wavetable_gui_ != wavetable_ && frame_gui_ != frame_) {
+            // load double frame. draw double frame
+            flash.StartFrameDMARead((uint32_t*)front_buffer_4, 4096, wavetable_ * 65536 + frame_ * 4096, NULL, EEPROM_FACTORY_SS);
+            wavetable_gui_ = wavetable_;
+            frame_gui_ = frame_;
+        }
+        abEngine.FillWaveform(BUF1, 0.0f);
+
+        // storage.LoadWaveSample(BUF1, wavetable_, frame_);
 
         Display::Draw_Wave(64, y_offset - y_shift, 64, bar_height - 3, BUF1);
     }

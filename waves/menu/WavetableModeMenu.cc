@@ -31,6 +31,8 @@ void WavetableModeMenu::triggerUpdate(bool back_pressed) {
     if(wavetable_ > wavetable_offset_ + 2) {
         wavetable_offset_ = wavetable_ - 2;
     }
+
+    flash.StartFrameDMARead((uint32_t*)wavetable_names_, 16 * 9, 0, NULL, EEPROM_PERSISTENT_SS);
 }
 
 bool WavetableModeMenu::handleKeyRelease(int key) {
@@ -71,11 +73,23 @@ void WavetableModeMenu::paint() {
     Display::clear_screen();
 
     int y_offset = 5;
-    int x_offset = 1 + 2 * 4;
+    // int x_offset = 1 + 2 * 4;
 
-    uint16_t morph = adc.getChannelProcessed(3);
+    float morph = adc.getChannelProcessed(3) / 65536.0f;
 
-    storage.LoadWaveSample(BUF1, wavetable_, morph * 1.0f / 4095.0f);
+    uint8_t frame = morph * 15.0f;
+
+    if(wavetable_gui_ != wavetable_ && frame_gui_ != frame) {
+        // load double frame. draw double frame
+        flash.StartFrameDMARead((uint32_t*)front_buffer_4, 8192, wavetable_ * 65536 + frame * 4096, NULL, EEPROM_FACTORY_SS);
+        wavetable_gui_ = wavetable_;
+        frame_gui_ = frame;
+    }
+    // storage.LoadWaveSample(BUF1, wavetable_, morph_);
+
+    abEngine.FillWaveform(BUF1, morph);
+
+    // storage.LoadWaveSample(BUF1, wavetable_, morph * 1.0f / 4095.0f);
     
     y_offset = 0;
     
@@ -86,7 +100,7 @@ void WavetableModeMenu::paint() {
     y_offset += 31;
     
     Display::outline_rectangle(0, y_offset, 128, 4);
-    Display::outline_rectangle(1 + 123 * (morph * 1.0f / 4095.0f), y_offset+1, 3, 2);
+    Display::outline_rectangle(1 + 123 * morph, y_offset+1, 3, 2);
 
     y_offset += 7;
     
@@ -105,7 +119,8 @@ void WavetableModeMenu::paint() {
         snprintf(line, 20, "%*d", 2, i + wavetable_offset_ + 1);
         Display::put_string_3x5(2, y_offset + i * 8, strlen(line), line);
         
-        char * name = storage.GetWavetable(i + wavetable_offset_)->name;
+        // char * name = storage.GetWavetable(i + wavetable_offset_)->name;
+        char * name = wavetable_names_[i + wavetable_offset_];
 
         char line2[20];
         memset(line2, 0, 20);

@@ -375,7 +375,7 @@ void FxMenu::paint() {
 
     if(effect_manager.getControlType() == MANUAL_CONTROL) {
         char pot_value_string[4];
-        snprintf(pot_value_string, 4, "%d", (fx * 100) / 4095);
+        snprintf(pot_value_string, 4, "%d", (fx * 100) / 65535);
         Display::put_string_9x9(64 + (64-3) / 2 - Display::get_string_9x9_width(pot_value_string, 2) / 2, graph_y_offset + graph_height / 2 - 4, strlen(pot_value_string), pot_value_string, false, 2);
     }
     else if(effect_manager.getControlType() == INTERNAL_MODULATOR) {
@@ -439,7 +439,7 @@ void FxMenu::paint() {
                 snprintf(rs_strings, 5, "X%.0f", ratio);
             Display::put_string_5x5(64 + 6*6+1, depth_y_offset, strlen(rs_strings), rs_strings, right_state_ == FX_MENU_RIGHT_RATIO);
         } else {
-            float frequency = pow(2, ((15.0 * fx) / 4095.0) - 3.0f);
+            float frequency = pow(2, ((15.0 * fx) / 65535.0) - 3.0f);
             
             Display::put_string_5x5(64, depth_y_offset, strlen(" FREQ:"), " FREQ:");
             

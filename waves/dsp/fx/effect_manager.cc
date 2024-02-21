@@ -8,8 +8,12 @@
   ==============================================================================
 */
 
-#include "waves/dsp/fx/effect_manager.h"
+// #include "waves/dsp/fx/effect_manager.h"
+// #include "waves/defines.h"
 #include "waves/Globals.h"
+
+
+namespace waves {
 
 void EffectManager::Init() {
 }
@@ -78,7 +82,7 @@ float EffectManager::RenderSampleEffect(float sample, float phase, float phase_i
     }
     return sample;
 }
-float EffectManager::RenderPhaseEffect(float phase, float phase_increment, uint16_t fx_amount, uint16_t fx, bool isOscilloscope, bool downsampling) {
+float EffectManager::RenderPhaseEffect(float phase, float phase_increment, uint16_t fx_amount, uint16_t fx, bool isOscilloscope) {
 
     switch(settings_.fx_effect) {
         case EFFECT_TYPE_BYPASS:
@@ -195,3 +199,5 @@ void EffectManager::setScale(int scale) { settings_.fx_scale = CLAMP<int>(scale,
 
 int EffectManager::getRange() { return settings_.fx_range; }
 void EffectManager::setRange(int range) { settings_.fx_range = CLAMP<int>(range, 1, 10); }
+
+}

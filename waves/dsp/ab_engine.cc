@@ -116,7 +116,7 @@ float ABEngine::GetSampleBetweenFrames(float phase, float morph) {
 void ABEngine::FillWaveform(int16_t * waveform, uint16_t tune, uint16_t fx_amount, uint16_t fx, uint16_t morph, bool withFx) {
     float frequency = 23.4375;
 
-    float phaseIncrement = frequency / 48000.0f;
+    float phaseIncrement = frequency / kCorrectedSampleRate;
     
     float temp_phase = 0.0f;
     
@@ -131,7 +131,7 @@ void ABEngine::FillWaveform(int16_t * waveform, uint16_t tune, uint16_t fx_amoun
         if(withFx)
             calculated_phase = effect_manager.RenderPhaseEffect(temp_phase, frequency, fx_amount, fx, true);
         
-        float sample = GetSampleBetweenFrames(calculated_phase, thisX);
+        float sample = GetSampleBetweenFramesNoDMA(calculated_phase, thisX);
         
         if(withFx)
             sample = effect_manager.RenderSampleEffect(sample, temp_phase, frequency, fx_amount, fx, true);
@@ -211,10 +211,11 @@ int16_t ABEngine::GetSampleBetweenFramesNoDMA(float phase, float morph) {
 
     return sample;
 }
-int16_t ABEngine::FillWaveform(int16_t * waveform, float morph) {
+
+void ABEngine::FillWaveform(int16_t * waveform, float morph) {
     float frequency = 23.4375;
 
-    float phaseIncrement = frequency / 48000.0f;
+    float phaseIncrement = frequency / kCorrectedSampleRate;
     
     float temp_phase = 0.0f;
 
@@ -248,8 +249,8 @@ void ABEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, uint1
 
     ParameterInterpolator morph_interpolator(&morph_, morphTarget, size);
     // ParameterInterpolator tune_interpolator(&tune_, tuneTarget, size);
-    Downsampler carrier_downsampler(&carrier_fir_);
-    Downsampler sub_carrier_downsampler(&sub_carrier_fir_);
+    // Downsampler carrier_downsampler(&carrier_fir_);
+    // Downsampler sub_carrier_downsampler(&sub_carrier_fir_);
 
 
     // TODO:  interpolate phase_increment instead of tune.  pass in phase increment to effects-functions instead of frequency.

@@ -90,12 +90,12 @@ void MemoryClearMenu::paint() {
         int16_t x_offset = 2;
         y_offset = 20 + (64 - 20) / 2 - 14 * 3 / 2;
 
-        char line[20];
+        // char line[20];
         
 //        int wavetable_count = 32;
 //        int snapshot_count = 4;
         
-        int center = 128 / 2;
+        // int center = 128 / 2;
 
         y_offset += 7;
 

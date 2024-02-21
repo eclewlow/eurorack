@@ -31,6 +31,11 @@ private:
     int16_t wavetable_offset_;
     int16_t wavetable_;
 
+    char wavetable_names_[16][9];
+
+    int wavetable_gui_;
+    int frame_gui_;
+
     DISALLOW_COPY_AND_ASSIGN (WavetableModeMenu);
 };
 

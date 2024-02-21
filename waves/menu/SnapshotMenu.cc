@@ -335,7 +335,7 @@ void SnapshotMenu::paint() {
 
             int32_t elapsed_time = system_clock.milliseconds() - ticker_timer_;
 
-            int8_t num_chars = 6;
+            uint8_t num_chars = 6;
 
             if(i + snapshot_offset_ == snapshot_) {
                 if(ticker_ == 0) {

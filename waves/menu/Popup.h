@@ -27,7 +27,7 @@ public:
     void SetLine(int line_no, char* str);
 private:
     uint32_t timer_;
-    int32_t timer_length_;
+    uint32_t timer_length_;
     char lines_[3][20];
     bool is_showing_;
     DISALLOW_COPY_AND_ASSIGN (Popup);

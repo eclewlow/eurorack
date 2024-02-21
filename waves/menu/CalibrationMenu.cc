@@ -77,7 +77,7 @@ void CalibrationMenu::paint() {
     
     y_offset += 6;
     char line[20];
-    snprintf(line, 20, "%1.3fV", (tune / 4095.0f) * 8.0f);
+    snprintf(line, 20, "%1.3fV", (tune / 65535.0f) * 8.0f);
     Display::put_string_5x5(128 - strlen(line) * 6, y_offset, strlen(line), line);
 
     
