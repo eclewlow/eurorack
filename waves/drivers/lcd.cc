@@ -278,32 +278,34 @@ void LCD::Init() {
   SPI_Cmd(SPI3, ENABLE);
 
 
-  // DMA_InitTypeDef dma_init;
+  DMA_InitTypeDef dma_init;
 
   // // SPI TX
-  // dma_init.DMA_Channel = DMA_Channel_0;
-  // dma_init.DMA_PeripheralBaseAddr = (uint32_t)&(SPI3->DR);
-  // dma_init.DMA_Memory0BaseAddr = (uint32_t)(lcd_buffer[0]);
-  // dma_init.DMA_DIR = DMA_DIR_MemoryToPeripheral;
-  // dma_init.DMA_BufferSize = 0;
-  // dma_init.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
-  // dma_init.DMA_MemoryInc = DMA_MemoryInc_Enable;
-  // dma_init.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
-  // dma_init.DMA_MemoryDataSize = DMA_MemoryDataSize_Byte;
-  // dma_init.DMA_Mode = DMA_Mode_Normal;
+  dma_init.DMA_Channel = DMA_Channel_0;
+  dma_init.DMA_PeripheralBaseAddr = (uint32_t)&(SPI3->DR);
+  dma_init.DMA_Memory0BaseAddr = (uint32_t)(0);
+  dma_init.DMA_DIR = DMA_DIR_MemoryToPeripheral;
+  dma_init.DMA_BufferSize = 0;
+  dma_init.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
+  dma_init.DMA_MemoryInc = DMA_MemoryInc_Enable;
+  dma_init.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
+  dma_init.DMA_MemoryDataSize = DMA_MemoryDataSize_Byte;
+  dma_init.DMA_Mode = DMA_Mode_Normal;
+  dma_init.DMA_Priority = DMA_Priority_High;
+  // DMA_Priority_Low
   // dma_init.DMA_Priority = DMA_Priority_High;
-  // dma_init.DMA_FIFOMode = DMA_FIFOMode_Disable;
-  // dma_init.DMA_FIFOThreshold = DMA_FIFOThreshold_1QuarterFull;
-  // dma_init.DMA_MemoryBurst = DMA_MemoryBurst_Single;
-  // dma_init.DMA_PeripheralBurst = DMA_PeripheralBurst_Single;
-  // DMA_Init(DMA1_Stream5, &dma_init);
+  dma_init.DMA_FIFOMode = DMA_FIFOMode_Disable;
+  dma_init.DMA_FIFOThreshold = DMA_FIFOThreshold_1QuarterFull;
+  dma_init.DMA_MemoryBurst = DMA_MemoryBurst_Single;
+  dma_init.DMA_PeripheralBurst = DMA_PeripheralBurst_Single;
+  DMA_Init(DMA1_Stream5, &dma_init);
 
-  // DMA_ITConfig(DMA1_Stream5, DMA_IT_TC, ENABLE);
+  DMA_ITConfig(DMA1_Stream5, DMA_IT_TC, ENABLE);
 
-  // // SPI_I2S_DMACmd(SPI3, SPI_I2S_DMAReq_Tx, ENABLE);
+  // SPI_I2S_DMACmd(SPI3, SPI_I2S_DMAReq_Tx, ENABLE);
 
   // // Enable the IRQ.
-  // NVIC_EnableIRQ(DMA1_Stream5_IRQn);
+  NVIC_EnableIRQ(DMA1_Stream5_IRQn);
 }
 
 void LCD::StartDMARead(uint16_t __bytes) {
@@ -652,6 +654,11 @@ void LCD::StartDMAWrite() {
 
   Set_Page_Address(page_);
   Set_Column_Address(0x00);
+
+
+  HIGH(LCD_CMD);
+
+  LOW(LCD_SS);
 
   DMA_SetCurrDataCounter(DMA1_Stream5, 128);
   DMA1_Stream5->M0AR = (int)(Display::framebuffer[page_]);
