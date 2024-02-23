@@ -28,6 +28,7 @@
 // Initializes the I2S port as SPI, and relies on a timer for clock generation.
 
 #include "waves/drivers/lcd.h"
+#include "waves/Display.h"
 
 namespace waves {
 
@@ -182,6 +183,7 @@ void LCD::Init() {
   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
+  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI3, ENABLE);
   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA1, ENABLE);
   
@@ -192,7 +194,7 @@ void LCD::Init() {
   GPIO_InitTypeDef gpio_init;
   gpio_init.GPIO_Mode = GPIO_Mode_OUT;
   gpio_init.GPIO_OType = GPIO_OType_PP;
-  gpio_init.GPIO_Speed = GPIO_Speed_50MHz;
+  gpio_init.GPIO_Speed = GPIO_Speed_2MHz;
   gpio_init.GPIO_PuPd = GPIO_PuPd_NOPULL;
   gpio_init.GPIO_Pin = GPIO_Pin_15;
   GPIO_Init(GPIOA, &gpio_init);
@@ -200,10 +202,10 @@ void LCD::Init() {
   // Initialize CMD NSS pin.
   gpio_init.GPIO_Mode = GPIO_Mode_OUT;
   gpio_init.GPIO_OType = GPIO_OType_PP;
-  gpio_init.GPIO_Speed = GPIO_Speed_50MHz;
+  gpio_init.GPIO_Speed = GPIO_Speed_2MHz;
   gpio_init.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  gpio_init.GPIO_Pin = GPIO_Pin_4;
-  GPIO_Init(GPIOB, &gpio_init);
+  gpio_init.GPIO_Pin = GPIO_Pin_2;
+  GPIO_Init(GPIOD, &gpio_init);
 
   // miso - NO MASTER IN
   // gpio_init.GPIO_Mode = GPIO_Mode_AF;
@@ -216,7 +218,7 @@ void LCD::Init() {
   // RESET
   gpio_init.GPIO_Mode = GPIO_Mode_OUT;
   gpio_init.GPIO_OType = GPIO_OType_PP;
-  gpio_init.GPIO_Speed = GPIO_Speed_50MHz;
+  gpio_init.GPIO_Speed = GPIO_Speed_2MHz;
   gpio_init.GPIO_PuPd = GPIO_PuPd_NOPULL;
   gpio_init.GPIO_Pin = GPIO_Pin_11;
   GPIO_Init(GPIOC, &gpio_init);
@@ -241,7 +243,7 @@ void LCD::Init() {
   // mosi
   gpio_init.GPIO_Mode = GPIO_Mode_AF;
   gpio_init.GPIO_OType = GPIO_OType_PP;
-  gpio_init.GPIO_Speed = GPIO_Speed_50MHz;
+  gpio_init.GPIO_Speed = GPIO_Speed_2MHz;
   gpio_init.GPIO_PuPd = GPIO_PuPd_NOPULL;
   gpio_init.GPIO_Pin = GPIO_Pin_12;
   GPIO_Init(GPIOC, &gpio_init);
@@ -249,7 +251,7 @@ void LCD::Init() {
   // // clock
   gpio_init.GPIO_Mode = GPIO_Mode_AF;
   gpio_init.GPIO_OType = GPIO_OType_PP;
-  gpio_init.GPIO_Speed = GPIO_Speed_50MHz;
+  gpio_init.GPIO_Speed = GPIO_Speed_2MHz;
   gpio_init.GPIO_PuPd = GPIO_PuPd_NOPULL;
   gpio_init.GPIO_Pin = GPIO_Pin_10;
   GPIO_Init(GPIOC, &gpio_init);
@@ -387,7 +389,7 @@ void LCD::Write_Instruction(uint8_t byte) {
 
   LOW(LCD_CMD);
 
-  LOW(LCD_CLOCK);
+  // LOW(LCD_CLOCK);
 
   LOW(LCD_SS);
 
@@ -413,11 +415,11 @@ void LCD::Write_Instruction(uint8_t byte) {
 }
 
 
-void LCD::Write_Data(uint8_t byte)
+void LCD::Write_Data(uint8_t * data, uint32_t size)
 {
   HIGH(LCD_CMD);
 
-  LOW(LCD_CLOCK);
+  // LOW(LCD_CLOCK);
 
   LOW(LCD_SS);
 
@@ -427,7 +429,7 @@ void LCD::Write_Data(uint8_t byte)
   // __asm__("nop");
   // __asm__("nop");
 
-  Write(&byte, 1);
+  Write(data, size);
 
   while (SPI_I2S_GetFlagStatus(SPI3, SPI_I2S_FLAG_BSY));
 
@@ -469,8 +471,8 @@ void LCD::Initial() {
   // referential c code
   Write_Instruction(0xa2); // set 1/9 bias
   Write_Instruction(0xa0); // seg normal direction
-  Write_Instruction(0xc0); // com reverse direction
-  // Write_Instruction(0xc8); // com reverse direction
+  // Write_Instruction(0xc0); // com reverse direction
+  Write_Instruction(0xc8); // com reverse direction
 
   Write_Instruction(0x20 | 0x4); // regulation ratio 5.0 (0x4)
 
@@ -544,7 +546,7 @@ void LCD::Display_Picture(uint8_t pic[])
     Set_Column_Address(0x00);
         for(j=0;j<0x80;j++)
     {
-        Write_Data(pic[i*0x80+j]);
+        Write_Data(&pic[i*0x80+j], 1);
     }
   }
     return;
@@ -556,16 +558,21 @@ void LCD::Display(uint8_t test[8][128])
   // uint8_t a[8][128];
   // memset(a, 0, 128*8);
   // a[4][64] = 255;
-  unsigned char page = 0, column = 0;
+  // unsigned char page = 0, column = 0;
   Initial_Dispay_Line(0x40);
-  for(page = 0; page < 8; page++)
+  for(unsigned char page = 0; page < 8; page++)
   {
     Set_Page_Address(page);
     Set_Column_Address(0x00);
-    for(column = 0; column < 128; column++)
-    {
-        Write_Data(test[page][column]);
-    }
+
+    // Wait<800>();
+    Write_Data(test[page], 128);
+
+    // for(unsigned char column = 0; column < 128; column++)
+    // {
+    //     // Wait<100>();
+    //     // Write_Data(test[page][column], 1);
+    // }
   }
   Write_Instruction(0xaf);
     return;
@@ -639,18 +646,15 @@ void LCD::Draw() {
 
 void LCD::StartDMAWrite() {
 
-  LOW(LCD_CMD);
-  LOW(LCD_SS);
+  if(page_ == 0) {
+    Initial_Dispay_Line(0x40);
+  }
 
-  uint8_t send_buf = 0xB0 + page_;
-
-  Write(&send_buf, 1);
-
-  HIGH(LCD_SS);
-  HIGH(LCD_CMD);
+  Set_Page_Address(page_);
+  Set_Column_Address(0x00);
 
   DMA_SetCurrDataCounter(DMA1_Stream5, 128);
-  DMA1_Stream5->M0AR = (int)(lcd_buffer[page_]);
+  DMA1_Stream5->M0AR = (int)(Display::framebuffer[page_]);
   DMA_Cmd(DMA1_Stream5, ENABLE);
   SPI_I2S_DMACmd(SPI3, SPI_I2S_DMAReq_Tx, ENABLE);
 
@@ -712,6 +716,7 @@ void DMA1_Stream5_IRQHandler(void) {
     } else {
       waves::LCD::GetInstance()->set_page(0);
       waves::LCD::GetInstance()->StopDMA();
+      waves::LCD::GetInstance()->Write_Instruction(0xaf);
     }
     // SetFlag(&_EREG_, _TXTC_, FLAG_SET);
 

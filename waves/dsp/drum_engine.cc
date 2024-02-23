@@ -234,7 +234,7 @@ void DrumEngine::triggerUpdate() {
     current_frame_ = 1;
     target_frame_ = 0;
 
-    flash.StopDMA(true);
+    // flash.StopDMA(true);
     flash.StartFrameDMARead((uint32_t*)back_buffer_1, 8192, target_frame_ * 4096, DrumEngine::on_load_finished);
 }
 

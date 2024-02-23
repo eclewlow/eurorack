@@ -41,23 +41,12 @@ void System::Init(bool application) {
   // IWDG_SetPrescaler(IWDG_Prescaler_32);
 
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE);
-  // RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);
-  // RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);
-
-  // RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
-
-  // GPIO_InitTypeDef gpio_init;
-  // gpio_init.GPIO_Mode = GPIO_Mode_OUT;
-  // gpio_init.GPIO_OType = GPIO_OType_PP;
-  // gpio_init.GPIO_Speed = GPIO_Speed_25MHz;
-  // gpio_init.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  // gpio_init.GPIO_Pin = GPIO_Pin_1;
-  // GPIO_Init(GPIOB, &gpio_init);
 
   TIM_TimeBaseInitTypeDef timer_init;
   // timer_init.TIM_Period = F_CPU / 1000 - 1;
   // timer_init.TIM_Prescaler = 0;
-  timer_init.TIM_Period = 850-1;
+  timer_init.TIM_Period = 1666-1;
+  // timer_init.TIM_Period = 50000-1;
   timer_init.TIM_Prescaler = (uint16_t) ((SystemCoreClock / 2) / 25000) - 1;
   // timer_init.TIM_Period = 50000-1;
   // timer_init.TIM_Prescaler = (uint16_t) ((SystemCoreClock / 2) / 25000) - 1;
@@ -70,7 +59,7 @@ void System::Init(bool application) {
   
   NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);  // 2.2 priority split.
   
-  // DAC interrupt is given highest priority
+  // // DAC interrupt is given highest priority
   NVIC_InitTypeDef timer_interrupt;
   timer_interrupt.NVIC_IRQChannel = TIM1_UP_TIM10_IRQn;
   timer_interrupt.NVIC_IRQChannelPreemptionPriority = 0;
@@ -81,7 +70,6 @@ void System::Init(bool application) {
 
 void System::StartTimers() {
   TIM_ITConfig(TIM1, TIM_IT_Update, ENABLE);  
-  // IWDG_Enable();
   SysTick_Config(F_CPU / 1000);
 }
 

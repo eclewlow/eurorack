@@ -138,7 +138,7 @@ void TIM1_UP_TIM10_IRQHandler(void) {
   }
   TIM1->SR = (uint16_t)~TIM_IT_Update;
   
-  counter++;
+  // counter++;
 
   // if(counter > 48000)
     // counter++;
@@ -154,7 +154,7 @@ void TIM1_UP_TIM10_IRQHandler(void) {
   // int16_t sample = flash.LoadWaveSample(0, 0, 0);
   // ITM_SendChar('h');
 
-  char value[80];
+  // char value[80];
 
 
 
@@ -184,10 +184,10 @@ void TIM1_UP_TIM10_IRQHandler(void) {
     //   flash.w25qxx.Capacity = buf;
     // }
 
-  uint32_t  sample1 = 0;
+  // uint32_t  sample1 = 0;
   // int16_t sample2 = 0;
 
-  uint8_t status = 0;
+  // uint8_t status = 0;
   // status = flash.ReadStatusRegister(EEPROM_FACTORY_SS);
 
   // sample1 = flash.w25qxx.ID;
@@ -202,8 +202,8 @@ void TIM1_UP_TIM10_IRQHandler(void) {
   // sample = adc.value(0);
   // int16_t * buffer = (int16_t *)dataBuffer;
 
-  sample1 += 0;
-  status += 0;
+  // sample1 += 0;
+  // status += 0;
   // snprintf(value, 80, "c=%d, m=%lu, s=%08lx, %08lx\n", counter, system_clock.milliseconds(), sample1, __REV(dataBuffer[0]));
   // _write(0, (char*)value, 80);
 // union fourbyte {
@@ -236,24 +236,23 @@ void TIM1_UP_TIM10_IRQHandler(void) {
   // loading = adc.getChannel(2);
   // loading = flash.ReadStatusRegister(EEPROM_FACTORY_SS);
   // memcpy(&result, dataBuffer, 2);
-  loading = front_buffer_1[counter % 10];
+  // loading = front_buffer_1[counter % 10];
   // snprintf(value, 80, "c=%d, s=%d, frame=%d, %d\n", counter, loading, frame_integral, front_buffer[(2048 - 20) + counter%20]);
-  snprintf(value, 80, "l=%ld, busy=%d, rxne=%d, %d\n", (int32_t)loading, GetFlag(&_EREG_, _BUSY_), GetFlag(&_EREG_, _RXNE_), (int16_t)counter);
+  // snprintf(value, 80, "l=%ld, busy=%d, rxne=%d, %d\n", (int32_t)loading, GetFlag(&_EREG_, _BUSY_), GetFlag(&_EREG_, _RXNE_), (int16_t)counter);
   // snprintf(value, 80, "%08lx\n", dataBuffer[0]);
   // snprintf(value, 80, "buf=%04x, db=%08lx\n, %08lx", buffer[0], dataBuffer[0], flash.w25qxx.ID);
   // snprintf(value, 40, "f=%d\n", static_cast<int>(phase*100.0f));
   // sample += 1;
-  _write(0, (char*)value, 80);
+  // _write(0, (char*)value, 80);
 
   // Display::clear_screen();
   // Display::LCD_Line(64, 32, 64 + 10*sin(radians), 32 + 10*cos(radians), true);
   mainMenu.paint();
-
   lcd.Display(Display::framebuffer);
 
-  radians += 2 * M_PI / 1200;
-  if(radians > 2 * M_PI)
-    radians -= 2 * M_PI;
+  // radians += 2 * M_PI / 1200;
+  // if(radians > 2 * M_PI)
+  //   radians -= 2 * M_PI;
 
   // lcd.swap_picture();
       // GPIO_ResetBits(GPIOA, kPinFactorySS);
@@ -336,9 +335,16 @@ float swap_increment = 1.0f / 10000.0f;
 float phase_increment = (440.0f) / 47992.0f;
 
 // SNAPSHOT settings_;
+// int ui_count = 0;
 
 void FillBuffer(AudioDac::Frame* output, size_t size) {
 
+  // ui_count++;
+  // if(ui_count > 1600) {
+  //   mainMenu.paint();
+  //   lcd.Display(Display::framebuffer);
+  //   ui_count = 0;
+  // }
 
   // Downsampler carrier_downsampler(&carrier_fir_);
 

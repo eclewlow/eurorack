@@ -58,6 +58,14 @@ void MatrixEngine::Init() {
     // SUBOSC_WAVE_SQUARE
     // SUBOSC_WAVE_COPY
     subosc_wave_ = SUBOSC_WAVE_SINE;
+    subosc_wave_ = SUBOSC_WAVE_SINE;
+    fx_depth_ = 1.0f;
+    fx_sync_ = false;
+    fx_scale_ = 0;
+    fx_range_ = 1;
+    fx_oscillator_shape_ = SINE_SHAPE;
+    fx_control_type_ = INTERNAL_MODULATOR;
+    fx_effect_ = EFFECT_TYPE_FM;
 }
 
 float MatrixEngine::GetSample(int16_t wavetable, int16_t frame, float phase) {
@@ -89,11 +97,13 @@ float MatrixEngine::GetSample(int16_t wavetable, int16_t frame, float phase) {
 
 void MatrixEngine::on_triple_load_1_finished() {
     SetFlag(&_EREG_, _RXNE_, FLAG_CLEAR);
+    SetFlag(&_EREG_, _BUSY_, FLAG_CLEAR);
     flash.StartFrameDMARead((uint32_t*)matrix_back_buffer_2, 12288, (matrixEngine.target_frame_y + 1) * 65536 + (matrixEngine.target_frame_x) * 4096, MatrixEngine::on_triple_load_2_finished);
 }
 
 void MatrixEngine::on_triple_load_2_finished() {
     SetFlag(&_EREG_, _RXNE_, FLAG_CLEAR);
+    SetFlag(&_EREG_, _BUSY_, FLAG_CLEAR);
     flash.StartFrameDMARead((uint32_t*)matrix_back_buffer_3, 12288, (matrixEngine.target_frame_y + 2) * 65536 + (matrixEngine.target_frame_x) * 4096, MatrixEngine::on_triple_load_3_finished);
 }
 
@@ -112,6 +122,7 @@ void MatrixEngine::on_load_1_finished() {
     // y morphs between wavetables  morph
     
     SetFlag(&_EREG_, _RXNE_, FLAG_CLEAR);
+    SetFlag(&_EREG_, _BUSY_, FLAG_CLEAR);
     flash.StartFrameDMARead((uint32_t*)back_buffer_2, 8192, (matrixEngine.target_frame_y + 1) * 65536 + (matrixEngine.target_frame_x) * 4096, MatrixEngine::on_load_2_finished);
 }
 
@@ -175,21 +186,6 @@ float MatrixEngine::GetSampleBetweenFrames(float phase, float morph_x, float mor
                 flash.StartFrameDMARead((uint32_t*)matrix_back_buffer_1, 12288, (target_frame_y) * 65536 + (target_frame_x) * 4096, MatrixEngine::on_triple_load_1_finished);
             }
         }
-        /* check fractional */
-        // >= 0.5 is closer to 1. < 0.5 is closer to 0
-        // check first which is closer to 0/1, x or y fractional.
-        // basically trigger dma if the back buffered frame doesn't match the calculated 
-
-        // else if(frame_x_fractional < 0.5 && frame_x_integral > current_frame_x + 1 && buffered_frame_x != current_frame_x + 1 && current_frame_x < GetX2() - 2) {
-        //     target_frame_x = current_frame_x + 1;
-        //     target_frame_y = current_frame_y;
-        //     flash.StartFrameDMARead((uint32_t*)matrix_back_buffer_1, 12288, (target_frame_y) * 65536 + (target_frame_x) * 4096, MatrixEngine::on_triple_load_1_finished);
-        // }
-        // else if(frame_x_fractional >= 0.5 && frame_x_integral == current_frame_x && buffered_frame_x != current_frame_x - 1 && current_frame_x > GetX1()) {
-        //     target_frame_x = current_frame_x - 1;
-        //     target_frame_y = current_frame_y;
-        //     flash.StartFrameDMARead((uint32_t*)matrix_back_buffer_1, 12288, (target_frame_y) * 65536 + (target_frame_x) * 4096, MatrixEngine::on_triple_load_1_finished);
-        // }
     }
 
     if(frame_y_integral <= current_frame_y) {
@@ -367,8 +363,8 @@ void MatrixEngine::Render(AudioDac::Frame* output, size_t size, uint16_t tune, u
     ParameterInterpolator morph_interpolator(&morph_, morphTarget, size);
     ParameterInterpolator fx_interpolator(&fx_, fxTarget, size);
     // ParameterInterpolator tune_interpolator(&tune_, tuneTarget, size);
-    Downsampler carrier_downsampler(&carrier_fir_);
-    Downsampler sub_carrier_downsampler(&sub_carrier_fir_);
+    // Downsampler carrier_downsampler(&carrier_fir_);
+    // Downsampler sub_carrier_downsampler(&sub_carrier_fir_);
 
     // float note = (120.0f * tune_interpolator.Next()) / 4095.0;
     float note = tuneTarget * calibration_x_ + calibration_y_;

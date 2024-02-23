@@ -280,6 +280,8 @@ void Flash::StopDMA(bool bypass) {
     SetFlag(&_EREG_, _RXNE_, FLAG_CLEAR);
     SetFlag(&_EREG_, _BUSY_, FLAG_CLEAR);    
   }
+
+  // set_on_dma_read_finished_func(NULL);
 }
 
 }  // namespace waves

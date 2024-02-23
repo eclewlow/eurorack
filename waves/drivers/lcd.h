@@ -256,7 +256,7 @@ void Display(uint8_t pic[8][128]);
 void Initial_Dispay_Line(uint8_t line);
 void Set_Page_Address(uint8_t add);
 void Set_Column_Address(uint8_t add);
-void Write_Data(uint8_t byte);
+void Write_Data(uint8_t * data, uint32_t size);
 
 inline uint8_t get_page() { return page_; }
 inline void increment_page() { page_++ ; }
