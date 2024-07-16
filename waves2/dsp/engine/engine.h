@@ -8,8 +8,8 @@
   ==============================================================================
 */
 
-#ifndef WAVES_2_DSP_ENGINE_TEST_H
-#define WAVES_2_DSP_ENGINE_TEST_H
+#ifndef WAVES_2_DSP_ENGINE_ENGINE_H
+#define WAVES_2_DSP_ENGINE_ENGINE_H
 
 #include "stmlib/utils/buffer_allocator.h"
 
