@@ -26,14 +26,14 @@
 
 #include "stmlib/system/system_clock.h"
 #include "waves2/drivers/system.h"
-#include "waves2/dsp/test_context.h"
+#include "waves2/dsp/context.h"
 
 using namespace waves2;
 using namespace std;
 using namespace stmlib;
 
-TestContext context;
-TestMenu mainMenuTest;
+Context context;
+ChildA childA;
 char shared_buffer[16384];
 
 extern "C" {
@@ -62,27 +62,20 @@ void Init() {
 
   sys.StartTimers();
 
-  // HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
-
   GPIO_ResetBits(GPIOA, GPIO_Pin_5);
 
   BufferAllocator allocator(shared_buffer, 16384);
   context.Init(&allocator);
 
-  mainMenuTest.Paint();
-  Move* e = &mainMenuTest;
+  childA.Paint();
+  Engine* e = &childA;
 
   volatile size_t counter = 1000000;
   while (counter--);
 
   e->Paint();
-// if(false) {
-//   e->Paint();
-// }
-  GPIO_SetBits(GPIOA, GPIO_Pin_5);
 
-  // GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_13);
-  // system_clock.milliseconds();
+  GPIO_SetBits(GPIOA, GPIO_Pin_5);
 
 }
 
@@ -90,15 +83,10 @@ int main(void) {
   Init();
   while (1) {
     // context.Paint();
-
-  //     if(GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_13) > 0) {
-  //     }
-
-      if((system_clock.milliseconds() / 1000) % 2 < 1) {
-    GPIO_SetBits(GPIOA, GPIO_Pin_5);
-  } else {
-    GPIO_ResetBits(GPIOA, GPIO_Pin_5);
-  }
-
+    if((system_clock.milliseconds() / 1000) % 2 < 1) {
+      GPIO_SetBits(GPIOA, GPIO_Pin_5);
+    } else {
+      GPIO_ResetBits(GPIOA, GPIO_Pin_5);
+    }
   }
 }

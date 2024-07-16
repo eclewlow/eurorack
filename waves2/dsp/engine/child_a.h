@@ -8,25 +8,25 @@
   ==============================================================================
 */
 
-#ifndef WAVES_2_DSP_ENGINE_TEST_FIVE_H
-#define WAVES_2_DSP_ENGINE_TEST_FIVE_H
+#ifndef WAVES_2_DSP_ENGINE_CHILD_A_H
+#define WAVES_2_DSP_ENGINE_CHILD_A_H
 
-#include "waves2/dsp/engine/test.h"
+#include "waves2/dsp/engine/engine.h"
 
 namespace waves2 {
 
-class TestFive: public Move
+class ChildA: public Engine
 {
 public:
 
-    TestFive() { }
-    ~TestFive() { }
+    ChildA() { }
+    ~ChildA() { }
 
     virtual void Init(stmlib::BufferAllocator* allocator);
     virtual void Paint();
 
 private:
-    DISALLOW_COPY_AND_ASSIGN(TestFive);
+    DISALLOW_COPY_AND_ASSIGN(ChildA);
 };
 
 }

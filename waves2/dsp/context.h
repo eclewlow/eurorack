@@ -8,25 +8,25 @@
   ==============================================================================
 */
 
-#ifndef WAVES_2_DSP_TEST_CONTEXT_H
-#define WAVES_2_DSP_TEST_CONTEXT_H
+#ifndef WAVES_2_DSP_CONTEXT_H
+#define WAVES_2_DSP_CONTEXT_H
 
 #include "stmlib/stmlib.h"
 
 #include "stmlib/utils/buffer_allocator.h"
 
-#include "waves2/dsp/engine/test.h"
-#include "waves2/dsp/engine/test_menu.h"
-#include "waves2/dsp/engine/test_five.h"
+#include "waves2/dsp/engine/engine.h"
+#include "waves2/dsp/engine/child_a.h"
+#include "waves2/dsp/engine/child_b.h"
 
 namespace waves2 {
 
 const int kMaxEngines = 24;
 
-class TestContext {
+class Context {
 public:
-    TestContext() {}
-    ~TestContext() {}
+    Context() {}
+    ~Context() {}
         
     void Init(stmlib::BufferAllocator* allocator);
     void Paint();
@@ -36,9 +36,9 @@ private:
     uint8_t index_;
     bool was_pressed_;
     EngineRegistry<kMaxEngines> engines_;
-    TestMenu mainMenuTest_;
-    TestFive test_five_;
-    DISALLOW_COPY_AND_ASSIGN(TestContext);
+    ChildA childA_;
+    ChildA childB_;
+    DISALLOW_COPY_AND_ASSIGN(Context);
 };
 
 }

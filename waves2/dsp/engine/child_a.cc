@@ -10,16 +10,16 @@
 
 #include <stm32f4xx_conf.h>
 #include "stmlib/system/system_clock.h"
-#include "waves2/dsp/engine/test_five.h"
+#include "waves2/dsp/engine/child_a.h"
 
 namespace waves2 {
 
 using namespace stmlib;
 
-void TestFive::Init(BufferAllocator* allocator) {
+void ChildA::Init(BufferAllocator* allocator) {
 }
 
-void TestFive::Paint() {
+void ChildA::Paint() {
 
 	// GPIO_ToggleBits(GPIOA, GPIO_Pin_5);
 	// toggle every 5 seconds

@@ -15,12 +15,11 @@
 
 namespace waves2 {
 
-class Move {
+class Engine {
 public:
-    Move() {}
-    ~Move() {}
+    Engine() {}
+    ~Engine() {}
     virtual void Init(stmlib::BufferAllocator* allocator) = 0;
-    // virtual void Init() = 0;
     virtual void Paint() = 0;
 };
 
@@ -34,11 +33,11 @@ class EngineRegistry {
     num_engines_ = 0;
   }
 
-  inline Move* get(int index) {
+  inline Engine* get(int index) {
     return engine_[index];
   }
   
-  void RegisterInstance(Move* instance) {
+  void RegisterInstance(Engine* instance) {
     if (num_engines_ >= max_size) {
       return;
     }
@@ -49,7 +48,7 @@ class EngineRegistry {
   inline int size() const { return num_engines_; }
 
  private:
-  Move* engine_[max_size];
+  Engine* engine_[max_size];
   int num_engines_;
 };
 
