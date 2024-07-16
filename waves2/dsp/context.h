@@ -37,7 +37,7 @@ private:
     bool was_pressed_;
     EngineRegistry<kMaxEngines> engines_;
     ChildA childA_;
-    ChildA childB_;
+    ChildB childB_;
     DISALLOW_COPY_AND_ASSIGN(Context);
 };
 
