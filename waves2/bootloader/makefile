@@ -13,6 +13,8 @@ UPLOAD_COMMAND  = upload_jtag_erase_first
 TARGET         = waves2_bootloader
 PACKAGES       = waves2/bootloader \
 		waves2/drivers \
+		waves2/dsp \
+		waves2/dsp/engine \
 		stmlib/dsp \
 		stmlib/utils \
 		stmlib/system

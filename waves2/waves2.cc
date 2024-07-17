@@ -45,12 +45,12 @@ void Init() {
   context.Init(&allocator);
 
   childA.Paint();
-  Engine* e = &childA;
+  // Engine* e = &childA;
 
   volatile size_t counter = 1000000;
   while (counter--);
 
-  e->Paint();
+  // e->Paint();
 
   GPIO_SetBits(GPIOA, GPIO_Pin_5);
 

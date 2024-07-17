@@ -4,6 +4,7 @@ F_CRYSTAL      = 8000000L
 F_CPU          = 168000000L
 SYSCLOCK       = SYSCLK_FREQ_168MHz
 FAMILY         = f4xx
+DENSITY        = md
 # USB            = enabled
 # EXTRA_DEFINES  = -DSTM32F446xx
 

@@ -27,7 +27,7 @@ void Context::Init(BufferAllocator* allocator) {
   for (int i = 0; i < engines_.size(); ++i) {
     // All engines will share the same RAM space.
     allocator->Free();
-    // engines_.get(i)->Init(allocator);
+    engines_.get(i)->Init(allocator);
   }
 
   index_ = 0;

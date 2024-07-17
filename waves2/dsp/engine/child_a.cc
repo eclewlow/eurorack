@@ -17,12 +17,14 @@ namespace waves2 {
 using namespace stmlib;
 
 void ChildA::Init(BufferAllocator* allocator) {
+	GPIO_SetBits(GPIOA, GPIO_Pin_5);
 }
 
 void ChildA::Paint() {
 
 	// GPIO_ToggleBits(GPIOA, GPIO_Pin_5);
 	// toggle every 5 seconds
+	// GPIO_SetBits(GPIOA, GPIO_Pin_5);
 	// if((system_clock.milliseconds() / 1000) % 2 < 1) {
 	// 	GPIO_SetBits(GPIOA, GPIO_Pin_5);
 	// } else {
