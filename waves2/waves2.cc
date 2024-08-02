@@ -42,10 +42,10 @@ void Init() {
   GPIO_ResetBits(GPIOA, GPIO_Pin_5);
 
   BufferAllocator allocator(shared_buffer, 16384);
-  context.Init(&allocator);
+  // context.Init(&allocator);
 
   childA.Paint();
-  // Engine* e = &childA;
+  Engine* e = &childA;
 
   volatile size_t counter = 1000000;
   while (counter--);

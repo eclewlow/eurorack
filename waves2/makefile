@@ -4,9 +4,14 @@ F_CRYSTAL      = 8000000L
 F_CPU          = 168000000L
 SYSCLOCK       = SYSCLK_FREQ_168MHz
 FAMILY         = f4xx
-DENSITY        = md
 # USB            = enabled
 # EXTRA_DEFINES  = -DSTM32F446xx
+
+# F_CRYSTAL      = 8000000L
+# F_CPU          = 72000000L
+# SYSCLOCK       = SYSCLK_FREQ_72MHz
+# FAMILY         = f37x
+
 
 APPLICATION_LARGE = TRUE
 BOOTLOADER        = waves2_bootloader
@@ -27,6 +32,7 @@ PACKAGES       = waves2 \
 RESOURCES      = waves2/resources
 
 TOOLCHAIN_PATH ?= /usr/local/arm-4.8.3/
+# TOOLCHAIN_PATH ?= /usr/local/arm-5.3.1/
 
 include stmlib/makefile.inc
 

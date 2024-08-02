@@ -20,5 +20,6 @@ PACKAGES       = waves2/bootloader \
 		stmlib/system
 
 TOOLCHAIN_PATH ?= /usr/local/arm-4.8.3/
+# TOOLCHAIN_PATH ?= /usr/local/arm-5.3.1/
 
 include stmlib/makefile.inc
